@@ -7,17 +7,6 @@ import (
 	"syscall"
 )
 
-// ControlEvaluation is a struct that contains all assessment results, organized by name
-type ControlEvaluation struct {
-	Name              string        // Name is the name of the control being evaluated
-	Control_Id        string        // Control_Id is the unique identifier for the control being evaluated
-	Result            Result        // Result is the overall result of the control evaluation
-	Message           string        // Message is the human-readable result of the final assessment to run in this evaluation
-	Corrupted_State   bool          // Corrupted_State is true if the control evaluation was interrupted and changes were not reverted
-	Remediation_Guide string        // Remediation_Guide is the URL to the documentation for this evaluation
-	Assessments       []*Assessment // Assessments is a map of pointers to Assessment objects to establish idempotency
-}
-
 func (c *ControlEvaluation) AddAssessment(requirementId string, description string, applicability []string, steps []AssessmentStep) (assessment *Assessment) {
 	assessment, err := NewAssessment(requirementId, description, applicability, steps)
 	if err != nil {
