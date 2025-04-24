@@ -1,5 +1,18 @@
 package layer4
 
+import "github.com/revanite-io/sci/layer2"
+
+// ForControlRequirement creates a new Assessment for a given control requirement.
+func ForControlRequirement(controlID string, requirement layer2.AssessmentRequirement) *Assessment {
+	return &Assessment{
+		RequirementID: requirement.Id,
+	}
+}
+
+func (a *Assessment) AddAssessmentMethod(method AssessmentMethod) {
+	a.Methods = append(a.Methods, method)
+}
+
 // AssessmentStep is a function type that inspects the provided targetData and returns a Result with a message.
 // The message may be an error string or other descriptive text.
 // type AssessmentStep func(payload interface{}, c map[string]*Change) (Result, string)
@@ -19,20 +32,6 @@ package layer4
 
 // func (as AssessmentStep) MarshalYAML() (interface{}, error) {
 // 	return as.String(), nil
-// }
-
-// // NewAssessment creates a new Assessment object and returns a pointer to it.
-// func NewAssessment(requirementId string, methods []AssessmentMethod) (*Assessment, error) {
-// 	a := &Assessment{
-// 		RequirementID: requirementId,
-// 		Methods:       []AssessmentMethod{},
-// 	}
-// 	err := a.precheck()
-// 	return a, err
-// }
-
-// func (a *Assessment) AddMethod(method AssessmentMethod) {
-// 	a.Methods = append(a.Methods, method)
 // }
 
 // func (a *Assessment) runStep(targetData interface{}, step AssessmentStep) Result {
@@ -96,7 +95,7 @@ package layer4
 // }
 
 // func (a *Assessment) precheck() error {
-// 	if a.Requirement_Id == "" || a.Description == "" || a.Applicability == nil || a.Steps == nil || len(a.Applicability) == 0 || len(a.Steps) == 0 {
+// 	if a.RequirementID == "" || a.Description == "" || a.Applicability == nil || a.Steps == nil || len(a.Applicability) == 0 || len(a.Steps) == 0 {
 // 		message := fmt.Sprintf(
 // 			"expected all Assessment fields to have a value, but got: requirementId=len(%v), description=len=(%v), applicability=len(%v), steps=len(%v)",
 // 			len(a.Requirement_Id), len(a.Description), len(a.Applicability), len(a.Steps),

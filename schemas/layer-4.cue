@@ -37,6 +37,7 @@ import "time"
 
 // AssessmentMethod describes the method used to assess the layer 2 control requirement referenced by requirementID.
 #AssessmentMethod: {
+    @go(-) // ignored for go struct generation as it does not currently deal with struct disjunction in a useful manner
     // Name is the name of the method used to assess the requirement.
     name: string
     // Description is a detailed explanation of the method.

@@ -2,18 +2,30 @@
 
 package layer4
 
-// Evaluation is a collection of evaluations of the framework controls and their requirements.
+import (
+	"time"
+)
+
+// Top level schema //
+// Evaluation is a collection of assessments of the framework controls and their requirements.
 type Evaluation struct {
-	// name of the framework being evaluated, ex: NIST 800-53, CCC, OSPS, etc.
-	// TODO: why materialize/duplicate this data here if a consumer can simply reference the layer 2 data?
+	// name is a descriptive identifier for the evaluation
 	Name string `json:"name"`
 
-	// frameworkID contains the unique identifier of the framework being evaluated
-	// TODO: in the case of versioned frameworks (ex: NIST 800-53), should we expect the version to be part of the ID?
-	FrameworkID string `json:"frameworkID"`
+	// ID of the Layer 2 Catalog being evaluated in this evaluation
+	CatalogID string `json:"catalog_id"`
+
+	// timestamp of when the evaluation execution began. If the field is not provided, the evaluation has not been executed yet.
+	StartTime time.Time `json:"start_time,omitempty"`
+
+	// timestamp of when the evaluation execution ended. If the field is not provided, the evaluation has not been executed yet.
+	EndTime time.Time `json:"end_time,omitempty"`
+
+	// will be true when the evaluation execution changed the evaluated service and could not successfully revert
+	CorruptedState bool `json:"corrupted_state"`
 
 	// one or more evaluations of the framework controls
-	Evaluations []ControlEvaluation `json:"evaluations"`
+	ControlEvaluations []ControlEvaluation `json:"control_evaluations"`
 }
 
 // URL describes a specific subset of URLs of interest to the framework
@@ -22,41 +34,29 @@ type URL string
 
 // ControlEvaluation describes the evaluation of the layer 2 control referenced by controlID and the assessment of that control's requirements.
 type ControlEvaluation struct {
-	// name of the control being evaluated
-	// TODO: why materialize/duplicate this data here if a consumer can simply reference the layer 2 data?
-	Name string `json:"name"`
-
 	// ID of the layer 2 control being evaluated
-	ControlID string `json:"controlID"`
+	ControlID string `json:"control_id"`
 
-	// TODO: should there also be a frameworkID here to make a ControlEvaluation more self-contained?
-	// one or more assessments of the control requirements
-	// TODO: should it be 0 or more to account for an evaluation where planning is "in-progress" for which assessments should be run?
+	// one or more assessments for each of the control's requirements
 	Assessments []Assessment `json:"assessments"`
 }
 
 // Assessment describes the evaluation of layer 2 control requirement referenced by requirementID and the assessment methods used to assess that requirement.
 type Assessment struct {
-	// TODO: should there also be frameworkID and controlID here to make a Assessment more self-contained?
-	// ID of the layer 2 control requirement being evaluated
-	RequirementID string `json:"requirementID"`
+	// ID of the Layer 2 Control's Requirement being evaluated
+	RequirementID string `json:"requirement_id"`
 
 	// the methods used to assess the requirement
 	Methods []AssessmentMethod `json:"methods"`
 }
 
-// AssessmentMethod describes the method used to assess the layer 2 control requirement referenced by requirementID.
-//
-// See https://cuelang.org/docs/tour/types/sumstruct/
-type AssessmentMethod struct {
-}
-
 // AssessmentResult describes the result of the assessment of a layer 2 control requirement.
-//   - passed when all evidence suggests the control is met
-//   - failed when some evidence suggests the control is not met
-//   - needs_review when evidence was gathered but cannot be reliably interpreted to reach a decision. A human should review the evidence gathered
-//   - error when the method failed to execute
 type AssessmentResult struct {
+	// status describes what happened when the assessment method was run
+	//   - passed when all evidence suggests the control is met
+	//   - failed when some evidence suggests the control is not met
+	//   - needs_review when evidence was gathered but cannot be reliably interpreted to reach a decision. A human should review the evidence gathered
+	//   - error when the method failed to execute
 	Status Status `json:"status"`
 
 	// TODO: I can imagine assessment methods potentially making more than a single change, perhaps this should be a list
@@ -71,7 +71,8 @@ type Status string
 type Change struct {
 	// TODO: document all fields here with more clarity once we have one or more examples of existing usage/dependency/necessity
 	// target name is ¯\_(ツ)_/¯
-	// TODO: update to `@go(TargetName)` when https://github.com/cue-lang/cue/commit/93c1421c23ac8d5ddc8910a9186f5b94e5252ea9 releases in cue > v0.12.1
+	TargetName string `json:"target_name"`
+
 	// applied describes whether the change was applied to the system(s) under assessment
 	Applied bool `json:"applied"`
 
@@ -82,5 +83,5 @@ type Change struct {
 	Error string `json:"error,omitempty"`
 
 	// target object is ¯\_(ツ)_/¯
-	// TODO: update to go(TargetObject) when https://github.com/cue-lang/cue/commit/93c1421c23ac8d5ddc8910a9186f5b94e5252ea9 releases in cue > v0.12.1
+	TargetObject any/* CUE top */ `json:"target_object,omitempty"`
 }

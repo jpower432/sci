@@ -1,5 +1,11 @@
 package layer2
 
+import (
+	"testing"
+
+	"github.com/stretchr/testify/assert"
+)
+
 // This file contains table tests for the following functions:
 // - loadYaml
 // - LoadControlFamily
@@ -11,12 +17,6 @@ package layer2
 // - LoadCapability (placeholder, pending implementation)
 
 // The test data is pulled from ./test-data.yaml
-
-import (
-	"testing"
-
-	"github.com/stretchr/testify/assert"
-)
 
 var tests = []struct {
 	name       string
