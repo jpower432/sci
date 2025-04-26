@@ -21,9 +21,6 @@ package schemas
 
 // ControlEvaluation describes the evaluation of the layer 2 control referenced by controlID and the assessment of that control's requirements.
 #ControlEvaluation: {
-    // name of the control being evaluated
-    // TODO: why materialize/duplicate this data here if a consumer can simply reference the layer 2 data?
-    name: string
     // ID of the layer 2 control being evaluated
     controlID: string
     // TODO: should there also be a frameworkID here to make a ControlEvaluation more self-contained?
@@ -50,7 +47,7 @@ package schemas
     description: string
     // Run is a boolean indicating whether the method was run or not. When run is true, result is expected to be present.
     run: bool
-    // Remediation guide is a ¯\_(ツ)_/¯
+    // Remediation guide is a URL to remediation guidance associated with the control's assessment requirement and this specific assessment method.
     remediation_guide?: #URL
 }
 
@@ -69,11 +66,12 @@ package schemas
 }
 
 // AssessmentResult describes the result of the assessment of a layer 2 control requirement.
-//  * passed when all evidence suggests the control is met
-//  * failed when some evidence suggests the control is not met
-//  * needs_review when evidence was gathered but cannot be reliably interpreted to reach a decision. A human should review the evidence gathered
-//  * error when the method failed to execute
 #AssessmentResult: {
+    // status describes what happened when the assessment method was run
+    //  * passed when all evidence suggests the control is met
+    //  * failed when some evidence suggests the control is not met
+    //  * needs_review when evidence was gathered but cannot be reliably interpreted to reach a decision. A human should review the evidence gathered
+    //  * error when the method failed to execute
     status: #Status
     // TODO: I can imagine assessment methods potentially making more than a single change, perhaps this should be a list
     change?: #Change

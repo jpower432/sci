@@ -1,8 +1,6 @@
-name: Open Source Security Baseline
 frameworkID: OSPS
 evaluations:
-  - name: "OSPS BR Controls Evaluation"
-    controlID: "OSPS-BR-01"
+  - controlID: "OSPS-BR-01"
     assessments:
       - requirementID: "OSPS-BR-01.01"
         methods:
