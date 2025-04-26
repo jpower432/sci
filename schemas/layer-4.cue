@@ -12,7 +12,7 @@ package schemas
     // TODO: in the case of versioned frameworks (ex: NIST 800-53), should we expect the version to be part of the ID?
     frameworkID: string
     // one or more evaluations of the framework controls
-    evaluations: [#ControlEvaluation, ...#ControlEvaluation]
+    control_evaluations: [#ControlEvaluation, ...#ControlEvaluation]
 }
 
 // URL describes a specific subset of URLs of interest to the framework
@@ -22,7 +22,7 @@ package schemas
 // ControlEvaluation describes the evaluation of the layer 2 control referenced by controlID and the assessment of that control's requirements.
 #ControlEvaluation: {
     // ID of the layer 2 control being evaluated
-    controlID: string
+    control_id: string
     // TODO: should there also be a frameworkID here to make a ControlEvaluation more self-contained?
     // one or more assessments of the control requirements
     // TODO: should it be 0 or more to account for an evaluation where planning is "in-progress" for which assessments should be run?
@@ -31,16 +31,14 @@ package schemas
 
 // Assessment describes the evaluation of layer 2 control requirement referenced by requirementID and the assessment methods used to assess that requirement.
 #Assessment: {
-    // TODO: should there also be frameworkID and controlID here to make a Assessment more self-contained?
-    // ID of the layer 2 control requirement being evaluated
-    requirementID: string
+    // ID of the Layer 2 Control's Requirement being evaluated
+    requirement_id: string
     // the methods used to assess the requirement
     methods: [#AssessmentMethod, ...#AssessmentMethod]
 }
 
 // AssessmentMethod describes the method used to assess the layer 2 control requirement referenced by requirementID.
 #AssessmentMethod: {
-    // TODO: should there also be frameworkID and controlID here to make a AssessmentMethod more self-contained?
     // Name is the name of the method used to assess the requirement.
     name: string
     // Description is a detailed explanation of the method.
@@ -85,7 +83,7 @@ package schemas
 #Change: {
     // TODO: document all fields here with more clarity once we have one or more examples of existing usage/dependency/necessity
     // target name is ¯\_(ツ)_/¯
-    "target-name": string
+    target_name: string
     // applied describes whether the change was applied to the system(s) under assessment
     applied: bool
     // reverted describes whether the change was reverted from the system(s) under assessment
@@ -93,5 +91,5 @@ package schemas
     // error describes whether an error occurred during either the application or reversion of the change
     error?: string
     // target object is ¯\_(ツ)_/¯
-    "target-object"?: _
+    target_object?: _
 }
