@@ -1,18 +1,18 @@
 package schemas
 
+import "time"
+
 #Layer4: {
-    evaluations: [#ControlEvaluation, ...#ControlEvaluation]
-}
-
-// Types
-
-#ControlEvaluation: {
-    name: string
-    // frameworkID contains the unique identifier of the framework being evaluated
-    // TODO: in the case of versioned frameworks (ex: NIST 800-53), should we expect the version to be part of the ID?
-    frameworkID: string
+    // ID of the Layer 2 Catalog being evaluated in this evaluation
+    catalog_id: string @go(CatalogID)
+    // timestamp of when the evaluation execution began. If the field is not provided, the evaluation has not been executed yet.
+    start_time?: time.Time @go(StartTime)
+    // timestamp of when the evaluation execution ended. If the field is not provided, the evaluation has not been executed yet.
+    end_time?: time.Time @go(EndTime)
+    // will be true when the evaluation execution changed the evaluated service and could not successfully revert
+    corrupted_state: bool @go(CorruptedState)
     // one or more evaluations of the framework controls
-    control_evaluations: [#ControlEvaluation, ...#ControlEvaluation]
+    evaluations: [#ControlEvaluation, ...#ControlEvaluation] @go(ControlEvaluations)
 }
 
 // URL describes a specific subset of URLs of interest to the framework
@@ -22,17 +22,15 @@ package schemas
 // ControlEvaluation describes the evaluation of the layer 2 control referenced by controlID and the assessment of that control's requirements.
 #ControlEvaluation: {
     // ID of the layer 2 control being evaluated
-    control_id: string
-    // TODO: should there also be a frameworkID here to make a ControlEvaluation more self-contained?
-    // one or more assessments of the control requirements
-    // TODO: should it be 0 or more to account for an evaluation where planning is "in-progress" for which assessments should be run?
+    control_id: string @go(ControlID)
+    // one or more assessments for each of the control's requirements
     assessments: [#Assessment, ...#Assessment]
 }
 
 // Assessment describes the evaluation of layer 2 control requirement referenced by requirementID and the assessment methods used to assess that requirement.
 #Assessment: {
     // ID of the Layer 2 Control's Requirement being evaluated
-    requirement_id: string
+    requirement_id: string @go(RequirementID)
     // the methods used to assess the requirement
     methods: [#AssessmentMethod, ...#AssessmentMethod]
 }
@@ -42,24 +40,28 @@ package schemas
     // Name is the name of the method used to assess the requirement.
     name: string
     // Description is a detailed explanation of the method.
-    description: string
+    description?: string
+    // URL to documentation that describes how the assessment method evaluates the control requirement.
+    documentation?: #URL
+    // Remediation guide is a URL to remediation guidance associated with the control's assessment requirement and this specific assessment method.
+    remediation_guide?: #URL @go(RemediationGuide)
     // Run is a boolean indicating whether the method was run or not. When run is true, result is expected to be present.
     run: bool
-    // Remediation guide is a URL to remediation guidance associated with the control's assessment requirement and this specific assessment method.
-    remediation_guide?: #URL
 }
 
 // See https://cuelang.org/docs/tour/types/sumstruct/
 #AssessmentMethod: {
     name: string
     description: string
-    run: false
+    documentation?: #URL
     remediation_guide?: #URL
+    run: false
 } | {
     name: string
     description: string
-    run: true
+    documentation?: #URL
     remediation_guide?: #URL
+    run: true
     result!: #AssessmentResult
 }
 
@@ -83,7 +85,7 @@ package schemas
 #Change: {
     // TODO: document all fields here with more clarity once we have one or more examples of existing usage/dependency/necessity
     // target name is ¯\_(ツ)_/¯
-    target_name: string
+    target_name: string @go(TargetName)
     // applied describes whether the change was applied to the system(s) under assessment
     applied: bool
     // reverted describes whether the change was reverted from the system(s) under assessment
@@ -91,5 +93,5 @@ package schemas
     // error describes whether an error occurred during either the application or reversion of the change
     error?: string
     // target object is ¯\_(ツ)_/¯
-    target_object?: _
+    target_object?: _ @go(TargetObject)
 }

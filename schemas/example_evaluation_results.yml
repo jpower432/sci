@@ -1,8 +1,9 @@
-frameworkID: OSPS
+catalog_id: OSPS
+corrupted_state: false
 evaluations:
-  - controlID: "OSPS-BR-01"
+  - control_id: "OSPS-BR-01"
     assessments:
-      - requirementID: "OSPS-BR-01.01"
+      - requirement_id: "OSPS-BR-01.01"
         methods:
           - name: "Manual review of CI pipelines used by the project"
             description: "Manually review the CI pipelines for proper handling of user-controlled build inputs."
@@ -15,7 +16,7 @@ evaluations:
             run: true
             result:
               status: needs_review
-      - requirementID: "OSPS-BR-01.02"
+      - requirement_id: "OSPS-BR-01.02"
         methods:
           - name: "Manual review of CI pipelines used by the project"
             description: "Manually review the CI pipelines for proper handling of branch-name build inputs."
