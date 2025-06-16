@@ -5,7 +5,7 @@ header:
   url: https://github.com/revanite-io/sci
 
 project:
-  name: "SCI: Simplified Compliance Infrastructure"
+  name: "Gemara: GRC Engineering Model for Automated Risk Assessment"
   administrators:
     - name: Eddie Knight
       affiliation: Sonatype
@@ -23,7 +23,7 @@ project:
     - name: sci
       url: https://github.com/revanite-io/sci
       comment: |
-        The main repository for the Simplified Compliance Infrastructure (SCI) project.
+        The main repository for the GRC Engineering Model for Automated Risk Assessment (Gemara) project.
         It contains the core codebase and documentation for the project.
   vulnerability-reporting:
     reports-accepted: false
