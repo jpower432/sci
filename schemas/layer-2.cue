@@ -72,6 +72,8 @@ package schemas
 #Mapping: {
     "reference-id": string @go(ReferenceId)
     identifiers: [...string]
+    // Adding context about this particular mapping and why it was mapped.
+    remarks?: string
 }
 
 #AssessmentRequirement: {

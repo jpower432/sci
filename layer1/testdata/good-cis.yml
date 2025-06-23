@@ -1,0 +1,38 @@
+# Source info - https://github.com/ComplianceAsCode/content/tree/a832787d169faed4966646ab8e2669505aa6fde4/linux_os/guide/system/software/integrity/crypto/configure_crypto_policy
+metadata:
+  id: CIS-RHEL
+  title: Example CIS RHEL Benchmark
+  description: An example representation of the CIS RHEL Benchmark
+  applicability-categories:
+    - id: L1Server
+      title: L1 Server
+      description: "Level 1 Server"
+    - id: L1Workstation
+      title: L1 Workstation
+      description: "Level 1 Workstation"
+  mapping-references:
+    - id: 800-53
+      title: Example NIST 800-53 Snippet
+      version: "0.1.0"
+      url: "https://raw.githubusercontent.com/revanite-io/sci/refs/heads/main/layer1/test-data/good-800-53.yaml"
+
+control-families:
+  - title: "Crypto Policy"
+    description: "Configure System Cryptography Policy"
+    controls:
+      - id: 1.6
+        title: Configure System Cryptography Policy
+        objective:
+        guideline-mappings:
+          - reference-id: 800-53
+            identifiers:
+              - cm-6_obj.a
+        assessment-requirements:
+          - id: 1.6.1
+            text: Ensure system wide crypto policy is not set to legacy
+            applicability:
+              - L1Server
+              - L1Workstation
+            recommendation: |
+              Run the following command:
+                sudo update-crypto-policies --set default_policy

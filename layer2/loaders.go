@@ -63,7 +63,7 @@ func loadJson(sourcePath string, data *Catalog) error {
 	return fmt.Errorf("loadJson not implemented [%s, %v]", sourcePath, data)
 }
 
-// LoadControlFamiliesFile loads data from any number of YAML
+// LoadFiles loads data from any number of YAML
 // files at the provided paths. JSON support is pending development.
 // If run multiple times, this method will append new data to previous data.
 func (c *Catalog) LoadFiles(sourcePaths []string) error {
@@ -80,7 +80,7 @@ func (c *Catalog) LoadFiles(sourcePaths []string) error {
 	return nil
 }
 
-// LoadControlFamiliesFile loads data from a single YAML
+// LoadFile loads data from a single YAML
 // file at the provided path. JSON support is pending development.
 // If run multiple times for the same data type, this method will override previous data.
 func (c *Catalog) LoadFile(sourcePath string) error {

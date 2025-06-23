@@ -1,0 +1,104 @@
+package layer1
+
+import (
+	"fmt"
+	"log"
+
+	"github.com/goccy/go-yaml"
+)
+
+func ExampleCatalog() {
+	l1catalog := Catalog{
+		Metadata: Metadata{
+			Id:          "800-53",
+			Title:       "Security and Privacy Controls for Information Systems and Organizations",
+			Description: "An example snippet of NIST 800-53",
+			Version:     "rev5",
+			IssuingBody: "NIST",
+			Resources: []ResourceReference{
+				{
+					Id:           "NIST_SP_800_53",
+					Title:        "NIST OSCAL Catalog",
+					Description:  "Upstream 800-53 Rev5 OSCAL Catalog",
+					Url:          "https://raw.githubusercontent.com/usnistgov/oscal-content/refs/heads/main/nist.gov/SP800-53/rev5/yaml/NIST_SP-800-53_rev5_catalog.yaml",
+					DocumentType: "Standard",
+					IssuingBody:  "NIST",
+				},
+			},
+		},
+		FrameworkSections: []FrameworkSection{
+			{
+				Title:       "Configuration Management",
+				Description: "Configuration Management Control Family",
+				Guidelines: []Guideline{
+					{
+						Id:    "cm-6",
+						Title: "Configuration Settings",
+						GuidanceSource: []Resource{
+							{
+								ReferenceId: "NIST_SP_800_53",
+								Remarks:     "Original text is specified in source catalog",
+							},
+						},
+						GuidelineParts: []*Guideline{
+							{
+								Id:           "cm-6_obj.a",
+								GuidanceText: "Establish and document configuration settings for components employed within the system that reflect the most restrictive mode consistent with operational requirements using common secure configurations",
+							},
+						},
+						GuidanceText: "Configuration settings are the parameters that can be changed in the hardware, software, or" +
+							" firmware components of the system that affect the security and privacy posture or functionality of the system. Information technology products for which" +
+							" configuration settings can be defined include mainframe computers, servers, workstations, operating systems, mobile devices, input/output devices, protocols," +
+							" and applications. Parameters that impact the security posture of systems include registry settings; account, file, or directory permission settings; and settings for" +
+							" functions, protocols, ports, services, and remote connections. Privacy parameters are parameters impacting the privacy posture of systems, including the parameters" +
+							" required to satisfy other privacy controls. Privacy parameters include settings for access controls, data processing preferences, and processing and retention permissions." +
+							" Organizations establish organization-wide configuration settings and subsequently derive specific configuration settings for systems." +
+							" The established settings become part of the configuration baseline for the system.\n\n" +
+							" Common secure configurations (also known as security configuration checklists, lockdown and hardening guides, and security reference guides) provide recognized, " +
+							"standardized, and established benchmarks that stipulate secure configuration settings for information technology products and platforms as well as instructions for configuring those" +
+							" products or platforms to meet operational requirements. Common secure configurations can be developed by a variety of organizations, including information technology product developers," +
+							" manufacturers, vendors, federal agencies, consortia, academia, industry, and other organizations in the public and private sectors.\n\n" +
+							" Implementation of a common secure configuration may be mandated at the organization level, mission and business process level, system level, or at a higher level, including by a " +
+							"regulatory agency. Common secure configurations include the United States Government Configuration Baseline [USGCB](#98498928-3ca3-44b3-8b1e-f48685373087) and security technical " +
+							"implementation guides (STIGs), which affect the implementation of [CM-6](#cm-6) and other controls such as [AC-19](#ac-19) and [CM-7](#cm-7) . " +
+							"The Security Content Automation Protocol (SCAP) and the defined standards within the protocol provide an effective method to uniquely identify, track, and control configuration settings.",
+					},
+				},
+			},
+		},
+	}
+
+	data, err := yaml.Marshal(l1catalog)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println(string(data))
+	// Output:
+	//metadata:
+	//   id: 800-53
+	//   title: Security and Privacy Controls for Information Systems and Organizations
+	//   description: An example snippet of NIST 800-53
+	//   version: rev5
+	//   issuing-body: NIST
+	//   resources:
+	//   - id: NIST_SP_800_53
+	//     title: NIST OSCAL Catalog
+	//     description: Upstream 800-53 Rev5 OSCAL Catalog
+	//     url: https://raw.githubusercontent.com/usnistgov/oscal-content/refs/heads/main/nist.gov/SP800-53/rev5/yaml/NIST_SP-800-53_rev5_catalog.yaml
+	//     document-type: Standard
+	//     issuing-body: NIST
+	//framework-sections:
+	//- title: Configuration Management
+	//   description: Configuration Management Control Family
+	//   guidelines:
+	//   - id: cm-6
+	//     title: Configuration Settings
+	//     guidance-text: "Configuration settings are the parameters that can be changed in the hardware, software, or firmware components of the system that affect the security and privacy posture or functionality of the system. Information technology products for which configuration settings can be defined include mainframe computers, servers, workstations, operating systems, mobile devices, input/output devices, protocols, and applications. Parameters that impact the security posture of systems include registry settings; account, file, or directory permission settings; and settings for functions, protocols, ports, services, and remote connections. Privacy parameters are parameters impacting the privacy posture of systems, including the parameters required to satisfy other privacy controls. Privacy parameters include settings for access controls, data processing preferences, and processing and retention permissions. Organizations establish organization-wide configuration settings and subsequently derive specific configuration settings for systems. The established settings become part of the configuration baseline for the system.\n\n Common secure configurations (also known as security configuration checklists, lockdown and hardening guides, and security reference guides) provide recognized, standardized, and established benchmarks that stipulate secure configuration settings for information technology products and platforms as well as instructions for configuring those products or platforms to meet operational requirements. Common secure configurations can be developed by a variety of organizations, including information technology product developers, manufacturers, vendors, federal agencies, consortia, academia, industry, and other organizations in the public and private sectors.\n\n Implementation of a common secure configuration may be mandated at the organization level, mission and business process level, system level, or at a higher level, including by a regulatory agency. Common secure configurations include the United States Government Configuration Baseline [USGCB](#98498928-3ca3-44b3-8b1e-f48685373087) and security technical implementation guides (STIGs), which affect the implementation of [CM-6](#cm-6) and other controls such as [AC-19](#ac-19) and [CM-7](#cm-7) . The Security Content Automation Protocol (SCAP) and the defined standards within the protocol provide an effective method to uniquely identify, track, and control configuration settings."
+	//     guidance-sources:
+	//     - reference-id: NIST_SP_800_53
+	//       remarks: Original text is specified in source catalog
+	//     guidelines-parts:
+	//     - id: cm-6_obj.a
+	//       guidance-text: Establish and document configuration settings for components employed within the system that reflect the most restrictive mode consistent with operational requirements using common secure configurations
+
+}

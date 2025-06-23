@@ -91,6 +91,9 @@ type Mapping struct {
 	ReferenceId	string	`json:"reference-id" yaml:"reference-id"`
 
 	Identifiers	[]string	`json:"identifiers" yaml:"identifiers"`
+
+	// Adding context about this particular mapping and why it was mapped.
+	Remarks	string	`json:"remarks,omitempty" yaml:"remarks,omitempty"`
 }
 
 type Threat struct {

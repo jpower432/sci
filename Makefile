@@ -69,6 +69,8 @@ lintcue:
 	@cue eval ./schemas/layer-2.cue --all-errors --verbose
 	@echo "  >  Linting layer-4.cue ..."
 	@cue eval ./schemas/layer-4.cue --all-errors --verbose
+	@echo "  >  Linting layer-1.cue ..."
+	@cue eval ./schemas/layer-1.cue --all-errors --verbose
 
 cuegen:
 	@echo "  >  Generating types from cue schema ..."
@@ -78,6 +80,14 @@ cuegen:
 	@echo "  >  Adding YAML tags to generated_types.go ..."
 	@go build -o utils/types_tagger utils/types_tagger.go
 	@utils/types_tagger layer2/generated_types.go
+
+	@echo "  >  Generating types from cue schema ..."
+	@echo "  >  Generating types for layer1 ..."
+	@cue exp gengotypes ./schemas/layer-1.cue
+	@mv cue_types_gen.go layer1/generated_types.go
+	@echo "  >  Adding YAML tags to generated_types.go ..."
+	@utils/types_tagger layer1/generated_types.go
+
 	@rm utils/types_tagger
 
 
