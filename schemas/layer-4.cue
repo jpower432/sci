@@ -40,6 +40,8 @@ import "time"
     @go(-) // ignored for go struct generation as it does not currently deal with struct disjunction in a useful manner
     // Name is the name of the method used to assess the requirement.
     name: string
+    // Optional method identifier for external policy id linking
+    id?: string
     // Description is a detailed explanation of the method.
     description?: string
     // URL to documentation that describes how the assessment method evaluates the control requirement.
@@ -83,6 +85,8 @@ import "time"
 
 // Change describes whether the execution of an automated assessment of a layer 2 control requirement resulted in changes being made to the system(s) under assessment.
 // TODO: flesh out more once we have one or more examples of existing usage/dependency/necessity
+
+// [jpower432]: Is this akin to a test fixture?
 #Change: {
     // TODO: document all fields here with more clarity once we have one or more examples of existing usage/dependency/necessity
     // target name is ¯\_(ツ)_/¯
