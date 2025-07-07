@@ -4,11 +4,12 @@ package layer4
 type AssessmentMethod struct {
 	Name             string            `json:"name"`
 	Description      string            `json:"description"`
+	ID               string            `json:"id,omitempty"`
 	Run              bool              `json:"run"`
 	RemediationGuide string            `json:"remediation_guide,omitempty"`
 	Documentation    string            `json:"documentation,omitempty"`
 	Result           *AssessmentResult `json:"result"`
-	Executor         MethodExecutor
+	Executor         MethodExecutor    `json:"-"`
 }
 
 // MethodExecutor is a function type that inspects the provided payload and returns the result of the assessment.

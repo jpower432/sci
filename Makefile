@@ -75,9 +75,13 @@ cuegen:
 	@echo "  >  Generating types for layer2 ..."
 	@cue exp gengotypes ./schemas/layer-2.cue
 	@mv cue_types_gen.go layer2/generated_types.go
+	@echo "  >  Generating types for layer4 ..."
+	@cue exp gengotypes ./schemas/layer-4.cue
+	@mv cue_types_gen.go layer4/generated_types.go
 	@echo "  >  Adding YAML tags to generated_types.go ..."
 	@go build -o utils/types_tagger utils/types_tagger.go
 	@utils/types_tagger layer2/generated_types.go
+	@utils/types_tagger layer4/generated_types.go
 	@rm utils/types_tagger
 
 
