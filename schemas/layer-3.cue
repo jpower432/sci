@@ -8,9 +8,8 @@ package schemas
 
     scope: #Scope
 
-    guidance-references: [...#Mapping]
-    control-references: [...#Mapping]
-    control-modifications: [...#Modification]
+    "guidance-references": [...#Mapping] @go(GuidanceReferences) @yaml("guidance-references",omitempty)
+    "control-references": [...#Mapping] @go(ControlReferences) @yaml("control-references",omitempty)
 }
 
 #Metadata: {
@@ -19,14 +18,11 @@ package schemas
     objective: string
 	version: string
     contacts: #Contacts
+
 	"last-modified": string @go(LastModified) @yaml("last-modified,omitempty")
-
-
-	"organization-id"?: string @go(OrganizationID)
-
-	author-notes?: string // For any instructions or considerations the author would like to provide for readers
-
-	"mapping-references"?: [...#MappingReference] @go(MappingReferences)
+	"organization-id"?: string @go(OrganizationID) @yaml("organization-id",omitempty)
+	"author-notes?": string @go(AuthorNotes) @yaml("author-notes",omitempty)
+	"mapping-references"?: [...#MappingReference] @go(MappingReferences) @yaml("mapping-references",omitempty)
 }
 
 #Contacts: {
@@ -44,13 +40,13 @@ package schemas
     "notified-parties"?: [...#NotificationGroup] @go(NotifiedParties) @yaml("notified-parties",omitempty)
 
     evaluation: #ImplementationDetails
-    "evaluation-points"?: [...#EvaluationPoint]
+    "evaluation-points"?: [...#EvaluationPoint] @go(EvaluationPoints) @yaml("evaluation-points",omitempty)
 
     enforcement: #ImplementationDetails
     "enforcement-methods"?: [...#EnforcementMethod] @go(EnforcementMethods) @yaml("enforcement-methods",omitempty)
 
     // The process that will be followed in the event that noncompliance is detected in an applicable resource
-    "noncompliance-plan"?: string
+    "noncompliance-plan"?: string @go(NoncompliancePlan) @yaml("noncompliance-plan",omitempty)
 }
 
 #ImplementationDetails: {
@@ -81,9 +77,9 @@ package schemas
 	"reference-id": string @go(ReferenceId) @yaml("reference-id",omitempty)
     "in-scope": #Scope @go(InScope) @yaml("in-scope",omitempty)
     "out-of-scope": #Scope @go(OutOfScope) @yaml("out-of-scope",omitempty)
-    control-modifications: [...#ControlModifier]
-    assessment-requirement-modifications: [...#AssessmentRequirementModifier]
-    guideline-modifications: [...#GuidelineModifier]
+    "control-modifications": [...#ControlModifier] @go(ControlModifications) @yaml("control-modifications",omitempty)
+    "assessment-requirement-modifications": [...#AssessmentRequirementModifier] @go(AssessmentRequirementModifications) @yaml("assessment-requirement-modifications",omitempty)
+    "guideline-modifications": [...#GuidelineModifier] @go(GuidelineModifications) @yaml("guideline-modifications",omitempty)
 }
 
 #Scope: {
@@ -98,8 +94,8 @@ package schemas
 }
 
 #ControlModifier: {
-    target-id: string
-    modification-type: #ModType
+    "target-id": string @go(TargetId) @yaml("target-id")
+    "modification-type": #ModType @go(ModType) @yaml("modification-type")
     rationale: string
 
     title?: string
@@ -107,8 +103,8 @@ package schemas
 }
 
 #AssessmentRequirementModifier: {
-    target-id: string
-    modification-type: #ModType
+    "target-id": string @go(TargetId) @yaml("target-id")
+    "modification-type": #ModType @go(ModType) @yaml("modification-type")
     rationale: string
 
     text: string
@@ -118,9 +114,9 @@ package schemas
 }
 
 #GuidelineModifier: {
-    target-id: string
-    modification-type: #ModType
-    rationale: string
+    "target-id": string @go(TargetId) @yaml("target-id")
+    "modification-type": #ModType @go(ModType) @yaml("modification-type")
+    "modification-rationale": string @go(ModificationRationale) @yaml("modification-rationale")
 
 	title: string
 	objective?: string
@@ -134,4 +130,4 @@ package schemas
 	"external-references"?: [...string] @go(ExternalReferences) @yaml("external-references,omitempty")
 }
 
-#ModType: "tighten" | "clarify" | "loosen" | "exclude"
+#ModType: "increase-strictness" | "clarify" | "reduce-strictness" | "exclude"
