@@ -2,6 +2,7 @@
 
 package layer3
 
+// Core Document Structure
 type PolicyDocument struct {
 	Metadata	Metadata	`json:"metadata" yaml:"metadata"`
 
@@ -46,7 +47,6 @@ type Contacts struct {
 	Informed	[]Contact	`json:"informed,omitempty" yaml:"informed,omitempty"`
 }
 
-// Contact represents a person or entity responsible for the project, including their name, affiliation, and contact details.
 type Contact struct {
 	// The contact person's name.
 	Name	string	`json:"name" yaml:"name"`
@@ -101,6 +101,7 @@ type Mapping struct {
 	GuidelineModifications	[]GuidelineModifier	`json:"guideline-modifications" yaml:"guideline-modifications"`
 }
 
+// Modifier Types
 type ControlModifier struct {
 	TargetId	string	`json:"target-id" yaml:"target-id"`
 
