@@ -1,9 +1,11 @@
 package schemas
 
+import "time"
+
 @go(layer3)
 
 #PolicyDocument: {
-	metadata: #Metadata
+    metadata: #Metadata
     contacts: #Contacts
 
     scope: #Scope
@@ -55,23 +57,23 @@ package schemas
     notes: string
 }
 
-#EvaluationPoint: "development-tools" // For noncompliance risk to workflows or local machines
-                | "pre-commit-hook" // For noncompliance risk to a development repository
-                | "pre-merge" // For noncompliance risk to primary repositories
-                | "pre-build" // For noncompliance risk to built assets
-                | "pre-release" // For noncompliance risk to released assets
-                | "pre-deploy" // For noncompliance risk to deployments
-                | "runtime-adhoc" // For situations where drift may occur
-                | "runtime-scheduled" // For situations where drift detection can be automated
+#EvaluationPoint: "development-tools" | // For noncompliance risk to workflows or local machines
+                  "pre-commit-hook" | // For noncompliance risk to a development repository
+                  "pre-merge" | // For noncompliance risk to primary repositories
+                  "pre-build" | // For noncompliance risk to built assets
+                  "pre-release" | // For noncompliance risk to released assets
+                  "pre-deploy" | // For noncompliance risk to deployments
+                  "runtime-adhoc" | // For situations where drift may occur
+                  "runtime-scheduled" // For situations where drift detection can be automated
 
-#EnforcementMethod: "Deployment Gate"
-                | "Autoremediation"
-                | "Manual Remediation"
+#EnforcementMethod: "Deployment Gate" |
+                   "Autoremediation" |
+                   "Manual Remediation"
 
-#NotificationGroup: "Responsible"
-                | "Acccountable"
-                | "Consulted"
-                | "Informed"
+#NotificationGroup: "Responsible" |
+                    "Acccountable" |
+                    "Consulted" |
+                    "Informed"
 
 #Mapping: {
 	"reference-id": string @go(ReferenceId) @yaml("reference-id",omitempty)
@@ -96,7 +98,7 @@ package schemas
 #ControlModifier: {
     "target-id": string @go(TargetId) @yaml("target-id")
     "modification-type": #ModType @go(ModType) @yaml("modification-type")
-    rationale: string
+    "modification-rationale": string @go(ModificationRationale) @yaml("modification-rationale")
 
     title?: string
     objective?: string
@@ -105,7 +107,7 @@ package schemas
 #AssessmentRequirementModifier: {
     "target-id": string @go(TargetId) @yaml("target-id")
     "modification-type": #ModType @go(ModType) @yaml("modification-type")
-    rationale: string
+    "modification-rationale": string @go(ModificationRationale) @yaml("modification-rationale")
 
     text: string
     applicability: [...string]
@@ -122,12 +124,49 @@ package schemas
 	objective?: string
 	recommendations?: [...string]
 	"base-guideline-id"?: string @go(BaseGuidelineID) @yaml("base-guideline-id,omitempty")
-	rationale?: #Rationale @go(Rationale,optional=nillable)
-	"guideline-parts"?: [...#Part] @go(GuidelineParts) @yaml("guideline-parts,omitempty")
+	rationale?: string @go(Rationale,optional=nillable)
 	"guideline-mappings"?: [...#Mapping] @go(GuidelineMappings) @yaml("guideline-mappings,omitempty")
 	"principle-mappings"?: [...#Mapping] @go(PrincipleMappings) @yaml("principle-mappings,omitempty")
 	"see-also"?: [...string] @go(SeeAlso) @yaml("see-also,omitempty")
 	"external-references"?: [...string] @go(ExternalReferences) @yaml("external-references,omitempty")
 }
 
+#PartModifier: {
+	"target-id": string @go(TargetId) @yaml("target-id")
+    "modification-type": #ModType @go(ModType) @yaml("modification-type")
+    "modification-rationale": string @go(ModificationRationale) @yaml("modification-rationale")
+
+	title?: string
+	prose:  string
+	recommendations?: [...string]
+}
+
+// Contact represents a person or entity responsible for the project, including their name, affiliation, and contact details.
+#Contact: {
+	// The contact person's name.
+	name: string
+
+	// Indicates whether this admin is the first point of contact for inquiries. Only one entry should be marked as primary.
+	primary: bool
+
+	// The entity with which the contact is affiliated, such as a school or employer.
+	affiliation?: string @go(Affiliation,type=*string)
+
+	// A preferred email address to reach the contact.
+	email?: #Email @go(Email,type=*Email)
+
+	// A social media handle or profile for the contact.
+	social?: string @go(Social,type=*string)
+}
+
+#MappingReference: {
+    id: string
+    title: string
+    version: string
+    description?: string
+    url?: =~"^https?://[^\\s]+$"
+}
+
+#Datetime: time.Format("2006-01-02T15:04:05Z07:00") @go(Datetime,format="date-time")
 #ModType: "increase-strictness" | "clarify" | "reduce-strictness" | "exclude"
+#Email: =~"^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$"
