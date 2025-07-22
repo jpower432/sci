@@ -140,14 +140,15 @@ import "time"
     url?: =~"^https?://[^\\s]+$"
 }
 
-#EvaluationPoint: "development-tools" |  // For noncompliance risk to workflows or local machines
-                  "pre-commit-hook" |     // For noncompliance risk to a development repository
-                  "pre-merge" |           // For noncompliance risk to primary repositories
-                  "pre-build" |           // For noncompliance risk to built assets
-                  "pre-release" |         // For noncompliance risk to released assets
-                  "pre-deploy" |          // For noncompliance risk to deployments
-                  "runtime-adhoc" |       // For situations where drift may occur
-                  "runtime-scheduled"     // For situations where drift detection can be automated
+#EvaluationPoint: "development-tools" | // For noncompliance risk to workflows or local machines
+                  "pre-commit-hook" |   // For noncompliance risk to a development repository
+                  "pre-merge" |         // For noncompliance risk to primary repositories
+                  "pre-build" |         // For noncompliance risk to built assets
+                  "pre-release" |       // For noncompliance risk to released assets
+                  "pre-deploy" |        // For noncompliance risk to deployments
+                  "runtime-adhoc" |     // For situations where drift may occur
+                  "runtime-scheduled" | // For situations where drift detection is automated
+                  "runtime-reactive"    // For situations where drift detection is triggered by events
 
 #EnforcementMethod: "Deployment Gate" |
                     "Autoremediation" |
