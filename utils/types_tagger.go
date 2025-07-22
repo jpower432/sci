@@ -13,7 +13,7 @@ import (
 )
 
 func main() {
-	const filename = "./layer2/generated_types.go"
+	filename := os.Args[1]
 
 	src, err := os.ReadFile(filename)
 	if err != nil {
