@@ -22,10 +22,12 @@ go test ./...
 endef
 
 build:
+	@$(call build,layer1)
 	@$(call build,layer2)
 	@$(call build,layer4)
 
 test:
+	@$(call test,layer1)
 	@$(call test,layer2)
 	@$(call test,layer4)
 
@@ -71,8 +73,16 @@ lintcue:
 	@cue eval ./schemas/layer-3.cue --all-errors --verbose
 	@echo "  >  Linting layer-4.cue ..."
 	@cue eval ./schemas/layer-4.cue --all-errors --verbose
+	@echo "  >  Linting layer-1.cue ..."
+	@cue eval ./schemas/layer-1.cue --all-errors --verbose
 
 cuegen:
+	@echo "  >  Generating types from cue schema ..."
+
+	@echo "  >  Generating types for layer1 ..."
+	@cue exp gengotypes ./schemas/layer-1.cue
+	@mv cue_types_gen.go layer1/generated_types.go
+
 	@echo "  >  Generating types for layer2 ..."
 	@cue exp gengotypes ./schemas/layer-2.cue
 	@mv cue_types_gen.go layer2/generated_types.go
@@ -81,8 +91,13 @@ cuegen:
 	@cue exp gengotypes ./schemas/layer-3.cue
 	@mv cue_types_gen.go layer3/generated_types.go
 
-	@echo "  >  Adding YAML tags to layer2/generated_types.go ..."
+	@echo "  >  Adding YAML tags to generated_types.go ..."
 	@go build -o utils/types_tagger utils/types_tagger.go
+
+	@echo "  >  Adding YAML tags to layer1/generated_types.go ..."
+	@utils/types_tagger layer1/generated_types.go
+
+	@echo "  >  Adding YAML tags to layer2/generated_types.go ..."
 	@utils/types_tagger layer2/generated_types.go
 
 	@echo "  >  Adding YAML tags to layer3/generated_types.go ..."
@@ -92,12 +107,31 @@ cuegen:
 
 cuegen-win:
 	@echo "  >  Generating types from cue schema ..."
+
+	@echo "  >  Generating types for layer1 ..."
+	@cue exp gengotypes .\schemas\layer-1.cue
+	@move /Y cue_types_gen.go layer1\generated_types.go
+
 	@echo "  >  Generating types for layer2 ..."
 	@cue exp gengotypes .\schemas\layer-2.cue
 	@move /Y cue_types_gen.go layer2\generated_types.go
+
+	@echo "  >  Generating types for layer3 ..."
+	@cue exp gengotypes .\schemas\layer-3.cue
+	@move /Y cue_types_gen.go layer3\generated_types.go
+
 	@echo "  >  Adding YAML tags to generated_types.go ..."
 	@go build -o utils/types_tagger.exe utils/types_tagger.go
+
+	@echo "  >  Adding YAML tags to layer1/generated_types.go ..."
+	@utils\types_tagger.exe layer1\generated_types.go
+
+	@echo "  >  Adding YAML tags to layer2/generated_types.go ..."
 	@utils\types_tagger.exe layer2\generated_types.go
+
+	@echo "  >  Adding YAML tags to layer3/generated_types.go ..."
+	@utils\types_tagger.exe layer3\generated_types.go
+
 	@del utils\types_tagger.exe
 
 dirtycheck:

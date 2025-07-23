@@ -15,6 +15,9 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4.2.2
+      - uses: actions/setup-go@v5.4.0
+        with:
+          go-version: stable
       - name: Setup Cue
         uses: cue-lang/setup-cue@a93fa358375740cd8b0078f76355512b9208acb1 # v1.0.1
         with:
