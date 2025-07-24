@@ -80,4 +80,15 @@ package schemas
     applicability: [...string]
 
     recommendation?: string
+    // Define a list of parameters associated with
+    // the recomendation that may be set by an
+    // organization in layer 3. This defines available
+    // technology-specific "knobs".
+    "recommended-parameters"?: [...#Parameter] @go(RecommendedParameters) @yaml("recommended-parameters",omitempty)
+}
+
+#Parameter: {
+	id: string
+	description?: string
+	default?: _
 }
