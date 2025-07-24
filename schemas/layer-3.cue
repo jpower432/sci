@@ -68,9 +68,10 @@ import "time"
     "reference-id": string @go(ReferenceId) @yaml("reference-id",omitempty)
     "in-scope": #Scope @go(InScope) @yaml("in-scope",omitempty)
     "out-of-scope": #Scope @go(OutOfScope) @yaml("out-of-scope",omitempty)
-    "control-modifications": [...#ControlModifier] @go(ControlModifications) @yaml("control-modifications",omitempty)
-    "assessment-requirement-modifications": [...#AssessmentRequirementModifier] @go(AssessmentRequirementModifications) @yaml("assessment-requirement-modifications",omitempty)
-    "guideline-modifications": [...#GuidelineModifier] @go(GuidelineModifications) @yaml("guideline-modifications",omitempty)
+    "control-modifications"?: [...#ControlModifier] @go(ControlModifications) @yaml("control-modifications",omitempty)
+    "assessment-requirement-modifications"?: [...#AssessmentRequirementModifier] @go(AssessmentRequirementModifications) @yaml("assessment-requirement-modifications",omitempty)
+    "guideline-modifications"?: [...#GuidelineModifier] @go(GuidelineModifications) @yaml("guideline-modifications",omitempty)
+    "parameter-modifications"?: [...#ParameterModifier] @go(ParameterModifications) @yaml("parameter-modifications",omitempty)
 }
 
 // Modifier Types
@@ -81,6 +82,15 @@ import "time"
 
     title?: string
     objective?: string
+}
+
+#ParameterModifier: {
+	  "target-id": string @go(TargetId) @yaml("target-id") // e.g., "recommended-parameters"
+    "modification-type": #ModType @go(ModType) @yaml("modification-type")
+    "modification-rationale": string @go(ModificationRationale) @yaml("modification-rationale")
+
+    description?: string // Description of the organization's specific parameter value
+    value: _ // This will override the default if one is set
 }
 
 #AssessmentRequirementModifier: {
@@ -162,3 +172,4 @@ import "time"
 #Datetime: time.Format("2006-01-02T15:04:05Z07:00") @go(Datetime,format="date-time")
 #ModType: "increase-strictness" | "clarify" | "reduce-strictness" | "exclude"
 #Email: =~"^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$"
+
