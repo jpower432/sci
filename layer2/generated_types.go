@@ -87,6 +87,20 @@ type AssessmentRequirement struct {
 	Applicability	[]string	`json:"applicability" yaml:"applicability"`
 
 	Recommendation	string	`json:"recommendation,omitempty" yaml:"recommendation,omitempty"`
+
+	// Define a list of parameters associated with
+	// the recomendation that may be set by an
+	// organization in layer 3. This defines available
+	// technology-specific "knobs".
+	RecommendedParameters	[]Parameter	`json:"recommended-parameters,omitempty" yaml:"recommended-parameters,omitempty"`
+}
+
+type Parameter struct {
+	Id	string	`json:"id" yaml:"id"`
+
+	Description	string	`json:"description,omitempty" yaml:"description,omitempty"`
+
+	Default	any/* CUE top */ `json:"default,omitempty" yaml:"default,omitempty"`
 }
 
 type Mapping struct {
