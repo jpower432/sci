@@ -18,8 +18,8 @@ type ControlEvaluation struct {
 	Assessments       []*Assessment // Assessments is a map of pointers to Assessment objects to establish idempotency
 }
 
-func (c *ControlEvaluation) AddAssessment(requirementId string, description string, applicability []string, steps []AssessmentStep) (assessment *Assessment) {
-	assessment, err := NewAssessment(requirementId, description, applicability, steps)
+func (c *ControlEvaluation) AddAssessment(requirementId string, description string, applicability []string, methods []AssessmentMethod) (assessment *Assessment) {
+	assessment, err := NewAssessment(requirementId, description, applicability, methods)
 	if err != nil {
 		c.Result = Failed
 		c.Message = err.Error()

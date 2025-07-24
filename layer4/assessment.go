@@ -1,11 +1,8 @@
 package layer4
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
-	"reflect"
-	"runtime"
 	"time"
 )
 
@@ -16,56 +13,35 @@ type Assessment struct {
 	Description    string             // Description is a human-readable description of the test
 	Result         Result             // Passed is true if the test passed
 	Message        string             // Message is the human-readable result of the test
-	Steps          []AssessmentStep   // Steps is a slice of steps that were executed during the test
+	Methods        []AssessmentMethod // Methods is a slice of assessment methods that were executed during the test
 	Steps_Executed int                // Steps_Executed is the number of steps that were executed during the test
 	Run_Duration   string             // Run_Duration is the time it took to run the test
 	Value          interface{}        // Value is the object that was returned during the test
 	Changes        map[string]*Change // Changes is a slice of changes that were made during the test
 }
 
-// AssessmentStep is a function type that inspects the provided targetData and returns a Result with a message.
-// The message may be an error string or other descriptive text.
-type AssessmentStep func(payload interface{}, c map[string]*Change) (Result, string)
-
-func (as AssessmentStep) String() string {
-	// Get the function pointer correctly
-	fn := runtime.FuncForPC(reflect.ValueOf(as).Pointer())
-	if fn == nil {
-		return "<unknown function>"
-	}
-	return fn.Name()
-}
-
-func (as AssessmentStep) MarshalJSON() ([]byte, error) {
-	return json.Marshal(as.String())
-}
-
-func (as AssessmentStep) MarshalYAML() (interface{}, error) {
-	return as.String(), nil
-}
-
 // NewAssessment creates a new Assessment object and returns a pointer to it.
 // The function demands a requirementId, description, applicability, and steps.
-func NewAssessment(requirementId string, description string, applicability []string, steps []AssessmentStep) (*Assessment, error) {
+func NewAssessment(requirementId string, description string, applicability []string, methods []AssessmentMethod) (*Assessment, error) {
 	a := &Assessment{
 		Requirement_Id: requirementId,
 		Description:    description,
 		Applicability:  applicability,
 		Result:         NotRun,
-		Steps:          steps,
+		Methods:        methods,
 	}
 	err := a.precheck()
 	return a, err
 }
 
-// NewStep queues a new step in the Assessment
-func (a *Assessment) AddStep(step AssessmentStep) {
-	a.Steps = append(a.Steps, step)
+// AddMethod queues a new method in the Assessment
+func (a *Assessment) AddMethod(method AssessmentMethod) {
+	a.Methods = append(a.Methods, method)
 }
 
-func (a *Assessment) runStep(targetData interface{}, step AssessmentStep) Result {
+func (a *Assessment) runMethod(targetData interface{}, method AssessmentMethod) Result {
 	a.Steps_Executed++
-	result, message := step(targetData, a.Changes)
+	result, message := method.RunMethod(targetData, a.Changes)
 	a.Result = UpdateAggregateResult(a.Result, result)
 	a.Message = message
 	return result
@@ -90,8 +66,8 @@ func (a *Assessment) Run(targetData interface{}, changesAllowed bool) Result {
 			change.Allow()
 		}
 	}
-	for _, step := range a.Steps {
-		if a.runStep(targetData, step) == Failed {
+	for _, method := range a.Methods {
+		if a.runMethod(targetData, method) == Failed {
 			return Failed
 		}
 	}
@@ -124,10 +100,10 @@ func (a *Assessment) RevertChanges() (corrupted bool) {
 }
 
 func (a *Assessment) precheck() error {
-	if a.Requirement_Id == "" || a.Description == "" || a.Applicability == nil || a.Steps == nil || len(a.Applicability) == 0 || len(a.Steps) == 0 {
+	if a.Requirement_Id == "" || a.Description == "" || a.Applicability == nil || a.Methods == nil || len(a.Applicability) == 0 || len(a.Methods) == 0 {
 		message := fmt.Sprintf(
 			"expected all Assessment fields to have a value, but got: requirementId=len(%v), description=len=(%v), applicability=len(%v), steps=len(%v)",
-			len(a.Requirement_Id), len(a.Description), len(a.Applicability), len(a.Steps),
+			len(a.Requirement_Id), len(a.Description), len(a.Applicability), len(a.Methods),
 		)
 		a.Result = Unknown
 		a.Message = message

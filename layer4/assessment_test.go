@@ -57,12 +57,12 @@ func getAssessmentsTestData() []struct {
 func TestAddStep(t *testing.T) {
 	for _, test := range getAssessmentsTestData() {
 		t.Run(test.testName, func(t *testing.T) {
-			if len(test.assessment.Steps) != test.numberOfSteps {
-				t.Errorf("Bad test data: expected to start with %d, got %d", test.numberOfSteps, len(test.assessment.Steps))
+			if len(test.assessment.Methods) != test.numberOfSteps {
+				t.Errorf("Bad test data: expected to start with %d, got %d", test.numberOfSteps, len(test.assessment.Methods))
 			}
-			test.assessment.AddStep(passingAssessmentStep)
-			if len(test.assessment.Steps) != test.numberOfSteps+1 {
-				t.Errorf("expected %d, got %d", test.numberOfSteps, len(test.assessment.Steps))
+			test.assessment.AddMethod(passingAssessmentStep)
+			if len(test.assessment.Methods) != test.numberOfSteps+1 {
+				t.Errorf("expected %d, got %d", test.numberOfSteps, len(test.assessment.Methods))
 			}
 		})
 	}
@@ -72,7 +72,7 @@ func TestAddStep(t *testing.T) {
 func TestRunStep(t *testing.T) {
 	stepsTestData := []struct {
 		testName string
-		step     AssessmentStep
+		step     AssessmentMethod
 		result   Result
 	}{
 		{
@@ -99,7 +99,7 @@ func TestRunStep(t *testing.T) {
 	for _, test := range stepsTestData {
 		t.Run(test.testName, func(t *testing.T) {
 			anyOldAssessment := Assessment{}
-			result := anyOldAssessment.runStep(nil, test.step)
+			result := anyOldAssessment.runMethod(nil, test.step)
 			if result != test.result {
 				t.Errorf("expected %s, got %s", test.result, result)
 			}
@@ -234,7 +234,7 @@ func TestNewAssessment(t *testing.T) {
 		requirementId string
 		description   string
 		applicability []string
-		steps         []AssessmentStep
+		steps         []AssessmentMethod
 		expectedError bool
 	}{
 		{
@@ -242,7 +242,7 @@ func TestNewAssessment(t *testing.T) {
 			requirementId: "",
 			description:   "test",
 			applicability: []string{"test"},
-			steps:         []AssessmentStep{passingAssessmentStep},
+			steps:         []AssessmentMethod{passingAssessmentStep},
 			expectedError: true,
 		},
 		{
@@ -250,7 +250,7 @@ func TestNewAssessment(t *testing.T) {
 			requirementId: "test",
 			description:   "",
 			applicability: []string{"test"},
-			steps:         []AssessmentStep{passingAssessmentStep},
+			steps:         []AssessmentMethod{passingAssessmentStep},
 			expectedError: true,
 		},
 		{
@@ -258,7 +258,7 @@ func TestNewAssessment(t *testing.T) {
 			requirementId: "test",
 			description:   "test",
 			applicability: []string{},
-			steps:         []AssessmentStep{passingAssessmentStep},
+			steps:         []AssessmentMethod{passingAssessmentStep},
 			expectedError: true,
 		},
 		{
@@ -266,7 +266,7 @@ func TestNewAssessment(t *testing.T) {
 			requirementId: "test",
 			description:   "test",
 			applicability: []string{"test"},
-			steps:         []AssessmentStep{},
+			steps:         []AssessmentMethod{},
 			expectedError: true,
 		},
 		{
@@ -274,7 +274,7 @@ func TestNewAssessment(t *testing.T) {
 			requirementId: "test",
 			description:   "test",
 			applicability: []string{"test"},
-			steps:         []AssessmentStep{passingAssessmentStep},
+			steps:         []AssessmentMethod{passingAssessmentStep},
 			expectedError: false,
 		},
 	}
