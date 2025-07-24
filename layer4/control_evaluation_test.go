@@ -139,7 +139,7 @@ func TestEvaluate(t *testing.T) {
 
 func TestAddAssesment(t *testing.T) {
 
-	controlEvaluationTestData[0].control.AddAssessment("test", "test", []string{}, []AssessmentStep{})
+	controlEvaluationTestData[0].control.AddAssessment("test", "test", []string{}, []AssessmentMethod{})
 
 	if controlEvaluationTestData[0].control.Result != Failed {
 		t.Errorf("Expected Result to be Failed, but it was %v", controlEvaluationTestData[0].control.Result)
