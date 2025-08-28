@@ -94,11 +94,11 @@ type Mapping struct {
 
 	OutOfScope	Scope	`json:"out-of-scope" yaml:"out-of-scope"`
 
-	ControlModifications	[]ControlModifier	`json:"control-modifications,omitempty" yaml:"control-modifications,omitempty"`
+	ControlModifications	[]ControlModifier	`json:"control-modifications" yaml:"control-modifications"`
 
-	AssessmentRequirementModifications	[]AssessmentRequirementModifier	`json:"assessment-requirement-modifications,omitempty" yaml:"assessment-requirement-modifications,omitempty"`
+	AssessmentRequirementModifications	[]AssessmentRequirementModifier	`json:"assessment-requirement-modifications" yaml:"assessment-requirement-modifications"`
 
-	GuidelineModifications	[]GuidelineModifier	`json:"guideline-modifications,omitempty" yaml:"guideline-modifications,omitempty"`
+	GuidelineModifications	[]GuidelineModifier	`json:"guideline-modifications" yaml:"guideline-modifications"`
 
 	ParameterModifications	[]ParameterModifier	`json:"parameter-modifications,omitempty" yaml:"parameter-modifications,omitempty"`
 }

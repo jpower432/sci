@@ -6,7 +6,7 @@ var controlEvaluationTestData = []struct {
 	testName          string
 	control           *ControlEvaluation
 	failBeforePass    bool
-	expectedResult    Result
+	expectedResult    Status
 	expectedCorrupted bool
 }{
 	{
@@ -14,81 +14,81 @@ var controlEvaluationTestData = []struct {
 		expectedResult:    NeedsReview,
 		expectedCorrupted: false,
 		control: &ControlEvaluation{
-			Assessments: []*Assessment{},
+			Assessments: []*AssessmentLog{},
 		},
 	},
 	{
-		testName:          "ControlEvaluation with one passing Assessment",
+		testName:          "ControlEvaluation with one passing AssessmentLog",
 		expectedResult:    Passed,
 		expectedCorrupted: false,
 		control: &ControlEvaluation{
-			Assessments: []*Assessment{passingAssessmentPtr()},
+			Assessments: []*AssessmentLog{passingAssessmentPtr()},
 		},
 	},
 	{
-		testName:          "ControlEvaluation with one failing Assessment",
+		testName:          "ControlEvaluation with one failing AssessmentLog",
 		expectedResult:    Failed,
 		expectedCorrupted: false,
 		control: &ControlEvaluation{
-			Assessments: []*Assessment{failingAssessmentPtr()},
+			Assessments: []*AssessmentLog{failingAssessmentPtr()},
 		},
 	},
 	{
-		testName:          "ControlEvaluation with one NeedsReview Assessment",
+		testName:          "ControlEvaluation with one NeedsReview AssessmentLog",
 		expectedResult:    NeedsReview,
 		expectedCorrupted: false,
 		control: &ControlEvaluation{
-			Assessments: []*Assessment{needsReviewAssessmentPtr()},
+			Assessments: []*AssessmentLog{needsReviewAssessmentPtr()},
 		},
 	},
 	{
-		testName:          "ControlEvaluation with one Unknown Assessment",
+		testName:          "ControlEvaluation with one Unknown AssessmentLog",
 		expectedResult:    Unknown,
 		expectedCorrupted: false,
 		control: &ControlEvaluation{
-			Assessments: []*Assessment{unknownAssessmentPtr()},
+			Assessments: []*AssessmentLog{unknownAssessmentPtr()},
 		},
 	},
 	{
-		testName:          "ControlEvaluation with first NeedsReview and then Unknown Assessment",
+		testName:          "ControlEvaluation with first NeedsReview and then Unknown AssessmentLog",
 		expectedResult:    Unknown,
 		expectedCorrupted: false,
 		control: &ControlEvaluation{
-			Assessments: []*Assessment{
+			Assessments: []*AssessmentLog{
 				needsReviewAssessmentPtr(),
 				unknownAssessmentPtr(),
 			},
 		},
 	},
 	{
-		testName:          "ControlEvaluation with first Unknown and then NeedsReview Assessment",
+		testName:          "ControlEvaluation with first Unknown and then NeedsReview AssessmentLog",
 		expectedResult:    Unknown,
 		expectedCorrupted: false,
 		control: &ControlEvaluation{
-			Assessments: []*Assessment{
+			Assessments: []*AssessmentLog{
 				unknownAssessmentPtr(),
 				needsReviewAssessmentPtr(),
 			},
 		},
 	},
 	{
-		testName:          "ControlEvaluation with first Failed and then NeedsReview Assessment",
+		testName:          "ControlEvaluation with first Failed and then NeedsReview AssessmentLog",
 		expectedResult:    Failed,
 		expectedCorrupted: false,
 		control: &ControlEvaluation{
-			Assessments: []*Assessment{
+			Assessments: []*AssessmentLog{
 				failingAssessmentPtr(),
 				needsReviewAssessmentPtr(),
 			},
 		},
 	},
 	{
-		testName:          "ControlEvaluation with first Failing and then Passing Assessment",
+		testName:          "ControlEvaluation with first Failing and then Passing AssessmentLog",
 		expectedResult:    Failed,
 		failBeforePass:    true,
 		expectedCorrupted: false,
 		control: &ControlEvaluation{
-			Assessments: []*Assessment{
+			Assessments: []*AssessmentLog{
 				failingAssessmentPtr(),
 				passingAssessmentPtr(),
 			},
@@ -103,8 +103,8 @@ func TestEvaluate(t *testing.T) {
 			c := test.control // copy the control to avoid duplication in the next test
 			c.Evaluate(nil, testingApplicability, true)
 
-			if c.Result != test.expectedResult {
-				t.Errorf("Expected Result to be %v, but it was %v", test.expectedResult, c.Result)
+			if c.Result.Status != test.expectedResult {
+				t.Errorf("Expected Status to be %v, but it was %v", test.expectedResult, c.Result)
 			}
 
 			if c.CorruptedState != test.expectedCorrupted {
@@ -126,8 +126,8 @@ func TestEvaluate(t *testing.T) {
 				}
 			}
 
-			if c.Result != test.expectedResult {
-				t.Errorf("Expected Result to be %v, but it was %v", test.expectedResult, c.Result)
+			if c.Result.Status != test.expectedResult {
+				t.Errorf("Expected Status to be %v, but it was %v", test.expectedResult, c.Result)
 			}
 
 			if c.CorruptedState != test.expectedCorrupted {
@@ -139,14 +139,14 @@ func TestEvaluate(t *testing.T) {
 
 func TestAddAssessment(t *testing.T) {
 
-	controlEvaluationTestData[0].control.AddAssessment("test", "test", []string{}, []*AssessmentProcedure{})
+	controlEvaluationTestData[0].control.AddAssessment("test", "test", []string{}, []AssessmentStep{})
 
-	if controlEvaluationTestData[0].control.Result != Failed {
-		t.Errorf("Expected Result to be Failed, but it was %v", controlEvaluationTestData[0].control.Result)
+	if controlEvaluationTestData[0].control.Result.Status != Failed {
+		t.Errorf("Expected Status to be Failed, but it was %v", controlEvaluationTestData[0].control.Result)
 	}
 
-	if controlEvaluationTestData[0].control.Message != "expected all Assessment fields to have a value, but got: requirementId=len(4), description=len=(4), applicability=len(0), procedures=len(0)" {
-		t.Errorf("Expected error message to be 'expected all Assessment fields to have a value, but got: requirementId=len(4), description=len=(4), applicability=len(0), procedures=len(0)', but instead it was '%v'", controlEvaluationTestData[0].control.Message)
+	if controlEvaluationTestData[0].control.Result.Message != "expected all AssessmentLog fields to have a value, but got: requirementId=len(4), description=len=(4), applicability=len(0), steps=len(0)" {
+		t.Errorf("Expected error message to be 'expected all AssessmentLog fields to have a value, but got: requirementId=len(4), description=len=(4), applicability=len(0), steps=len(0)', but instead it was '%v'", controlEvaluationTestData[0].control.Result.Message)
 	}
 
 }

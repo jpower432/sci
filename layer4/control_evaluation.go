@@ -15,32 +15,30 @@ type ControlEvaluation struct {
 	ControlID string `yaml:"control-id"`
 	// Result is the overall result of the control evaluation
 	Result Result `yaml:"result"`
-	// Message is the human-readable result of the final assessment to run in this evaluation
-	Message string `yaml:"message"`
 	// CorruptedState is true if the control evaluation was interrupted and changes were not reverted
 	CorruptedState bool `yaml:"corrupted-state"`
-	// Assessments is a slice of pointers to Assessment objects to establish idempotency
-	Assessments []*Assessment `yaml:"assessments"`
+	// Assessments is a map of pointers to AssessmentLog objects to establish idempotency
+	Assessments []*AssessmentLog `yaml:"assessments"`
 }
 
-// AddAssessment creates a new Assessment object and adds it to the ControlEvaluation.
-func (c *ControlEvaluation) AddAssessment(requirementId string, description string, applicability []string, procedures []*AssessmentProcedure) (assessment *Assessment) {
-	assessment, err := NewAssessment(requirementId, description, applicability, procedures)
+// AddAssessment creates a new AssessmentLog object and adds it to the ControlEvaluation.
+func (c *ControlEvaluation) AddAssessment(requirementId string, description string, applicability []string, steps []AssessmentStep) (assessment *AssessmentLog) {
+	assessment, err := NewAssessment(requirementId, description, applicability, steps)
 	if err != nil {
-		c.Result = Failed
-		c.Message = err.Error()
+		c.Result.Status = Failed
+		c.Result.Message = err.Error()
 	}
 	c.Assessments = append(c.Assessments, assessment)
 	return
 }
 
-// Evaluate runs each test procedure in each assessment, updating the relevant fields on the control evaluation.
-// It will halt an assessment if a procedure step returns a failed result. The targetData is the data that the assessment will be run against.
+// Evaluate runs each step in each assessment, updating the relevant fields on the control evaluation.
+// It will halt if a step returns a failed result. The targetData is the data that the assessment will be run against.
 // The userApplicability is a slice of strings that determine when the assessment is applicable. The changesAllowed
 // determines whether the assessment is allowed to execute its changes.
 func (c *ControlEvaluation) Evaluate(targetData interface{}, userApplicability []string, changesAllowed bool) {
 	if len(c.Assessments) == 0 {
-		c.Result = NeedsReview
+		c.Result.Status = NeedsReview
 		return
 	}
 	c.closeHandler()
@@ -56,9 +54,9 @@ func (c *ControlEvaluation) Evaluate(targetData interface{}, userApplicability [
 		}
 		if applicable {
 			result := assessment.Run(targetData, changesAllowed)
-			c.Result = UpdateAggregateResult(c.Result, result)
-			c.Message = assessment.Message
-			if c.Result == Failed {
+			c.Result.Status = UpdateAggregateStatus(c.Result.Status, result)
+			c.Result.Message = assessment.Result.Message
+			if c.Result.Status == Failed {
 				break
 			}
 		}

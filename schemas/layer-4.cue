@@ -7,27 +7,44 @@ import "time"
 	...
 }
 
-#ControlEvaluation: {
-	name:              string
-	"control-id":      string @go(ControlId)
-	result:            #Result
-	message:           string
-	"corrupted-state": bool @go(CorruptedState)
-	assessments: [...#Assessment]
+#EvaluationPlan: {
+	author: #Contact
+	plans: [...#AssessmentPlan]
+	...
+}
+
+#AssessmentPlan: {
+	"control-id": string @go(ControlId)
+	"assessment": [...#Assessment] @go(Assessment)
 }
 
 #Assessment: {
 	"requirement-id": string @go(RequirementId)
+	procedures: [...#AssessmentProcedure] @go(Procedures)
+}
+
+#ControlEvaluation: {
+	name:              string
+	"control-id":      string @go(ControlId)
+	result:            #Result
+	"corrupted-state": bool @go(CorruptedState)
+	"assessments-logs": [...#AssessmentLog] @go(AssessmentLogs)
+}
+
+#AssessmentLog: {
+	"requirement-id": string @go(RequirementId)
+	"procedure-id?":  string @go(ProcedureId)
 	applicability: [...string]
 	description: string
 	result:      #Result
-	message:     string
-	procedures: [...#AssessmentProcedure]
+	steps: [...#AssessmentStep]
+	"steps-executed"?: int @go(StepsExecuted)
 	"start":           #Datetime
 	"end"?:            #Datetime
 	value?:            _
 	changes?: {[string]: #Change}
 	recommendation?: string
+}
 
 // AssessmentProcedure describes a testing procedure for evaluating a Layer 2 control requirement.
 #AssessmentProcedure: {
@@ -37,38 +54,11 @@ import "time"
 	name: string
 	// Description provides a detailed explanation of the procedure
 	description: string
-	// Method describe the high-level method used to determine the results of the procedure
-	method: #ProcedureMethod
-	// Run is a boolean indicating whether the procedure was run or not. When run is true, result is expected to be present
-	run: bool
 	// Documentation provides a URL to documentation that describes how the assessment procedure evaluates the control requirement
-	documentation?: #URL
-	// Steps provides the address for the assessment steps executed
-	"steps"?: [...#AssessmentStep]
+	documentation?: =~"^https?://[^\\s]+$"
 }
 
-// Additional constraints on Assessment Procedure.
-#AssessmentProcedure: {
-	run: false
-	// Message describes the result of the procedure
-	message?: string
-	// Result communicates the outcome(s) of the procedure
-	result?: ("Not Run" | *null) @go(Result,optional=nillable)
-} | {
-	run:     true
-	message!: string
-	result!: #ResultWhenRun
-}
-
-// Result describes valid assessment outcomes before and after execution.
-#Result: #ResultWhenRun | "Not Run"
 #AssessmentStep: string
-
-// Result describes the outcome(s) of an assessment procedure when it is executed.
-#ResultWhenRun: "Passed" | "Failed" | "Needs Review" | "Not Applicable" | "Unknown"
-
-// ProcedureMethod describes method options that can be used to determine the results
-#ProcedureMethod: "Test" | "Observation"
 
 // Change is a struct that contains the data and functions associated with a single change to a target resource.
 #Change: {
@@ -81,3 +71,24 @@ import "time"
 }
 
 #Datetime: time.Format("2006-01-02T15:04:05Z07:00") @go(Datetime,format="date-time")
+
+#Contact: {
+	// The contact person's name.
+	name: string
+	// Indicates whether this admin is the first point of contact for inquiries. Only one entry should be marked as primary.
+	primary: bool
+	// The entity with which the contact is affiliated, such as a school or employer.
+	affiliation?: string @go(Affiliation,type=*string)
+	// A preferred email address to reach the contact.
+	email?: #Email @go(Email,type=*Email)
+	// A social media handle or profile for the contact.
+	social?: string @go(Social,type=*string)
+}
+#Email: =~"^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$"
+
+#Result: {
+	status:  #Status
+	message: string
+}
+
+#Status: "Passed" | "Failed" | "Needs Review" | "Not Applicable" | "Unknown"

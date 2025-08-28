@@ -2,12 +2,18 @@ package layer4
 
 import "encoding/json"
 
-// Result is an enum representing the result of a control evaluation
+type Result struct {
+	Status Status `json:"status"`
+
+	Message string `json:"message"`
+}
+
+// Status is an enum representing the result of a control evaluation
 // This is designed to restrict the possible result values to a set of known states
-type Result int
+type Status int
 
 const (
-	NotRun Result = iota
+	NotRun Status = iota
 	Passed
 	Failed
 	NeedsReview
@@ -15,7 +21,7 @@ const (
 	Unknown
 )
 
-var toString = map[Result]string{
+var toString = map[Status]string{
 	NotRun:        "Not Run",
 	Passed:        "Passed",
 	Failed:        "Failed",
@@ -24,22 +30,22 @@ var toString = map[Result]string{
 	Unknown:       "Unknown",
 }
 
-func (r Result) String() string {
-	return toString[r]
+func (s Status) String() string {
+	return toString[s]
 }
 
-// MarshalYAML ensures that Result is serialized as a string in YAML
-func (r Result) MarshalYAML() (interface{}, error) {
-	return r.String(), nil
+// MarshalYAML ensures that Status is serialized as a string in YAML
+func (s Status) MarshalYAML() (interface{}, error) {
+	return s.String(), nil
 }
 
-// MarshalJSON ensures that Result is serialized as a string in JSON
-func (r Result) MarshalJSON() ([]byte, error) {
-	return json.Marshal(r.String())
+// MarshalJSON ensures that Status is serialized as a string in JSON
+func (s Status) MarshalJSON() ([]byte, error) {
+	return json.Marshal(s.String())
 }
 
-// UpdateAggregateResult compares the current result with the new result and returns the most severe of the two.
-func UpdateAggregateResult(previous Result, new Result) Result {
+// UpdateAggregateStatus compares the current result with the new result and returns the most severe of the two.
+func UpdateAggregateStatus(previous Status, new Status) Status {
 	if new == NotRun {
 		// Not Run should not overwrite anything
 		// Failed should not be overwritten by anything

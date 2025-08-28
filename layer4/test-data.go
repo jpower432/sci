@@ -22,53 +22,18 @@ var (
 		return errors.New("error")
 	}
 
-	// Assessment Results
-	passingAssessmentStep = func(interface{}, map[string]*Change) (Result, string) {
-		return Passed, ""
+	// AssessmentLog Results
+	passingAssessmentStep = func(interface{}, map[string]*Change) Result {
+		return Result{Passed, ""}
 	}
-	failingAssessmentStep = func(interface{}, map[string]*Change) (Result, string) {
-		return Failed, ""
+	failingAssessmentStep = func(interface{}, map[string]*Change) Result {
+		return Result{Failed, ""}
 	}
-	needsReviewAssessmentStep = func(interface{}, map[string]*Change) (Result, string) {
-		return NeedsReview, ""
+	needsReviewAssessmentStep = func(interface{}, map[string]*Change) Result {
+		return Result{NeedsReview, ""}
 	}
-	unknownAssessmentStep = func(interface{}, map[string]*Change) (Result, string) {
-		return Unknown, ""
-	}
-
-	// AssessmentProcedures
-	failingProcedure = AssessmentProcedure{
-		Steps: []AssessmentStep{
-			failingAssessmentStep,
-			passingAssessmentStep,
-		},
-		Method: TestMethod,
-	}
-
-	passingProcedure = AssessmentProcedure{
-		Steps: []AssessmentStep{
-			passingAssessmentStep,
-		},
-		Method: TestMethod,
-	}
-
-	needsReviewProcedure = AssessmentProcedure{
-		Steps: []AssessmentStep{
-			passingAssessmentStep,
-			needsReviewAssessmentStep,
-			passingAssessmentStep,
-		},
-		Method: TestMethod,
-	}
-
-	badRevertPassingProcedure = AssessmentProcedure{
-		Steps: []AssessmentStep{
-			passingAssessmentStep,
-			passingAssessmentStep,
-			passingAssessmentStep,
-			passingAssessmentStep,
-		},
-		Method: TestMethod,
+	unknownAssessmentStep = func(interface{}, map[string]*Change) Result {
+		return Result{Unknown, ""}
 	}
 )
 
@@ -181,80 +146,88 @@ func disallowedChange() Change {
 	}
 }
 
-func failingAssessmentPtr() *Assessment {
+func failingAssessmentPtr() *AssessmentLog {
 	a := failingAssessment()
 	return &a
 }
 
-func failingAssessment() Assessment {
-	return Assessment{
+func failingAssessment() AssessmentLog {
+	return AssessmentLog{
 		RequirementId: "failingAssessment()",
 		Description:   "failing assessment",
-		Procedures:    []*AssessmentProcedure{&failingProcedure},
+		Steps: []AssessmentStep{
+			failingAssessmentStep,
+			passingAssessmentStep,
+		},
 		Applicability: testingApplicability,
 	}
 }
-func passingAssessmentPtr() *Assessment {
+func passingAssessmentPtr() *AssessmentLog {
 	a := passingAssessment()
 	return &a
 }
 
-func passingAssessment() Assessment {
-	return Assessment{
+func passingAssessment() AssessmentLog {
+	return AssessmentLog{
 		RequirementId: "passingAssessment()",
 		Description:   "passing assessment",
-		Procedures:    []*AssessmentProcedure{&passingProcedure},
+		Steps: []AssessmentStep{
+			passingAssessmentStep,
+		},
 		Applicability: testingApplicability,
 		Changes: map[string]*Change{
 			"pendingChange": pendingChangePtr(),
 		},
 	}
 }
-func needsReviewAssessmentPtr() *Assessment {
+func needsReviewAssessmentPtr() *AssessmentLog {
 	a := needsReviewAssessment()
 	return &a
 }
 
-func needsReviewAssessment() Assessment {
-	return Assessment{
+func needsReviewAssessment() AssessmentLog {
+	return AssessmentLog{
 		RequirementId: "needsReviewAssessment()",
 		Description:   "needs review assessment",
-		Procedures:    []*AssessmentProcedure{&needsReviewProcedure},
+		Steps: []AssessmentStep{
+			passingAssessmentStep,
+			needsReviewAssessmentStep,
+			passingAssessmentStep,
+		},
 		Applicability: testingApplicability,
 	}
 }
-
-func unknownAssessmentPtr() *Assessment {
+func unknownAssessmentPtr() *AssessmentLog {
 	a := unknownAssessment()
 	return &a
 }
 
-func unknownAssessment() Assessment {
-	return Assessment{
+func unknownAssessment() AssessmentLog {
+	return AssessmentLog{
 		RequirementId: "unknownAssessment()",
 		Description:   "unknown assessment",
-		Procedures: []*AssessmentProcedure{
-			{
-				Steps: []AssessmentStep{
-					passingAssessmentStep,
-					unknownAssessmentStep,
-					passingAssessmentStep,
-				},
-				Method: TestMethod,
-			},
+		Steps: []AssessmentStep{
+			passingAssessmentStep,
+			unknownAssessmentStep,
+			passingAssessmentStep,
 		},
 		Applicability: testingApplicability,
 	}
 }
 
-func badRevertPassingAssessment() Assessment {
-	return Assessment{
+func badRevertPassingAssessment() AssessmentLog {
+	return AssessmentLog{
 		RequirementId: "badRevertPassingAssessment()",
 		Description:   "bad revert passing assessment",
 		Changes: map[string]*Change{
 			"badRevertChange": badRevertChangePtr(),
 		},
-		Procedures:    []*AssessmentProcedure{&badRevertPassingProcedure},
+		Steps: []AssessmentStep{
+			passingAssessmentStep,
+			passingAssessmentStep,
+			passingAssessmentStep,
+			passingAssessmentStep,
+		},
 		Applicability: testingApplicability,
 	}
 }

@@ -7,7 +7,7 @@ import (
 func TestResultString(t *testing.T) {
 	tests := []struct {
 		name     string
-		result   Result
+		result   Status
 		expected string
 	}{
 		{
@@ -49,9 +49,9 @@ func TestResultString(t *testing.T) {
 func TestUpdateAggregateResult(t *testing.T) {
 	tests := []struct {
 		name     string
-		prev     Result
-		new      Result
-		expected Result
+		prev     Status
+		new      Status
+		expected Status
 	}{
 		{
 			name:     "NotRun should not overwrite anything",
@@ -99,7 +99,7 @@ func TestUpdateAggregateResult(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			actual := UpdateAggregateResult(test.prev, test.new)
+			actual := UpdateAggregateStatus(test.prev, test.new)
 			if actual != test.expected {
 				t.Errorf("expected %s, got %s", test.expected, actual)
 			}

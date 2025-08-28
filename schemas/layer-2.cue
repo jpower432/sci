@@ -87,16 +87,16 @@ package schemas
 	text: string
 	applicability: [...string]
 
-    recommendation?: string
-    // Define a list of parameters associated with
-    // the recomendation that may be set by an
-    // organization in layer 3. This defines available
-    // technology-specific "knobs".
-    "recommended-parameters"?: [...#Parameter] @go(RecommendedParameters) @yaml("recommended-parameters",omitempty)
+	recommendation?: string
+	// Define a list of parameters associated with
+	// the recomendation that may be set by an
+	// organization in layer 3. This defines available
+	// technology-specific "knobs".
+	"recommended-parameters"?: [...#Parameter] @go(RecommendedParameters) @yaml("recommended-parameters",omitempty)
 }
 
 #Parameter: {
-	id: string
+	id:           string
 	description?: string
-	default?: _
+	default?:     _
 }

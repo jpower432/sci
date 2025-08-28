@@ -71,7 +71,7 @@ import "time"
 	"control-modifications": [...#ControlModifier] @go(ControlModifications) @yaml("control-modifications",omitempty)
 	"assessment-requirement-modifications": [...#AssessmentRequirementModifier] @go(AssessmentRequirementModifications) @yaml("assessment-requirement-modifications",omitempty)
 	"guideline-modifications": [...#GuidelineModifier] @go(GuidelineModifications) @yaml("guideline-modifications",omitempty)
-  "parameter-modifications"?: [...#ParameterModifier] @go(ParameterModifications) @yaml("parameter-modifications",omitempty)
+	"parameter-modifications"?: [...#ParameterModifier] @go(ParameterModifications) @yaml("parameter-modifications",omitempty)
 }
 
 // Modifier Types
@@ -85,12 +85,12 @@ import "time"
 }
 
 #ParameterModifier: {
-	  "target-id": string @go(TargetId) @yaml("target-id") // e.g., "recommended-parameters"
-    "modification-type": #ModType @go(ModType) @yaml("modification-type")
-    "modification-rationale": string @go(ModificationRationale) @yaml("modification-rationale")
+	"target-id":              string   @go(TargetId) @yaml("target-id") // e.g., "recommended-parameters"
+	"modification-type":      #ModType @go(ModType) @yaml("modification-type")
+	"modification-rationale": string   @go(ModificationRationale) @yaml("modification-rationale")
 
-    description?: string // Description of the organization's specific parameter value
-    value: _ // This will override the default if one is set
+	description?: string // Description of the organization's specific parameter value
+	value:        _      // This will override the default if one is set
 }
 
 #AssessmentRequirementModifier: {
