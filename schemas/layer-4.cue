@@ -15,7 +15,7 @@ import "time"
 
 #AssessmentPlan: {
 	"control-id": string @go(ControlId)
-	"assessment": [...#Assessment] @go(Assessment)
+	"assessments": [...#Assessment] @go(Assessments)
 }
 
 #Assessment: {
