@@ -22,10 +22,17 @@ type Assessment struct {
 	Procedures []*AssessmentProcedure `yaml:"procedures"`
 	// RunDuration is the time it took to run the test
 	RunDuration string `yaml:"run-duration,omitempty"`
+	// Start is the time the assessment run began.
+	Start string `yaml:"start"`
+	// End is the time the assessment run finished.
+	// This is omitted if the assessment was interrupted or did not complete.
+	End string `yaml:"end,omitempty"`
 	// Value is the object that was returned during the test
 	Value interface{} `yaml:"value,omitempty"`
 	// Changes is a map of changes that were made during the test
 	Changes map[string]*Change `yaml:"changes,omitempty"`
+	// Recommendation is a string to aid users in remediation, such as the text from a layer 2 assessment requirement
+	Recommendation string `yaml:"recommendation,omitempty"`
 }
 
 // NewAssessment creates a new Assessment object and returns a pointer to it.
@@ -52,7 +59,7 @@ func (a *Assessment) Run(targetData interface{}, changesAllowed bool) Result {
 		return a.Result
 	}
 
-	startTime := time.Now()
+	a.Start = time.Now().Format(time.RFC3339)
 	err := a.precheck()
 	if err != nil {
 		a.Result = Unknown
@@ -71,8 +78,7 @@ func (a *Assessment) Run(targetData interface{}, changesAllowed bool) Result {
 			a.Message = procedure.Message
 		}
 	}
-
-	a.RunDuration = time.Since(startTime).String()
+	a.End = time.Now().Format(time.RFC3339)
 	return a.Result
 }
 
