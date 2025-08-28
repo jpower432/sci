@@ -33,7 +33,7 @@ import "time"
 
 #AssessmentLog: {
 	"requirement-id": string @go(RequirementId)
-	"procedure-id?":  string @go(ProcedureId)
+	"procedure-id"?:  string @go(ProcedureId)
 	applicability: [...string]
 	description: string
 	result:      #Result

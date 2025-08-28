@@ -13,6 +13,9 @@ import (
 type AssessmentLog struct {
 	// RequirementID is the unique identifier for the requirement being tested
 	RequirementId string `yaml:"requirement-id"`
+	// ProcedureId is the unique identifier for the assessment procedure that defined how
+	// the requirement is assessed.
+	ProcedureId string `yaml:"procedure-id,omitempty"`
 	// Applicability is a slice of identifier strings to determine when this test is applicable
 	Applicability []string `yaml:"applicability"`
 	// Description is a human-readable description of the test
