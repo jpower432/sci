@@ -42,6 +42,8 @@ Each layer in the model builds upon the lower layer, though in higher-level use 
 | 5 | Enforcement | Prevention or remediation based on assessment findings |
 | 6 | Audit | Review of organizational policy and conformance |
 
+<img src="./docs/assets/gemara.png" alt="Gemara diagram">
+
 ### Layer 1: Guidance
 
 The Guidance layer is the lowest level of the Gemara Model. Activities in this layer provide high-level rules pertaining to cybersecurity measures. Guidance is typically developed by industry groups, government agencies, or international standards bodies. Examples include the NIST Cybersecurity Framework, ISO 27001, PCI DSS, HIPPA, GDPR, and CRA. They are intended to be used as a starting point for organizations to develop their own cybersecurity programs.
@@ -132,41 +134,3 @@ Some Gemara use cases include:
 ## Contributing
 
 We're so glad you asked - see [CONTRIBUTING.md](/CONTRIBUTING.md) and if you have any questions or feedback head over to the OpenSSF Slack in [#wg-orbit](https://openssf.slack.com/archives/C08NJTFAL74)
-
-### Relationships
-
-```mermaid
-graph TD
-subgraph Gemara: GRC Engineering Model for Automated Risk Assessment
-direction LR
-subgraph Layers
-G[1. Guidance]
-C[2. Controls]
-P[3. Policy]
-E[4. Evaluation]
-F[5. Enforcement]
-A[6. Audit]
-end
-
-        G -- Supports --> C;
-        C -- "Tailors" --> P;
-        G -- "Informs" --> P;
-        P -- "Drives" --> E;
-        E -. "Technical Controls" .-> C;
-        P -- "Guides" --> F;
-        E -. "Triggers" .-> F;
-        A --> P;
-        F --> A;
-        E --> A;
-        P --> A;
-        C --> A;
-        G --> A;
-    end
-
-    style G fill:#2ECC71,stroke:#186A3B,color:#FFFFFF;
-    style C fill:#3498DB,stroke:#1F618D,color:#FFFFFF;
-    style P fill:#F1C40F,stroke:#B7950B,color:#000000;
-    style E fill:#E74C3C,stroke:#B03A2E,color:#FFFFFF;
-    style F fill:#9B59B6,stroke:#7D3C98,color:#FFFFFF;
-    style A fill:#D2B4DE,stroke:#AF7AC5,color:#000000;
-```
