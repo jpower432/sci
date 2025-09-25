@@ -15,6 +15,7 @@
 - [Usage](#usage)
 - [Projects and tooling using Gemara](#projects-and-tooling-using-gemara)
 - [Contributing](#contributing)
+- [Relationship](#relationships)
 
 ## Overview
 
@@ -131,3 +132,41 @@ Some Gemara use cases include:
 ## Contributing
 
 We're so glad you asked - see [CONTRIBUTING.md](/CONTRIBUTING.md) and if you have any questions or feedback head over to the OpenSSF Slack in [#wg-orbit](https://openssf.slack.com/archives/C08NJTFAL74)
+
+### Relationships
+
+```mermaid
+graph TD
+subgraph Gemara: GRC Engineering Model for Automated Risk Assessment
+direction LR
+subgraph Layers
+G[1. Guidance]
+C[2. Controls]
+P[3. Policy]
+E[4. Evaluation]
+F[5. Enforcement]
+A[6. Audit]
+end
+
+        G -- Supports --> C;
+        C -- "Tailors" --> P;
+        G -- "Informs" --> P;
+        P -- "Drives" --> E;
+        E -. "Technical Controls" .-> C;
+        P -- "Guides" --> F;
+        E -. "Triggers" .-> F;
+        A --> P;
+        F --> A;
+        E --> A;
+        P --> A;
+        C --> A;
+        G --> A;
+    end
+
+    style G fill:#2ECC71,stroke:#186A3B,color:#FFFFFF;
+    style C fill:#3498DB,stroke:#1F618D,color:#FFFFFF;
+    style P fill:#F1C40F,stroke:#B7950B,color:#000000;
+    style E fill:#E74C3C,stroke:#B03A2E,color:#FFFFFF;
+    style F fill:#9B59B6,stroke:#7D3C98,color:#FFFFFF;
+    style A fill:#D2B4DE,stroke:#AF7AC5,color:#000000;
+```
