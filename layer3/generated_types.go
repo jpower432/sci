@@ -99,6 +99,8 @@ type Mapping struct {
 	AssessmentRequirementModifications	[]AssessmentRequirementModifier	`json:"assessment-requirement-modifications" yaml:"assessment-requirement-modifications"`
 
 	GuidelineModifications	[]GuidelineModifier	`json:"guideline-modifications" yaml:"guideline-modifications"`
+
+	ParameterModifications	[]ParameterModifier	`json:"parameter-modifications,omitempty" yaml:"parameter-modifications,omitempty"`
 }
 
 // Modifier Types
@@ -154,6 +156,18 @@ type GuidelineModifier struct {
 	SeeAlso	[]string	`json:"see-also,omitempty" yaml:"see-also,omitempty"`
 
 	ExternalReferences	[]string	`json:"external-references,omitempty" yaml:"external-references,omitempty"`
+}
+
+type ParameterModifier struct {
+	TargetId	string	`json:"target-id" yaml:"target-id"`
+
+	ModType	ModType	`json:"modification-type" yaml:"modification-type"`
+
+	ModificationRationale	string	`json:"modification-rationale" yaml:"modification-rationale"`
+
+	Description	string	`json:"description,omitempty" yaml:"description,omitempty"`
+
+	Value	any/* CUE top */ `json:"value" yaml:"value"`
 }
 
 type ImplementationPlan struct {
