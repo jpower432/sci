@@ -47,6 +47,9 @@ import "time"
 
 	// The process that will be followed in the event that noncompliance is detected in an applicable resource
 	"noncompliance-plan"?: string @go(NoncompliancePlan) @yaml("noncompliance-plan",omitempty)
+
+	// Risk-based enforcement thresholds for different risk levels
+	"risk-thresholds"?: [...#RiskThreshold] @go(RiskThresholds) @yaml("risk-thresholds",omitempty)
 }
 
 #ImplementationDetails: {
@@ -168,6 +171,18 @@ import "time"
 	"Consulted" |
 	"Informed"
 
+#RiskThreshold: {
+	// The risk level this threshold applies to
+	"risk-level": #RiskLevel @go(RiskLevel) @yaml("risk-level")
+	// The enforcement method to use for this risk level
+	"enforcement-method": #EnforcementMethod @go(EnforcementMethod) @yaml("enforcement-method")
+	// Optional additional conditions for this threshold
+	remarks?: string
+}
+
 #Datetime: time.Format("2006-01-02T15:04:05Z07:00") @go(Datetime,format="date-time")
 #ModType:  "increase-strictness" | "clarify" | "reduce-strictness" | "exclude"
 #Email:    =~"^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$"
+
+// RiskLevel defines the organizational risk severity levels for policy decisions
+#RiskLevel: "Critical" | "High" | "Medium" | "Low" | "Informational"

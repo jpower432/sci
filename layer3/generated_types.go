@@ -103,6 +103,9 @@ type ImplementationPlan struct {
 
 	// The process that will be followed in the event that noncompliance is detected in an applicable resource
 	NoncompliancePlan	string	`json:"noncompliance-plan,omitempty" yaml:"noncompliance-plan,omitempty"`
+
+	// Risk-based enforcement thresholds for different risk levels
+	RiskThresholds	[]RiskThreshold	`json:"risk-thresholds,omitempty" yaml:"risk-thresholds,omitempty"`
 }
 
 type NotificationGroup string
@@ -120,6 +123,20 @@ type Datetime string
 type EvaluationPoint string
 
 type EnforcementMethod string
+
+type RiskThreshold struct {
+	// The risk level this threshold applies to
+	RiskLevel	RiskLevel	`json:"risk-level" yaml:"risk-level"`
+
+	// The enforcement method to use for this risk level
+	EnforcementMethod	EnforcementMethod	`json:"enforcement-method" yaml:"enforcement-method"`
+
+	// Optional additional conditions for this threshold
+	Remarks	string	`json:"remarks,omitempty" yaml:"remarks,omitempty"`
+}
+
+// RiskLevel defines the organizational risk severity levels for policy decisions
+type RiskLevel string
 
 type Mapping struct {
 	ReferenceId	string	`json:"reference-id" yaml:"reference-id"`
