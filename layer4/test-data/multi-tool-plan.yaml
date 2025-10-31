@@ -1,0 +1,252 @@
+metadata:
+  id: test-multi-tool-osps-plan
+  version: "1.0.0"
+  author:
+    name: Test Evaluation Plan Generator
+    uri: https://example.com/test-plans
+    version: "1.0.0"
+  mapping-references:
+    - id: OSPS-B
+      title: Open Source Project Security Baseline
+      version: "2024"
+      description: The Open Source Project Security (OSPS) Baseline
+
+executors:
+  - id: pvtr-baseline-scanner
+    name: PVTR Baseline Scanner
+    type: Automated
+    description: Automated security baseline scanner for GitHub repositories
+    documentation: https://github.com/revanite-io/pvtr-github-repo
+  
+  - id: openssf-scorecard
+    name: OpenSSF Scorecard
+    type: Automated
+    description: Security health scorecard for open source projects
+    documentation: https://github.com/ossf/scorecard
+  
+  - id: manual-review
+    name: Manual Security Review
+    type: Manual
+    description: Human expert review of security controls and documentation
+    documentation: https://example.com/manual-review-guide
+
+plans:
+  - control:
+      reference-id: OSPS-B
+      entry-id: OSPS-AC-01
+    assessments:
+      - requirement:
+          reference-id: OSPS-B
+          entry-id: OSPS-AC-01.01
+        procedures:
+          - id: check-mfa-automated
+            name: Automated MFA Check via API
+            description: |
+              Query the version control system API to verify that multi-factor authentication
+              is required for collaborators with repository modification permissions.
+            executors:
+              - id: pvtr-baseline-scanner
+                trust-score: 8
+          
+          - id: check-mfa-manual
+            name: Manual MFA Configuration Review
+            description: |
+              Manually verify that MFA is enabled for all collaborators by reviewing
+              repository settings and user access permissions.
+            executors:
+              - id: manual-review
+                trust-score: 10
+
+  - control:
+      reference-id: OSPS-B
+      entry-id: OSPS-AC-03
+    assessments:
+      - requirement:
+          reference-id: OSPS-B
+          entry-id: OSPS-AC-03.01
+        strategy:
+          conflict-rule-type: Strict
+          remarks: |
+            Branch protection is critical for security. Any failure from any procedure
+            (automated or manual) should cause the requirement to fail, ensuring high security standards.
+        procedures:
+          - id: check-branch-protection-automated
+            name: Automated Branch Protection Check
+            description: |
+              Verify that branch protection rules prevent direct commits to the primary branch
+              by querying the version control system API. Multiple automated tools can perform this check.
+            executors:
+              - id: pvtr-baseline-scanner
+                trust-score: 7
+              - id: openssf-scorecard
+                trust-score: 9
+            strategy:
+              conflict-rule-type: Strict
+              remarks: |
+                Any automated tool reporting a failure should cause the procedure to fail.
+                Trust scores can be used if WeightedScore strategy is applied, giving more weight to Scorecard since it's a stable project.
+          
+          - id: check-branch-protection-manual
+            name: Manual Branch Protection Review
+            description: |
+              Manually review repository settings to confirm branch protection is configured
+              and requires pull request reviews before merging.
+            executors:
+              - id: manual-review
+                trust-score: 10
+
+  - control:
+      reference-id: OSPS-B
+      entry-id: OSPS-BR-01
+    assessments:
+      - requirement:
+          reference-id: OSPS-B
+          entry-id: OSPS-BR-01.01
+        procedures:
+          - id: check-cicd-input-sanitization-automated
+            name: Automated CI/CD Input Parameter Sanitization Check
+            description: |
+              Verify that CI/CD pipeline inputs are properly sanitized and validated
+              by analyzing workflow files and pipeline configurations.
+            executors:
+              - id: pvtr-baseline-scanner
+                trust-score: 7
+          
+          - id: check-cicd-input-manual
+            name: Manual CI/CD Input Review
+            description: |
+              Manually review CI/CD pipeline configuration files to ensure input parameters
+              are sanitized and validated before use.
+            executors:
+              - id: manual-review
+                trust-score: 10
+
+  - control:
+      reference-id: OSPS-B
+      entry-id: OSPS-QA-02
+    assessments:
+      - requirement:
+          reference-id: OSPS-B
+          entry-id: OSPS-QA-02.01
+        procedures:
+          - id: check-dependency-manifests-automated
+            name: Automated Dependency Manifest Detection
+            description: |
+              Scan the repository to identify and verify the presence of dependency
+              manifest files (package.json, requirements.txt, go.mod, etc.).
+            executors:
+              - id: pvtr-baseline-scanner
+                trust-score: 9
+          
+          - id: check-dependency-manifests-manual
+            name: Manual Dependency Manifest Review
+            description: |
+              Manually verify that dependency manifest files are present and properly
+              configured for the project's language and package manager.
+            executors:
+              - id: manual-review
+                trust-score: 10
+
+  - control:
+      reference-id: OSPS-B
+      entry-id: OSPS-QA-05
+    assessments:
+      - requirement:
+          reference-id: OSPS-B
+          entry-id: OSPS-QA-05.01
+        procedures:
+          - id: check-binary-files-automated
+            name: Automated Binary File Detection
+            description: |
+              Scan the repository to detect binary or executable files that should
+              not be stored in version control.
+            executors:
+              - id: pvtr-baseline-scanner
+                trust-score: 8
+          
+          - id: check-binary-files-manual
+            name: Manual Binary File Review
+            description: |
+              Manually review the repository structure to identify any binary or
+              executable files that should be excluded from version control.
+            executors:
+              - id: manual-review
+                trust-score: 10
+
+  - control:
+      reference-id: OSPS-B
+      entry-id: OSPS-VM-02
+    assessments:
+      - requirement:
+          reference-id: OSPS-B
+          entry-id: OSPS-VM-02.01
+        procedures:
+          - id: check-security-contacts-automated
+            name: Automated Security Contacts Detection
+            description: |
+              Scan project documentation files (README, SECURITY.md, etc.) to detect
+              security contact information.
+            executors:
+              - id: pvtr-baseline-scanner
+                trust-score: 7
+          
+          - id: check-security-contacts-manual
+            name: Manual Security Contacts Review
+            description: |
+              Manually review project documentation to verify that security contacts
+              are clearly documented and accessible.
+            executors:
+              - id: manual-review
+                trust-score: 10
+
+  - control:
+      reference-id: OSPS-B
+      entry-id: OSPS-GV-03
+    assessments:
+      - requirement:
+          reference-id: OSPS-B
+          entry-id: OSPS-GV-03.01
+        procedures:
+          - id: check-contribution-guide-automated
+            name: Automated Contribution Guide Detection
+            description: |
+              Scan the repository for contribution guide files (CONTRIBUTING.md,
+              CONTRIBUTING.rst, etc.) and verify their presence.
+            executors:
+              - id: pvtr-baseline-scanner
+                trust-score: 8
+          
+          - id: check-contribution-guide-manual
+            name: Manual Contribution Guide Review
+            description: |
+              Manually review the contribution guide to ensure it provides clear
+              instructions on how to contribute to the project.
+            executors:
+              - id: manual-review
+                trust-score: 10
+
+  - control:
+      reference-id: OSPS-B
+      entry-id: OSPS-LE-02
+    assessments:
+      - requirement:
+          reference-id: OSPS-B
+          entry-id: OSPS-LE-02.01
+        procedures:
+          - id: check-license-compliance-automated
+            name: Automated License Compliance Check
+            description: |
+              Analyze license files and project metadata to verify that licenses
+              meet OSI or FSF approval criteria.
+            executors:
+              - id: pvtr-baseline-scanner
+                trust-score: 8
+          
+          - id: check-license-compliance-manual
+            name: Manual License Compliance Review
+            description: |
+              Manually review the project license to ensure it meets OSI Open Source
+              Definition or FSF Free Software Definition requirements.
+            executors:
+              - id: manual-review
+                trust-score: 10
