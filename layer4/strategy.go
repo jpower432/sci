@@ -7,8 +7,8 @@ import "encoding/json"
 type ConflictRuleType string
 
 const (
-	// WeightedScore uses trust scores from executor mappings to compute a weighted
-	// average of results, giving more weight to executors with higher trust scores.
+	// WeightedScore uses trust scores to compute a weighted average of results,
+	// giving more weight to executors with higher trust scores. See SPEC.md for details.
 	WeightedScore ConflictRuleType = "WeightedScore"
 
 	// Strict indicates that if any executor reports a failure, the overall

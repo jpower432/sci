@@ -43,45 +43,76 @@ Three conflict resolution strategies are available for determining findings from
 
 ### 2. WeightedScore
 
-**Description**: Uses trust scores from executor mappings to compute a weighted determination of findings, giving more weight to executors with higher trust scores.
+**Description**: Uses trust scores from executor mappings to compute a weighted average of results, giving more weight to executors with higher trust scores. This allows you to prioritize results from more reliable or accurate executors when multiple executors provide conflicting results.
 
-**Use Case**: Use when different executors have varying levels of reliability or accuracy for a specific procedure, and you want their results weighted accordingly.
+**Use Case**: Use when different executors have varying levels of reliability or accuracy for a specific procedure, and you want their results weighted proportionally to their trustworthiness. For example:
+- A well-established tool with high accuracy should have more influence than a newer experimental tool
+- A tool that specializes in a specific domain should be weighted higher for assessments in that domain
+- Multiple tools with different strengths can contribute proportionally to the final determination
 
-**Trust Scores**: Each executor has a trust score on a scale of 1 to 10, where 10 is the most trusted.
+**Trust Scores**: Each executor has a trust score on a scale of 1 to 10, where:
+- **1-3**: Low trust/reliability (e.g., experimental tools, tools with known issues)
+- **4-6**: Moderate trust (e.g., standard tools with typical accuracy)
+- **7-9**: High trust (e.g., well-established tools, tools with proven track records)
+- **10**: Maximum trust (e.g., industry-standard tools, manually verified executors)
 
-**Finding Determination**:
-1. Convert each result to a numeric value:
-   - Failed = 0
-   - Unknown = 1
-   - NeedsReview = 2
-   - Passed = 3
-   - NotApplicable = 4
-   - NotRun = excluded from calculation
+**Finding Determination Process**:
 
-2. Calculate weighted average:
+1. **Convert results to numeric values**:
+   Each result type is assigned a numeric value representing its severity/confidence:
+   - `Failed = 0` (most severe - security issue detected)
+   - `Unknown = 1` (indeterminate result)
+   - `NeedsReview = 2` (requires human review)
+   - `Passed = 3` (no issues found)
+   - `NotApplicable = 4` (not relevant to context)
+   - `NotRun` = excluded from calculation (no result available)
+
+2. **Calculate weighted average**:
+   For each executor with a valid result (not NotRun), multiply its result value by its trust score, then sum all products and divide by the sum of all trust scores:
    ```
    weighted_sum = ?(result_value ? trust_score)
    total_weight = ?(trust_score)
    weighted_average = weighted_sum / total_weight
    ```
+   
+   This formula ensures that executors with higher trust scores have proportionally more influence on the final result.
 
-3. Determine finding based on weighted average:
-   - If weighted_average < 0.5: **Finding exists** (Failed)
-   - If weighted_average < 1.5: **Finding exists** (Unknown)
-   - If weighted_average < 2.5: **Finding exists** (NeedsReview)
-   - If weighted_average < 3.5: **No finding** (Passed)
-   - Otherwise: **No finding** (NotApplicable)
+3. **Determine finding based on weighted average thresholds**:
+   The weighted average is compared against thresholds to determine the final finding:
+   - If `weighted_average < 0.5`: **Finding exists** (Failed)
+   - If `weighted_average < 1.5`: **Finding exists** (Unknown)
+   - If `weighted_average < 2.5`: **Finding exists** (NeedsReview)
+   - If `weighted_average < 3.5`: **No finding** (Passed)
+   - Otherwise (`weighted_average >= 3.5`): **No finding** (NotApplicable)
 
 **Special Cases**:
-- If any executor reports Failed, a **Failed finding** is determined (regardless of weights)
-- If all executors report NotRun, no finding is determined
-- Executors with NotRun results are excluded from the weighted calculation
+- **Failed results override weights**: If ANY executor reports `Failed`, a **Failed finding** is determined immediately, regardless of weighted average. This ensures that any detected security issue is not masked by weighted averaging.
+- **NotRun exclusion**: Executors with `NotRun` results are excluded from the weighted calculation (they don't contribute to weighted_sum or total_weight).
+- **All NotRun**: If all executors report `NotRun`, no finding is determined.
+- **Single executor**: If only one executor has a valid result, its result becomes the final determination (weighted average equals that executor's result value).
 
-**Example**:
+**Example 1: Basic Weighted Average**:
 - Executor A (trust-score: 7): Passed (value: 3)
 - Executor B (trust-score: 9): NeedsReview (value: 2)
-- Weighted average = (3?7 + 2?9) / (7+9) = (21 + 18) / 16 = 39/16 = 2.4375
-- **Finding**: NeedsReview finding determined (since 2.4375 < 2.5)
+- Calculation:
+  - weighted_sum = (3 ? 7) + (2 ? 9) = 21 + 18 = 39
+  - total_weight = 7 + 9 = 16
+  - weighted_average = 39 / 16 = 2.4375
+- **Finding**: NeedsReview finding determined (since 2.4375 < 2.5, but >= 1.5)
+
+**Example 2: Failed Override**:
+- Executor A (trust-score: 10): Passed (value: 3)
+- Executor B (trust-score: 5): Failed (value: 0)
+- Even though Executor A has a higher trust score and reported Passed, **Finding**: Failed finding determined immediately because Executor B reported Failed.
+
+**Example 3: High Trust Dominance**:
+- Executor A (trust-score: 9): Passed (value: 3)
+- Executor B (trust-score: 2): NeedsReview (value: 2)
+- Calculation:
+  - weighted_sum = (3 ? 9) + (2 ? 2) = 27 + 4 = 31
+  - total_weight = 9 + 2 = 11
+  - weighted_average = 31 / 11 = 2.818
+- **Finding**: No finding (Passed) - The high-trust executor's Passed result dominates, resulting in weighted_average of 2.818, which is > 2.5 and < 3.5, indicating Passed.
 
 ### 3. ManualOverride
 
