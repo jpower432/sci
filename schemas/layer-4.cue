@@ -8,6 +8,22 @@ import "time"
 #EvaluationPlan: {
 	metadata: #Metadata
 	plans: [...#AssessmentPlan]
+	// Executors defines the assessment executors that can be used to execute assessment procedures.
+	executors?: [...#AssessmentExecutor]
+
+	// Ensure procedure reference a valid executor
+	_validExecutorIds: [for e in executors {e.id}]
+	_allowedId: or(_validExecutorIds)
+
+	plans: [...#AssessmentPlan & {
+		assessments: [...#Assessment & {
+			procedures: [...#AssessmentProcedure & {
+				executors: [...#ExecutorMapping & {
+					id: _allowedId
+				}]
+			}]
+		}]
+	}]
 }
 
 // EvaluationLog contains the results of evaluating a set of Layer 2 controls.
@@ -116,6 +132,9 @@ import "time"
 	requirement: #Mapping
 	// Procedures defines possible testing procedures to evaluate the requirement.
 	procedures: [...#AssessmentProcedure] @go(Procedures)
+	// Strategy defines the rules for aggregating results from multiple procedures.
+	// This is used when multiple procedures exist for the same requirement and their results conflict.
+	"strategy"?: #Strategy
 }
 
 // AssessmentProcedure describes a testing procedure for evaluating a Layer 2 control requirement.
@@ -128,6 +147,54 @@ import "time"
 	description: string
 	// Documentation provides a URL to documentation that describes how the assessment procedure evaluates the control requirement
 	documentation?: =~"^https?://[^\\s]+$"
+	// Executors lists which assessment executors can execute this procedure, along with their trust scores for this specific procedure.
+	// Multiple executors indicate that different tools can perform the same check (e.g., PVTR and Scorecard both checking branch protection).
+	executors: [...#ExecutorMapping]
+	// Strategy defines the rules for aggregating results from multiple executors running the same procedure.
+	"strategy"?: #Strategy
+}
+
+// ExecutorMapping maps an assessment executor to a procedure with a trust score.
+#ExecutorMapping: {
+	id: string
+	// TrustScore is the numerical weight assigned to this method-procedure combination on a scale of 1 to 10, with 10 being the most trusted.
+	"trust-score": int & >=1 & <=10 @go(TrustScore)
+	// Remarks provides context about why this executor-procedure combination
+	remarks?: string
+}
+
+// AssessmentExecutor describes an assessment method (tool or manual approach) that can be used to execute assessment procedures.
+#AssessmentExecutor: {
+	// Id uniquely identifies the assessment method.
+	id: string
+	// Name provides the name of the assessment method.
+	name: string
+	// Type specifies whether the executor is automated or manual.
+	// Automated executors are tools or scripts that run without human intervention.
+	// Manual executors require human review or judgment.
+	type: "Automated" | "Manual" @go(Type)
+	// Version specifies the version of the assessment method (if applicable, e.g., for tools).
+	version?: string
+	// Description provides additional context about the assessment method.
+	description?: string
+	// Documentation provides a URL to documentation for the assessment method.
+	documentation?: =~"^https?://[^\\s]+$"
+}
+
+// Strategy defines the rules for resolving conflicts between multiple execution agents.
+// ConflictRuleType specifies the type of aggregation logic used to resolve conflicts
+// when multiple executors provide results for the same assessment procedure.
+#Strategy: {
+	// WeightedScore uses trust scores from executor mappings to compute a weighted
+	// average of results, giving more weight to executors with higher trust scores.
+	// Strict indicates that if any executor reports a failure, the overall
+	// procedure result is failed, regardless of other executor results.
+	// ManualOverride gives precedence to manual review executors over automated
+	// executors when results conflict.
+	"conflict-rule-type": "WeightedScore" | "Strict" | "ManualOverride" @go(ConflictRuleType)
+
+	// Remarks provides context for why this specific conflict resolution strategy was chosen.
+	remarks?: string
 }
 
 #Contact: {

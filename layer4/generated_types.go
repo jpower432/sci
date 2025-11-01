@@ -6,7 +6,19 @@ package layer4
 type EvaluationPlan struct {
 	Metadata	Metadata	`json:"metadata" yaml:"metadata"`
 
-	Plans	[]AssessmentPlan	`json:"plans" yaml:"plans"`
+	Plans	[]struct {
+		// Control points to the Layer 2 control being evaluated.
+		Control	Mapping	`json:"control"`
+
+		// Assessments defines possible testing procedures to evaluate the control.
+		//
+		// Enforce that control reference and the assessments' references match
+		// This formulation uses the control's reference if the assessment doesn't include a reference
+		Assessments	[]Assessment	`json:"assessments"`
+	}	`json:"plans" yaml:"plans"`
+
+	// Executors defines the assessment executors that can be used to execute assessment procedures.
+	Executors	[]AssessmentExecutor	`json:"executors,omitempty" yaml:"executors,omitempty"`
 }
 
 // Metadata contains metadata about the Layer 4 evaluation plan and log.
@@ -60,18 +72,6 @@ type MappingReference struct {
 	Url	string	`json:"url,omitempty" yaml:"url,omitempty"`
 }
 
-// AssessmentPlan defines all testing procedures for a control id.
-type AssessmentPlan struct {
-	// Control points to the Layer 2 control being evaluated.
-	Control	Mapping	`json:"control" yaml:"control"`
-
-	// Assessments defines possible testing procedures to evaluate the control.
-	//
-	// Enforce that control reference and the assessments' references match
-	// This formulation uses the control's reference if the assessment doesn't include a reference
-	Assessments	[]Assessment	`json:"assessments" yaml:"assessments"`
-}
-
 type Mapping struct {
 	// ReferenceId should reference the corresponding MappingReference id
 	ReferenceId	string	`json:"reference-id" yaml:"reference-id"`
@@ -84,6 +84,29 @@ type Mapping struct {
 
 	// Remarks provides additional context about the mapping entry.
 	Remarks	string	`json:"remarks,omitempty" yaml:"remarks,omitempty"`
+}
+
+// AssessmentExecutor describes an assessment method (tool or manual approach) that can be used to execute assessment procedures.
+type AssessmentExecutor struct {
+	// Id uniquely identifies the assessment method.
+	Id	string	`json:"id" yaml:"id"`
+
+	// Name provides the name of the assessment method.
+	Name	string	`json:"name" yaml:"name"`
+
+	// Type specifies whether the executor is automated or manual.
+	// Automated executors are tools or scripts that run without human intervention.
+	// Manual executors require human review or judgment.
+	Type	string	`json:"type" yaml:"type"`
+
+	// Version specifies the version of the assessment method (if applicable, e.g., for tools).
+	Version	string	`json:"version,omitempty" yaml:"version,omitempty"`
+
+	// Description provides additional context about the assessment method.
+	Description	string	`json:"description,omitempty" yaml:"description,omitempty"`
+
+	// Documentation provides a URL to documentation for the assessment method.
+	Documentation	string	`json:"documentation,omitempty" yaml:"documentation,omitempty"`
 }
 
 // EvaluationLog contains the results of evaluating a set of Layer 2 controls.
@@ -146,6 +169,18 @@ type AssessmentLog struct {
 
 type Datetime string
 
+// AssessmentPlan defines all testing procedures for a control id.
+type AssessmentPlan struct {
+	// Control points to the Layer 2 control being evaluated.
+	Control	Mapping	`json:"control" yaml:"control"`
+
+	// Assessments defines possible testing procedures to evaluate the control.
+	//
+	// Enforce that control reference and the assessments' references match
+	// This formulation uses the control's reference if the assessment doesn't include a reference
+	Assessments	[]Assessment	`json:"assessments" yaml:"assessments"`
+}
+
 // Assessment defines all testing procedures for a requirement.
 type Assessment struct {
 	// RequirementId points to the requirement being tested.
@@ -153,6 +188,10 @@ type Assessment struct {
 
 	// Procedures defines possible testing procedures to evaluate the requirement.
 	Procedures	[]AssessmentProcedure	`json:"procedures" yaml:"procedures"`
+
+	// Strategy defines the rules for aggregating results from multiple procedures.
+	// This is used when multiple procedures exist for the same requirement and their results conflict.
+	Strategy	Strategy	`json:"strategy,omitempty" yaml:"strategy,omitempty"`
 }
 
 // AssessmentProcedure describes a testing procedure for evaluating a Layer 2 control requirement.
@@ -168,6 +207,40 @@ type AssessmentProcedure struct {
 
 	// Documentation provides a URL to documentation that describes how the assessment procedure evaluates the control requirement
 	Documentation	string	`json:"documentation,omitempty" yaml:"documentation,omitempty"`
+
+	// Executors lists which assessment executors can execute this procedure, along with their trust scores for this specific procedure.
+	// Multiple executors indicate that different tools can perform the same check (e.g., PVTR and Scorecard both checking branch protection).
+	Executors	[]ExecutorMapping	`json:"executors" yaml:"executors"`
+
+	// Strategy defines the rules for aggregating results from multiple executors running the same procedure.
+	Strategy	Strategy	`json:"strategy,omitempty" yaml:"strategy,omitempty"`
+}
+
+// ExecutorMapping maps an assessment executor to a procedure with a trust score.
+type ExecutorMapping struct {
+	Id	string	`json:"id" yaml:"id"`
+
+	// TrustScore is the numerical weight assigned to this method-procedure combination on a scale of 1 to 10, with 10 being the most trusted.
+	TrustScore	int64	`json:"trust-score" yaml:"trust-score"`
+
+	// Remarks provides context about why this executor-procedure combination
+	Remarks	string	`json:"remarks,omitempty" yaml:"remarks,omitempty"`
+}
+
+// Strategy defines the rules for resolving conflicts between multiple execution agents.
+// ConflictRuleType specifies the type of aggregation logic used to resolve conflicts
+// when multiple executors provide results for the same assessment procedure.
+type Strategy struct {
+	// WeightedScore uses trust scores from executor mappings to compute a weighted
+	// average of results, giving more weight to executors with higher trust scores.
+	// Strict indicates that if any executor reports a failure, the overall
+	// procedure result is failed, regardless of other executor results.
+	// ManualOverride gives precedence to manual review executors over automated
+	// executors when results conflict.
+	ConflictRuleType	string	`json:"conflict-rule-type" yaml:"conflict-rule-type"`
+
+	// Remarks provides context for why this specific conflict resolution strategy was chosen.
+	Remarks	string	`json:"remarks,omitempty" yaml:"remarks,omitempty"`
 }
 
 type Email string
