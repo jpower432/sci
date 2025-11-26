@@ -54,7 +54,7 @@ type Scope struct {
 	Providers []string `json:"providers,omitempty" yaml:"providers,omitempty"`
 }
 
-// ImportedPolicy represents a reference to another policy that is imported wholesale
+// ImportedPolicy represents a reference to another policy that is imported.
 type ImportedPolicy struct {
 	ReferenceId string `json:"reference-id" yaml:"reference-id"`
 }
