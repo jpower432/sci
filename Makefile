@@ -3,6 +3,8 @@ all: tidy test testcov cuefmtcheck lintcue cuegen dirtycheck lintinsights
 tidy:
 	@echo "  >  Tidying go.mod ..."
 	@go mod tidy
+	@echo "  >  Tidying cue.mod ..."
+	@cd schemas && cue mod tidy
 
 test:
 	@echo "  >  Running tests ..."
@@ -25,28 +27,28 @@ lint:
 	@golangci-lint run
 
 lintcue:
-	@echo "  >  Linting CUE files ..."
-	@cue eval ./schemas/layer-1.cue --all-errors --verbose
-	@cue eval ./schemas/layer-2.cue --all-errors --verbose
-	@cue eval ./schemas/layer-3.cue --all-errors --verbose
-	@cue eval ./schemas/layer-4.cue --all-errors --verbose
+	@echo "  >  Linting CUE files (with module support) ..."
+	@cd schemas && cue eval ./layer1/layer1.cue --all-errors --verbose
+	@cd schemas && cue eval ./layer2/layer2.cue --all-errors --verbose
+	@cd schemas && cue eval ./layer3/layer3.cue --all-errors --verbose
+	@cd schemas && cue eval ./layer4/layer4.cue --all-errors --verbose
 
-cuegen:
+cuegen: tidy
 	@echo "  >  Generating types from cue schema ..."
-	@cue exp gengotypes ./schemas/layer-1.cue
-	@mv cue_types_gen.go layer1/generated_types.go
-	@cue exp gengotypes ./schemas/layer-2.cue
-	@mv cue_types_gen.go layer2/generated_types.go
-	@cue exp gengotypes ./schemas/layer-3.cue
-	@mv cue_types_gen.go layer3/generated_types.go
-	@cue exp gengotypes ./schemas/layer-4.cue
-	@mv cue_types_gen.go layer4/generated_types.go
-	@go build -o utils/types_tagger utils/types_tagger.go
-	@utils/types_tagger layer1/generated_types.go
-	@utils/types_tagger layer2/generated_types.go
-	@utils/types_tagger layer3/generated_types.go
-	@utils/types_tagger layer4/generated_types.go
-	@rm utils/types_tagger
+	@cd schemas && cue exp gengotypes ./layer3/layer3.cue
+	@mv schemas/cue_types_gen.go layer3/generated_types.go
+	@cd schemas && cue exp gengotypes ./layer4/layer4.cue
+	@mv schemas/cue_types_gen.go layer4/generated_types.go
+	@mv schemas/common/cue_types_gen.go common/generated_types.go
+	@mv schemas/layer1/cue_types_gen.go layer1/generated_types.go
+	@mv schemas/layer2/cue_types_gen.go layer2/generated_types.go
+	@go build -o utils/fix_generated_types utils/fix_generated_types.go
+	@utils/fix_generated_types common/generated_types.go
+	@utils/fix_generated_types layer1/generated_types.go
+	@utils/fix_generated_types layer2/generated_types.go
+	@utils/fix_generated_types layer3/generated_types.go
+	@utils/fix_generated_types layer4/generated_types.go
+	@rm utils/fix_generated_types
 
 dirtycheck:
 	@echo "  >  Checking for uncommitted changes ..."

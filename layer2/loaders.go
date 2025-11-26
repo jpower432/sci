@@ -10,9 +10,9 @@ import (
 // LoadFiles loads data from any number of YAML or JSON files at the provided paths.
 // sourcePath are expected to be file or https URIs in the form file:///path/to/file.yaml or https://example.com/file.yaml.
 // If run multiple times, this method will append new data to previous data.
-func (c *Catalog) LoadFiles(sourcePaths []string) error {
+func (c *ControlObjectives) LoadFiles(sourcePaths []string) error {
 	for _, sourcePath := range sourcePaths {
-		catalog := &Catalog{}
+		catalog := &ControlObjectives{}
 		err := catalog.LoadFile(sourcePath)
 		if err != nil {
 			return err
@@ -20,7 +20,8 @@ func (c *Catalog) LoadFiles(sourcePaths []string) error {
 		if c.Metadata.Id == "" {
 			c.Metadata = catalog.Metadata
 		}
-		c.ControlFamilies = append(c.ControlFamilies, catalog.ControlFamilies...)
+		c.Families = append(c.Families, catalog.Families...)
+		c.Controls = append(c.Controls, catalog.Controls...)
 		c.Capabilities = append(c.Capabilities, catalog.Capabilities...)
 		c.Threats = append(c.Threats, catalog.Threats...)
 		c.ImportedControls = append(c.ImportedControls, catalog.ImportedControls...)
@@ -33,7 +34,7 @@ func (c *Catalog) LoadFiles(sourcePaths []string) error {
 // LoadFile loads data from a single YAML or JSON file at the provided path.
 // sourcePath is expected to be a file or https URI in the form file:///path/to/file.yaml or https://example.com/file.yaml.
 // If run multiple times for the same data type, this method will override previous data.
-func (c *Catalog) LoadFile(sourcePath string) error {
+func (c *ControlObjectives) LoadFile(sourcePath string) error {
 	ext := path.Ext(sourcePath)
 	switch ext {
 	case ".yaml", ".yml":
@@ -57,7 +58,7 @@ func (c *Catalog) LoadFile(sourcePath string) error {
 // Accepts file URIs with the 'file:///' prefix.
 // Throws an error if the URL is not https.
 // TODO: Consider validating/sanitizing inputs to reduce injection risks.
-func (c *Catalog) LoadNestedCatalog(sourcePath, fieldName string) error {
+func (c *ControlObjectives) LoadNestedCatalog(sourcePath, fieldName string) error {
 	if fieldName == "" {
 		return fmt.Errorf("fieldName cannot be empty")
 	}
@@ -70,14 +71,14 @@ func (c *Catalog) LoadNestedCatalog(sourcePath, fieldName string) error {
 	if !exists {
 		return fmt.Errorf("field '%s' not found in YAML file", fieldName)
 	}
-	// Marshal and unmarshal the nested field into Catalog
+	// Marshal and unmarshal the nested field into ControlObjectives
 	fieldYamlBytes, err := loaders.MarshalYAML(fieldData)
 	if err != nil {
 		return fmt.Errorf("error marshaling field data to YAML: %w", err)
 	}
 	err = loaders.UnmarshalYAML(fieldYamlBytes, c)
 	if err != nil {
-		return fmt.Errorf("error decoding field '%s' into Catalog: %w", fieldName, err)
+		return fmt.Errorf("error decoding field '%s' into ControlObjectives: %w", fieldName, err)
 	}
 	return nil
 }

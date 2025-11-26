@@ -2,206 +2,179 @@
 
 package layer3
 
+import (
+	"github.com/ossf/gemara/common"
+	"github.com/ossf/gemara/layer1"
+	"github.com/ossf/gemara/layer2"
+)
+
 // Core Document Structure
-type PolicyDocument struct {
-	Metadata	Metadata	`json:"metadata" yaml:"metadata"`
+type Policy struct {
+	Metadata common.Metadata `json:"metadata" yaml:"metadata"`
 
-	Scope	Scope	`json:"scope" yaml:"scope"`
+	OrganizationID string `json:"organization-id" yaml:"organization-id"`
 
-	ImplementationPlan	ImplementationPlan	`json:"implementation-plan,omitempty" yaml:"implementation-plan,omitempty"`
+	Title string `json:"title" yaml:"title"`
 
-	GuidanceReferences	[]Mapping	`json:"guidance-references" yaml:"guidance-references"`
+	Purpose string `json:"purpose" yaml:"purpose"`
 
-	ControlReferences	[]Mapping	`json:"control-references" yaml:"control-references"`
-}
+	Contacts Contacts `json:"contacts" yaml:"contacts"`
 
-type Metadata struct {
-	Id	string	`json:"id" yaml:"id"`
+	Scope Scope `json:"scope" yaml:"scope"`
 
-	Title	string	`json:"title" yaml:"title"`
+	ImportedPolicies []ImportedPolicy `json:"imported-policies,omitempty" yaml:"imported-policies,omitempty"`
 
-	Objective	string	`json:"objective" yaml:"objective"`
+	ImplementationPlan ImplementationPlan `json:"implementation-plan,omitempty" yaml:"implementation-plan,omitempty"`
 
-	Version	string	`json:"version" yaml:"version"`
+	GuidanceReferences []PolicyMapping `json:"guidance-references,omitempty" yaml:"guidance-references,omitempty"`
 
-	Contacts	Contacts	`json:"contacts" yaml:"contacts"`
-
-	LastModified	string	`json:"last-modified" yaml:"last-modified"`
-
-	OrganizationID	string	`json:"organization-id,omitempty" yaml:"organization-id,omitempty"`
-
-	AuthorNotes	string	`json:"author-notes,omitempty" yaml:"author-notes,omitempty"`
-
-	MappingReferences	[]MappingReference	`json:"mapping-references,omitempty" yaml:"mapping-references,omitempty"`
+	ControlReferences []PolicyMapping `json:"control-references,omitempty" yaml:"control-references,omitempty"`
 }
 
 type Contacts struct {
-	Author	Contact	`json:"author" yaml:"author"`
+	Author common.Contact `json:"author" yaml:"author"`
 
-	Responsible	[]Contact	`json:"responsible" yaml:"responsible"`
+	Responsible []common.Contact `json:"responsible" yaml:"responsible"`
 
-	Accountable	[]Contact	`json:"accountable" yaml:"accountable"`
+	Accountable []common.Contact `json:"accountable" yaml:"accountable"`
 
-	Consulted	[]Contact	`json:"consulted,omitempty" yaml:"consulted,omitempty"`
+	Consulted []common.Contact `json:"consulted,omitempty" yaml:"consulted,omitempty"`
 
-	Informed	[]Contact	`json:"informed,omitempty" yaml:"informed,omitempty"`
-}
-
-type Contact struct {
-	// The contact person's name.
-	Name	string	`json:"name" yaml:"name"`
-
-	// Indicates whether this admin is the first point of contact for inquiries. Only one entry should be marked as primary.
-	Primary	bool	`json:"primary" yaml:"primary"`
-
-	// The entity with which the contact is affiliated, such as a school or employer.
-	Affiliation	*string	`json:"affiliation,omitempty" yaml:"affiliation,omitempty"`
-
-	// A preferred email address to reach the contact.
-	Email	*Email	`json:"email,omitempty" yaml:"email,omitempty"`
-
-	// A social media handle or profile for the contact.
-	Social	*string	`json:"social,omitempty" yaml:"social,omitempty"`
-}
-
-type MappingReference struct {
-	Id	string	`json:"id" yaml:"id"`
-
-	Title	string	`json:"title" yaml:"title"`
-
-	Version	string	`json:"version" yaml:"version"`
-
-	Description	string	`json:"description,omitempty" yaml:"description,omitempty"`
-
-	Url	string	`json:"url,omitempty" yaml:"url,omitempty"`
+	Informed []common.Contact `json:"informed,omitempty" yaml:"informed,omitempty"`
 }
 
 type Scope struct {
 	// geopolitical boundaries such as region names or jurisdictions
-	Boundaries	[]string	`json:"boundaries,omitempty" yaml:"boundaries,omitempty"`
+	Boundaries []string `json:"boundaries,omitempty" yaml:"boundaries,omitempty"`
 
 	// names of technology categories or services
-	Technologies	[]string	`json:"technologies,omitempty" yaml:"technologies,omitempty"`
+	Technologies []string `json:"technologies,omitempty" yaml:"technologies,omitempty"`
 
 	// names of organizations who make the listed technologies available
-	Providers	[]string	`json:"providers,omitempty" yaml:"providers,omitempty"`
+	Providers []string `json:"providers,omitempty" yaml:"providers,omitempty"`
+}
+
+// ImportedPolicy represents a reference to another policy that is imported wholesale
+type ImportedPolicy struct {
+	ReferenceId string `json:"reference-id" yaml:"reference-id"`
 }
 
 type ImplementationPlan struct {
 	// The process through which notified parties should be made aware of this policy
-	NotificationProcess	string	`json:"notification-process,omitempty" yaml:"notification-process,omitempty"`
+	NotificationProcess string `json:"notification-process,omitempty" yaml:"notification-process,omitempty"`
 
-	NotifiedParties	[]NotificationGroup	`json:"notified-parties,omitempty" yaml:"notified-parties,omitempty"`
+	NotifiedParties []NotificationGroup `json:"notified-parties,omitempty" yaml:"notified-parties,omitempty"`
 
-	Evaluation	ImplementationDetails	`json:"evaluation" yaml:"evaluation"`
+	EvaluationTimeline ImplementationDetails `json:"evaluation-timeline" yaml:"evaluation-timeline"`
 
-	EvaluationPoints	[]EvaluationPoint	`json:"evaluation-points,omitempty" yaml:"evaluation-points,omitempty"`
+	Evaluators []common.Actor `json:"evaluators,omitempty" yaml:"evaluators,omitempty"`
 
-	Enforcement	ImplementationDetails	`json:"enforcement" yaml:"enforcement"`
+	EnforcementTimeline ImplementationDetails `json:"enforcement-timeline" yaml:"enforcement-timeline"`
 
-	EnforcementMethods	[]EnforcementMethod	`json:"enforcement-methods,omitempty" yaml:"enforcement-methods,omitempty"`
+	EnforcementMethods []EnforcementMethod `json:"enforcement-methods,omitempty" yaml:"enforcement-methods,omitempty"`
 
-	// The process that will be followed in the event that noncompliance is detected in an applicable resource
-	NoncompliancePlan	string	`json:"noncompliance-plan,omitempty" yaml:"noncompliance-plan,omitempty"`
+	// The consequence that will be applied in the event that noncompliance is detected
+	NoncomplianceConsequence string `json:"noncompliance-consequence,omitempty" yaml:"noncompliance-consequence,omitempty"`
 }
 
 type NotificationGroup string
 
 type ImplementationDetails struct {
-	Start	Datetime	`json:"start" yaml:"start"`
+	Start common.Datetime `json:"start" yaml:"start"`
 
-	End	Datetime	`json:"end,omitempty" yaml:"end,omitempty"`
+	End common.Datetime `json:"end,omitempty" yaml:"end,omitempty"`
 
-	Notes	string	`json:"notes" yaml:"notes"`
+	Notes string `json:"notes" yaml:"notes"`
 }
-
-type Datetime string
-
-type EvaluationPoint string
 
 type EnforcementMethod string
 
-type Mapping struct {
-	ReferenceId	string	`json:"reference-id" yaml:"reference-id"`
+// Layer 3 specific mapping that extends common Mapping with modifications
+type PolicyMapping struct {
+	ReferenceId string `json:"reference-id" yaml:"reference-id"`
 
-	InScope	Scope	`json:"in-scope" yaml:"in-scope"`
+	ControlModifications []ControlModifier `json:"control-modifications,omitempty" yaml:"control-modifications,omitempty"`
 
-	OutOfScope	Scope	`json:"out-of-scope" yaml:"out-of-scope"`
-
-	ControlModifications	[]ControlModifier	`json:"control-modifications" yaml:"control-modifications"`
-
-	AssessmentRequirementModifications	[]AssessmentRequirementModifier	`json:"assessment-requirement-modifications" yaml:"assessment-requirement-modifications"`
-
-	GuidelineModifications	[]GuidelineModifier	`json:"guideline-modifications" yaml:"guideline-modifications"`
+	GuidelineModifications []GuidelineModifier `json:"guideline-modifications,omitempty" yaml:"guideline-modifications,omitempty"`
 }
 
 // Modifier Types
 type ControlModifier struct {
-	TargetId	string	`json:"target-id" yaml:"target-id"`
+	Id string `json:"id,omitempty" yaml:"id,omitempty"`
 
-	ModType	ModType	`json:"modification-type" yaml:"modification-type"`
+	TargetId string `json:"target-id" yaml:"target-id"`
 
-	ModificationRationale	string	`json:"modification-rationale" yaml:"modification-rationale"`
+	ModType ModType `json:"modification-type" yaml:"modification-type"`
 
-	Title	string	`json:"title,omitempty" yaml:"title,omitempty"`
+	ModificationRationale string `json:"modification-rationale" yaml:"modification-rationale"`
 
-	Objective	string	`json:"objective,omitempty" yaml:"objective,omitempty"`
+	Overrides *layer2.Control `json:"overrides,omitempty" yaml:"overrides,omitempty"`
+
+	Extensions *ControlExtensions `json:"extensions,omitempty" yaml:"extensions,omitempty"`
+
+	AssessmentRequirementModifications []AssessmentRequirementModifier `json:"assessment-requirement-modifications,omitempty" yaml:"assessment-requirement-modifications,omitempty"`
 }
 
 type ModType string
 
-type AssessmentRequirementModifier struct {
-	TargetId	string	`json:"target-id" yaml:"target-id"`
+type ControlExtensions struct {
+	Severity Severity `json:"severity,omitempty" yaml:"severity,omitempty"`
 
-	ModType	ModType	`json:"modification-type" yaml:"modification-type"`
+	AutoRemediationAllowed bool `json:"auto-remediation-allowed,omitempty" yaml:"auto-remediation-allowed,omitempty"`
 
-	ModificationRationale	string	`json:"modification-rationale" yaml:"modification-rationale"`
-
-	Text	string	`json:"text" yaml:"text"`
-
-	Applicability	[]string	`json:"applicability" yaml:"applicability"`
-
-	Recommendation	string	`json:"recommendation,omitempty" yaml:"recommendation,omitempty"`
+	DeploymentGateAllowed bool `json:"deployment-gate-allowed,omitempty" yaml:"deployment-gate-allowed,omitempty"`
 }
+
+type AssessmentRequirementModifier struct {
+	Id string `json:"id,omitempty" yaml:"id,omitempty"`
+
+	TargetId string `json:"target-id" yaml:"target-id"`
+
+	ModType ModType `json:"modification-type" yaml:"modification-type"`
+
+	ModificationRationale string `json:"modification-rationale" yaml:"modification-rationale"`
+
+	Overrides *layer2.AssessmentRequirement `json:"overrides,omitempty" yaml:"overrides,omitempty"`
+
+	Extensions *AssessmentRequirementExtensions `json:"extensions,omitempty" yaml:"extensions,omitempty"`
+}
+
+type AssessmentRequirementExtensions struct {
+	RequiredEvaluators []string `json:"required-evaluators,omitempty" yaml:"required-evaluators,omitempty"`
+
+	OptionalEvaluators []string `json:"optional-evaluators,omitempty" yaml:"optional-evaluators,omitempty"`
+
+	EvidenceRequirements string `json:"evidence-requirements,omitempty" yaml:"evidence-requirements,omitempty"`
+
+	ResolutionStrategy ResolutionStrategy `json:"resolution-strategy,omitempty" yaml:"resolution-strategy,omitempty"`
+
+	EvaluationPoints []EvaluationPoint `json:"evaluation-points,omitempty" yaml:"evaluation-points,omitempty"`
+}
+
+type EvaluationPoint string
 
 type GuidelineModifier struct {
-	TargetId	string	`json:"target-id" yaml:"target-id"`
+	Id string `json:"id,omitempty" yaml:"id,omitempty"`
 
-	ModType	ModType	`json:"modification-type" yaml:"modification-type"`
+	TargetId string `json:"target-id" yaml:"target-id"`
 
-	ModificationRationale	string	`json:"modification-rationale" yaml:"modification-rationale"`
+	ModType ModType `json:"modification-type" yaml:"modification-type"`
 
-	Title	string	`json:"title" yaml:"title"`
+	ModificationRationale string `json:"modification-rationale" yaml:"modification-rationale"`
 
-	Objective	string	`json:"objective,omitempty" yaml:"objective,omitempty"`
+	Overrides *layer1.Guideline `json:"overrides,omitempty" yaml:"overrides,omitempty"`
 
-	Recommendations	[]string	`json:"recommendations,omitempty" yaml:"recommendations,omitempty"`
-
-	BaseGuidelineID	string	`json:"base-guideline-id,omitempty" yaml:"base-guideline-id,omitempty"`
-
-	Rationale	*string	`json:"rationale,omitempty" yaml:"rationale,omitempty"`
-
-	GuidelineMappings	[]*Mapping	`json:"guideline-mappings,omitempty" yaml:"guideline-mappings,omitempty"`
-
-	PrincipleMappings	[]*Mapping	`json:"principle-mappings,omitempty" yaml:"principle-mappings,omitempty"`
-
-	SeeAlso	[]string	`json:"see-also,omitempty" yaml:"see-also,omitempty"`
-
-	ExternalReferences	[]string	`json:"external-references,omitempty" yaml:"external-references,omitempty"`
+	StatementModifications []StatementModifier `json:"statement-modifications,omitempty" yaml:"statement-modifications,omitempty"`
 }
 
-type PartModifier struct {
-	TargetId	string	`json:"target-id" yaml:"target-id"`
+type StatementModifier struct {
+	Id string `json:"id,omitempty" yaml:"id,omitempty"`
 
-	ModType	ModType	`json:"modification-type" yaml:"modification-type"`
+	TargetId string `json:"target-id" yaml:"target-id"`
 
-	ModificationRationale	string	`json:"modification-rationale" yaml:"modification-rationale"`
+	ModType ModType `json:"modification-type" yaml:"modification-type"`
 
-	Title	string	`json:"title,omitempty" yaml:"title,omitempty"`
+	ModificationRationale string `json:"modification-rationale" yaml:"modification-rationale"`
 
-	Prose	string	`json:"prose" yaml:"prose"`
-
-	Recommendations	[]string	`json:"recommendations,omitempty" yaml:"recommendations,omitempty"`
+	Overrides *layer1.Statement `json:"overrides,omitempty" yaml:"overrides,omitempty"`
 }
-
-type Email string

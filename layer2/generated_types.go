@@ -2,125 +2,104 @@
 
 package layer2
 
-type Catalog struct {
-	Metadata	Metadata	`json:"metadata,omitempty" yaml:"metadata,omitempty"`
+import (
+	"github.com/ossf/gemara/common"
+)
 
-	ControlFamilies	[]ControlFamily	`json:"control-families,omitempty" yaml:"control-families,omitempty"`
+type ControlObjectives struct {
+	Metadata Metadata `json:"metadata,omitempty" yaml:"metadata,omitempty"`
 
-	Threats	[]Threat	`json:"threats,omitempty" yaml:"threats,omitempty"`
+	Families []common.Family `json:"families" yaml:"families"`
 
-	Capabilities	[]Capability	`json:"capabilities,omitempty" yaml:"capabilities,omitempty"`
+	Controls []Control `json:"controls,omitempty" yaml:"controls,omitempty"`
 
-	ImportedControls	[]Mapping	`json:"imported-controls,omitempty" yaml:"imported-controls,omitempty"`
+	Threats []Threat `json:"threats,omitempty" yaml:"threats,omitempty"`
 
-	ImportedThreats	[]Mapping	`json:"imported-threats,omitempty" yaml:"imported-threats,omitempty"`
+	Capabilities []Capability `json:"capabilities,omitempty" yaml:"capabilities,omitempty"`
 
-	ImportedCapabilities	[]Mapping	`json:"imported-capabilities,omitempty" yaml:"imported-capabilities,omitempty"`
+	ImportedControls []Mapping `json:"imported-controls,omitempty" yaml:"imported-controls,omitempty"`
+
+	ImportedThreats []Mapping `json:"imported-threats,omitempty" yaml:"imported-threats,omitempty"`
+
+	ImportedCapabilities []Mapping `json:"imported-capabilities,omitempty" yaml:"imported-capabilities,omitempty"`
 }
 
 // Resuable types //
 type Metadata struct {
-	Id	string	`json:"id" yaml:"id"`
+	Id string `json:"id" yaml:"id"`
 
-	Title	string	`json:"title" yaml:"title"`
+	Title string `json:"title" yaml:"title"`
 
-	Description	string	`json:"description" yaml:"description"`
+	Description string `json:"description" yaml:"description"`
 
-	Version	string	`json:"version,omitempty" yaml:"version,omitempty"`
+	Version string `json:"version,omitempty" yaml:"version,omitempty"`
 
-	LastModified	string	`json:"last-modified,omitempty" yaml:"last-modified,omitempty"`
+	LastModified string `json:"last-modified,omitempty" yaml:"last-modified,omitempty"`
 
-	ApplicabilityCategories	[]Category	`json:"applicability-categories,omitempty" yaml:"applicability-categories,omitempty"`
+	ApplicabilityCategories []Category `json:"applicability-categories,omitempty" yaml:"applicability-categories,omitempty"`
 
-	MappingReferences	[]MappingReference	`json:"mapping-references,omitempty" yaml:"mapping-references,omitempty"`
+	MappingReferences []MappingReference `json:"mapping-references,omitempty" yaml:"mapping-references,omitempty"`
 }
 
 type Category struct {
-	Id	string	`json:"id" yaml:"id"`
+	Id string `json:"id" yaml:"id"`
 
-	Title	string	`json:"title" yaml:"title"`
+	Title string `json:"title" yaml:"title"`
 
-	Description	string	`json:"description" yaml:"description"`
+	Description string `json:"description" yaml:"description"`
 }
 
-type MappingReference struct {
-	Id	string	`json:"id" yaml:"id"`
-
-	Title	string	`json:"title" yaml:"title"`
-
-	Version	string	`json:"version" yaml:"version"`
-
-	Description	string	`json:"description,omitempty" yaml:"description,omitempty"`
-
-	Url	string	`json:"url,omitempty" yaml:"url,omitempty"`
-}
-
-type ControlFamily struct {
-	Id	string	`json:"id" yaml:"id"`
-
-	Title	string	`json:"title" yaml:"title"`
-
-	Description	string	`json:"description" yaml:"description"`
-
-	Controls	[]Control	`json:"controls" yaml:"controls"`
-}
+// MappingReference uses the common definition
+type MappingReference common.MappingReference
 
 type Control struct {
-	Id	string	`json:"id" yaml:"id"`
+	Id string `json:"id" yaml:"id"`
 
-	Title	string	`json:"title" yaml:"title"`
+	Title string `json:"title" yaml:"title"`
 
-	Objective	string	`json:"objective" yaml:"objective"`
+	Objective string `json:"objective" yaml:"objective"`
 
-	AssessmentRequirements	[]AssessmentRequirement	`json:"assessment-requirements" yaml:"assessment-requirements"`
+	FamilyId string `json:"family-id,omitempty" yaml:"family-id,omitempty"`
 
-	GuidelineMappings	[]Mapping	`json:"guideline-mappings,omitempty" yaml:"guideline-mappings,omitempty"`
+	AssessmentRequirements []AssessmentRequirement `json:"assessment-requirements" yaml:"assessment-requirements"`
 
-	ThreatMappings	[]Mapping	`json:"threat-mappings,omitempty" yaml:"threat-mappings,omitempty"`
+	GuidelineMappings []Mapping `json:"guideline-mappings,omitempty" yaml:"guideline-mappings,omitempty"`
+
+	ThreatMappings []Mapping `json:"threat-mappings,omitempty" yaml:"threat-mappings,omitempty"`
 }
 
 type AssessmentRequirement struct {
-	Id	string	`json:"id" yaml:"id"`
+	Id string `json:"id" yaml:"id"`
 
-	Text	string	`json:"text" yaml:"text"`
+	Text string `json:"text" yaml:"text"`
 
-	Applicability	[]string	`json:"applicability" yaml:"applicability"`
+	Applicability []string `json:"applicability" yaml:"applicability"`
 
-	Recommendation	string	`json:"recommendation,omitempty" yaml:"recommendation,omitempty"`
+	Recommendation string `json:"recommendation,omitempty" yaml:"recommendation,omitempty"`
 }
 
-type Mapping struct {
-	ReferenceId	string	`json:"reference-id" yaml:"reference-id"`
-
-	Entries	[]MappingEntry	`json:"entries" yaml:"entries"`
-
-	Remarks	string	`json:"remarks,omitempty" yaml:"remarks,omitempty"`
-}
-
-type MappingEntry struct {
-	ReferenceId	string	`json:"reference-id" yaml:"reference-id"`
-
-	Strength	int64	`json:"strength" yaml:"strength"`
-
-	Remarks	string	`json:"remarks,omitempty" yaml:"remarks,omitempty"`
-}
+// Mapping uses the common definition
+type Mapping common.Mapping
 
 type Threat struct {
-	Id	string	`json:"id" yaml:"id"`
+	Id string `json:"id" yaml:"id"`
 
-	Title	string	`json:"title" yaml:"title"`
+	Title string `json:"title" yaml:"title"`
 
-	Description	string	`json:"description" yaml:"description"`
+	Description string `json:"description" yaml:"description"`
 
-	Capabilities	[]Mapping	`json:"capabilities" yaml:"capabilities"`
+	Capabilities []Mapping `json:"capabilities" yaml:"capabilities"`
 
-	ExternalMappings	[]Mapping	`json:"external-mappings,omitempty" yaml:"external-mappings,omitempty"`
+	ExternalMappings []Mapping `json:"external-mappings,omitempty" yaml:"external-mappings,omitempty"`
 }
 
 type Capability struct {
-	Id	string	`json:"id" yaml:"id"`
+	Id string `json:"id" yaml:"id"`
 
-	Title	string	`json:"title" yaml:"title"`
+	Title string `json:"title" yaml:"title"`
 
-	Description	string	`json:"description" yaml:"description"`
+	Description string `json:"description" yaml:"description"`
 }
+
+// MappingEntry uses the common definition
+type MappingEntry common.MappingEntry

@@ -1,0 +1,342 @@
+# This is an example guidance for testing purposes. The OSCAL catalog can be found in the NIST GitHub org
+# at https://github.com/usnistgov/oscal-content/blob/main/nist.gov/SP800-53/rev5/json/NIST_SP-800-53_rev5_catalog.json.
+metadata:
+  id: NIST-800-53
+  description: Security and Privacy Controls for Information Systems and Organizations
+  author:
+    id: nist-author-001
+    name: National Institute of Standards and Technology
+    type: Human
+  version: Rev. 5
+  date: '2020-09-23'
+  mapping-references:
+  - id: NIST-CSF
+    title: NIST Cybersecurity Framework
+    version: '2.0'
+    url: https://nvlpubs.nist.gov/nistpubs/CSWP/NIST.CSWP.29.pdf
+title: NIST Special Publication 800-53
+front-matter: |
+  This document provides a catalog of security and privacy controls for information systems
+  and organizations to protect organizational operations and assets, individuals, other organizations,
+  and the Nation from a diverse set of threats and risks.
+document-type: Standard
+guidelines:
+- id: SA-15
+  title: Development Process, Standards, and Tools
+  family-id: SA
+  objective: |
+    Require the developer of the system, system component, or system service to follow
+    a documented development process that explicitly addresses security and privacy requirements;
+    identifies the standards and tools used in the development process; documents the specific
+    tool options and tool configurations used in the development process; documents, manages,
+    and ensures the integrity of changes to the process and/or tools used in development;
+    and requires review of the development process, standards, tools, tool options, and tool
+    configurations to determine if they can satisfy organization-defined security and privacy
+    requirements.
+  statements:
+  - id: SA-15.a
+    title: Documented Development Process Requirements
+    text: |
+      Require the developer of the system, system component, or system service to follow a
+      documented development process that: explicitly addresses security and privacy requirements;
+      identifies the standards and tools used in the development process; documents the specific
+      tool options and tool configurations used in the development process; and documents,
+      manages, and ensures the integrity of changes to the process and/or tools used in development.
+  - id: SA-15.b
+    title: Review Development Process and Tools
+    text: |
+      Review the development process, standards, tools, tool options, and tool configurations
+      at organization-defined frequency to determine if the process, standards, tools, tool
+      options and tool configurations selected and employed can satisfy organization-defined
+      security and privacy requirements.
+  rationale:
+    importance: |
+      Development tools include programming languages and computer-aided design systems.
+      Reviews of development processes include the use of maturity models to determine the
+      potential effectiveness of such processes. Maintaining the integrity of changes to tools
+      and processes facilitates effective supply chain risk assessment and mitigation. Such
+      integrity requires configuration control throughout the system development life cycle
+      to track authorized changes and prevent unauthorized changes.
+    goals:
+    - Ensure development processes address security and privacy requirements
+    - Maintain visibility into development standards and tools
+    - Control changes to development processes and tools
+    - Verify processes and tools meet security and privacy requirements
+  guideline-mappings:
+  - reference-id: NIST-CSF
+    entries:
+    - reference-id: PR.DS-1
+      strength: 7
+      remarks: Supports secure development practices
+- id: SA-15.1
+  title: Development Process, Standards, and Tools | Quality Metrics
+  family-id: SA
+  objective: |
+    Require the developer of the system, system component, or system service to define quality
+    metrics at the beginning of the development process and provide evidence of meeting the
+    quality metrics at organization-defined frequency, program review milestones, or upon delivery.
+  extends:
+    entry-id: SA-15
+  statements:
+  - id: SA-15.1.a
+    title: Define Quality Metrics
+    text: |
+      Require the developer of the system, system component, or system service to define quality
+      metrics at the beginning of the development process; and
+  - id: SA-15.1.b
+    title: Provide Evidence of Quality Metrics
+    text: |
+      Require the developer of the system, system component, or system service to provide evidence
+      of meeting the quality metrics at organization-defined frequency, program review milestones,
+      or upon delivery.
+  rationale:
+    importance: |
+      Organizations use quality metrics to establish acceptable levels of system quality. Metrics
+      can include quality gates, which are collections of completion criteria or sufficiency
+      standards that represent the satisfactory execution of specific phases of the system development
+      project. For example, a quality gate may require the elimination of all compiler warnings
+      or a determination that such warnings have no impact on the effectiveness of required security
+      or privacy capabilities. During the execution phases of development projects, quality gates
+      provide clear, unambiguous indications of progress. Other metrics apply to the entire development
+      project. Metrics can include defining the severity thresholds of vulnerabilities in accordance
+      with organizational risk tolerance, such as requiring no known vulnerabilities in the delivered
+      system with a Common Vulnerability Scoring System (CVSS) severity of medium or high.
+- id: SA-15.2
+  title: Development Process, Standards, and Tools | Security and Privacy Tracking Tools
+  family-id: SA
+  objective: |
+    Require the developer of the system, system component, or system service to select and employ
+    security and privacy tracking tools for use during the development process.
+  extends:
+    entry-id: SA-15
+  statements:
+  - id: SA-15.2.1
+    title: Security and Privacy Tracking Tools
+    text: |
+      Require the developer of the system, system component, or system service to select and employ
+      security and privacy tracking tools for use during the development process.
+  rationale:
+    importance: |
+      System development teams select and deploy security and privacy tracking tools, including
+      vulnerability or work item tracking systems that facilitate assignment, sorting, filtering,
+      and tracking of completed work items or tasks associated with development processes.
+- id: SA-15.3
+  title: Development Process, Standards, and Tools | Criticality Analysis
+  family-id: SA
+  objective: |
+    Require the developer of the system, system component, or system service to perform a criticality
+    analysis at organization-defined decision points in the system development life cycle and at
+    organization-defined breadth and depth of criticality analysis.
+  extends:
+    entry-id: SA-15
+  statements:
+  - id: SA-15.3.a
+    title: Criticality Analysis at Decision Points
+    text: |
+      Require the developer of the system, system component, or system service to perform a criticality
+      analysis at organization-defined decision points in the system development life cycle; and
+  - id: SA-15.3.b
+    title: Criticality Analysis Level of Rigor
+    text: |
+      Require the developer of the system, system component, or system service to perform a criticality
+      analysis at organization-defined breadth and depth of criticality analysis.
+  rationale:
+    importance: |
+      Criticality analysis performed by the developer provides input to the criticality analysis
+      performed by organizations. Developer input is essential to organizational criticality analysis
+      because organizations may not have access to detailed design documentation for system components
+      that are developed as commercial off-the-shelf products. Such design documentation includes
+      functional specifications, high-level designs, low-level designs, source code, and hardware
+      schematics. Criticality analysis is important for organizational systems that are designated
+      as high value assets. High value assets can be moderate- or high-impact systems due to heightened
+      adversarial interest or potential adverse effects on the federal enterprise. Developer input
+      is especially important when organizations conduct supply chain criticality analyses.
+- id: SA-15.5
+  title: Development Process, Standards, and Tools | Attack Surface Reduction
+  family-id: SA
+  objective: |
+    Require the developer of the system, system component, or system service to reduce attack surfaces
+    to organization-defined thresholds.
+  extends:
+    entry-id: SA-15
+  statements:
+  - id: SA-15.5.1
+    title: Attack Surface Reduction
+    text: |
+      Require the developer of the system, system component, or system service to reduce attack surfaces
+      to organization-defined thresholds.
+  rationale:
+    importance: |
+      Attack surface reduction is closely aligned with threat and vulnerability analyses and system
+      architecture and design. Attack surface reduction is a means of reducing risk to organizations
+      by giving attackers less opportunity to exploit weaknesses or deficiencies (i.e., potential
+      vulnerabilities) within systems, system components, and system services. Attack surface reduction
+      includes implementing the concept of layered defenses, applying the principles of least privilege
+      and least functionality, applying secure software development practices, deprecating unsafe
+      functions, reducing entry points available to unauthorized users, reducing the amount of code
+      that executes, and eliminating application programming interfaces (APIs) that are vulnerable
+      to attacks.
+- id: SA-15.6
+  title: Development Process, Standards, and Tools | Continuous Improvement
+  family-id: SA
+  objective: |
+    Require the developer of the system, system component, or system service to implement an explicit
+    process to continuously improve the development process.
+  extends:
+    entry-id: SA-15
+  statements:
+  - id: SA-15.6.1
+    title: Continuous Improvement Process
+    text: |
+      Require the developer of the system, system component, or system service to implement an explicit
+      process to continuously improve the development process.
+  rationale:
+    importance: |
+      Developers of systems, system components, and system services consider the effectiveness and
+      efficiency of their development processes for meeting quality objectives and addressing the
+      security and privacy capabilities in current threat environments.
+- id: SA-15.7
+  title: Development Process, Standards, and Tools | Automated Vulnerability Analysis
+  family-id: SA
+  objective: |
+    Require the developer of the system, system component, or system service at organization-defined
+    frequency to perform an automated vulnerability analysis using organization-defined tools;
+    determine the exploitation potential for discovered vulnerabilities; determine potential risk
+    mitigations for delivered vulnerabilities; and deliver the outputs of the tools and results
+    of the analysis to organization-defined personnel or roles.
+  extends:
+    entry-id: SA-15
+  statements:
+  - id: SA-15.7.a
+    title: Perform Automated Vulnerability Analysis
+    text: |
+      Require the developer of the system, system component, or system service at organization-defined
+      frequency to perform an automated vulnerability analysis using organization-defined tools;
+  - id: SA-15.7.b
+    title: Determine Exploitation Potential
+    text: |
+      Require the developer of the system, system component, or system service to determine the
+      exploitation potential for discovered vulnerabilities;
+  - id: SA-15.7.c
+    title: Determine Risk Mitigations
+    text: |
+      Require the developer of the system, system component, or system service to determine potential
+      risk mitigations for delivered vulnerabilities; and
+  - id: SA-15.7.d
+    title: Deliver Analysis Results
+    text: |
+      Require the developer of the system, system component, or system service to deliver the outputs
+      of the tools and results of the analysis to organization-defined personnel or roles.
+  rationale:
+    importance: |
+      Automated tools can be more effective at analyzing exploitable weaknesses or deficiencies
+      in large and complex systems, prioritizing vulnerabilities by severity, and providing recommendations
+      for risk mitigations.
+- id: SA-15.8
+  title: Development Process, Standards, and Tools | Reuse of Threat and Vulnerability Information
+  family-id: SA
+  objective: |
+    Require the developer of the system, system component, or system service to use threat modeling
+    and vulnerability analyses from similar systems, components, or services to inform the current
+    development process.
+  extends:
+    entry-id: SA-15
+  statements:
+  - id: SA-15.8.1
+    title: Reuse Threat and Vulnerability Information
+    text: |
+      Require the developer of the system, system component, or system service to use threat modeling
+      and vulnerability analyses from similar systems, components, or services to inform the current
+      development process.
+  rationale:
+    importance: |
+      Analysis of vulnerabilities found in similar software applications can inform potential design
+      and implementation issues for systems under development. Similar systems or system components
+      may exist within developer organizations. Vulnerability information is available from a variety
+      of public and private sector sources, including the NIST National Vulnerability Database.
+- id: SA-15.10
+  title: Development Process, Standards, and Tools | Incident Response Plan
+  family-id: SA
+  objective: |
+    Require the developer of the system, system component, or system service to provide, implement,
+    and test an incident response plan.
+  extends:
+    entry-id: SA-15
+  statements:
+  - id: SA-15.10.1
+    title: Incident Response Plan
+    text: |
+      Require the developer of the system, system component, or system service to provide, implement,
+      and test an incident response plan.
+  rationale:
+    importance: |
+      The incident response plan provided by developers may provide information not readily available
+      to organizations and be incorporated into organizational incident response plans. Developer
+      information may also be extremely helpful, such as when organizations respond to vulnerabilities
+      in commercial off-the-shelf products.
+- id: SA-15.11
+  title: Development Process, Standards, and Tools | Archive System or Component
+  family-id: SA
+  objective: |
+    Require the developer of the system or system component to archive the system or component to
+    be released or delivered together with the corresponding evidence supporting the final security
+    and privacy review.
+  extends:
+    entry-id: SA-15
+  statements:
+  - id: SA-15.11.1
+    title: Archive System or Component
+    text: |
+      Require the developer of the system or system component to archive the system or component
+      to be released or delivered together with the corresponding evidence supporting the final
+      security and privacy review.
+  rationale:
+    importance: |
+      Archiving system or system components requires the developer to retain key development artifacts,
+      including hardware specifications, source code, object code, and relevant documentation from
+      the development process that can provide a readily available configuration baseline for system
+      and component upgrades or modifications.
+- id: SA-15.12
+  title: Development Process, Standards, and Tools | Minimize Personally Identifiable Information
+  family-id: SA
+  objective: |
+    Require the developer of the system or system component to minimize the use of personally
+    identifiable information in development and test environments.
+  extends:
+    entry-id: SA-15
+  statements:
+  - id: SA-15.12.1
+    title: Minimize PII in Development and Test
+    text: |
+      Require the developer of the system or system component to minimize the use of personally
+      identifiable information in development and test environments.
+  rationale:
+    importance: |
+      Organizations can minimize the risk to an individual's privacy by using techniques such as
+      de-identification or synthetic data. Limiting the use of personally identifiable information
+      in development and test environments helps reduce the level of privacy risk created by a system.
+- id: SA-15.13
+  title: Development Process, Standards, and Tools | Logging Syntax
+  family-id: SA
+  objective: |
+    Require the developer of the system or system component to use organization-defined secure logging
+    format(s) to log organization-defined event types at organization-defined level of detail.
+  extends:
+    entry-id: SA-15
+  statements:
+  - id: SA-15.13.1
+    title: Logging Syntax Requirements
+    text: |
+      Require the developer of the system or system component to use organization-defined secure
+      logging format(s) to log organization-defined event types at organization-defined level of
+      detail.
+  rationale:
+    importance: |
+      In support of better incident response and the ability to more quickly reconstruct security-related
+      actions, identifying specific requirements for secure logging facilitates the ability to connect
+      application-produced audit event logs with operational data. Event types are consistent with
+      the event types defined in AU-2.
+families:
+- id: SA
+  title: System and Services Acquisition
+  description: Controls related to the acquisition of systems, system components, and system services

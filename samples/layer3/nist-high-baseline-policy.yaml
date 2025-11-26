@@ -1,0 +1,52 @@
+# This is an example policy for testing purposes. The OSCAL version can be found at
+# https://github.com/usnistgov/oscal-content/blob/main/nist.gov/SP800-53/rev5/json/NIST_SP-800-53_rev5_HIGH-baseline_profile.json
+metadata:
+  id: nist-high-baseline-policy
+  version: 5.2.0
+  date: '2025-08-26'
+  description: NIST Special Publication 800-53 Revision 5.1.1 HIGH IMPACT BASELINE - SA-15 controls subset
+  author:
+    id: nist-policy-author-001
+    name: Joint Task Force, Interagency Working Group
+    type: Human
+  mapping-references:
+  - id: NIST-800-53
+    title: NIST Special Publication 800-53
+    version: Rev. 5
+    description: Security and Privacy Controls for Federal Information Systems
+    url: https://csrc.nist.gov/publications/detail/sp/800-53/rev-5/final
+organization-id: nist-jtf
+title: NIST High Baseline - SA-15 Development Process, Standards, and Tools
+purpose: |
+  This policy represents the NIST High Impact Baseline subset for SA-15 (Development Process,
+  Standards, and Tools) and its control enhancement SA-15.3 (Criticality Analysis). This baseline
+  is designed for high-impact systems requiring comprehensive development process controls and
+  criticality analysis capabilities.
+contacts:
+  author:
+    name: Joint Task Force, Interagency Working Group
+    affiliation: National Institute of Standards and Technology
+    email: sec-cert@nist.gov
+  responsible:
+  - name: Computer Security Division
+    affiliation: National Institute of Standards and Technology
+    email: sec-cert@nist.gov
+  accountable:
+  - name: Joint Task Force, Interagency Working Group
+    affiliation: National Institute of Standards and Technology
+    email: sec-cert@nist.gov
+scope:
+  boundaries:
+  - United States
+  technologies:
+  - Federal Information Systems
+  - High-Impact Systems
+guidance-references:
+- reference-id: NIST-800-53
+  control-modifications:
+  - target-id: SA-15
+    modification-type: include
+    modification-rationale: Include SA-15 (Development Process, Standards, and Tools) from NIST High Baseline
+  - target-id: SA-15.3
+    modification-type: include
+    modification-rationale: Include SA-15.3 (Criticality Analysis) enhancement from NIST High Baseline

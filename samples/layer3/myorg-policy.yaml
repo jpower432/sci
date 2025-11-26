@@ -1,0 +1,130 @@
+metadata:
+  id: "myorg-policy-001"
+  version: "1.0.0"
+  date: "2024-01-20"
+  description: "Security policy extending tailoring the high baseline with supply chain security and OSPS controls"
+  author:
+    id: "policy-author-002"
+    name: "Security Policy Team"
+    type: "Human"
+  mapping-references:
+    - id: "NIST-800-53"
+      title: "NIST Special Publication 800-53"
+      version: "Rev. 5"
+      description: "Security and Privacy Controls for Federal Information Systems"
+      url: "https://csrc.nist.gov/publications/detail/sp/800-53/rev-5/final"
+    - id: "NIST-800-161"
+      title: "NIST Special Publication 800-161"
+      version: "Rev. 1"
+      description: "Cybersecurity Supply Chain Risk Management Practices"
+      url: "https://csrc.nist.gov/publications/detail/sp/800-161/rev-1/final"
+    - id: "OSPS-B"
+      title: "Open Source Project Security Baseline"
+      version: "2024"
+      description: "Security criteria for open source projects"
+      url: "https://baseline.openssf.org/"
+    - id: "nist-high-baseline-policy"
+      title: "NIST High Baseline - SA-15 Development Process, Standards, and Tools"
+      version: "5.2.0"
+      description: "Security criteria for open source projects"
+      url: "file://samples/layer3/nist-high-baseline-policy.yaml"
+
+organization-id: "org-example-001"
+title: "My Security Policy"
+purpose: |
+  This policy tailors the high baseline security policy with additional controls for
+  supply chain security (NIST 800-161) and open source project security (OSPS Baseline).
+  It is designed for systems requiring enhanced security posture including supply chain
+  risk management and open source component security.
+
+contacts:
+  author:
+    name: "Security Policy Team"
+    affiliation: "Information Security"
+    email: "advanced-security@example.com"
+  responsible:
+    - name: "IT Operations Manager"
+      affiliation: "Information Technology"
+      email: "it-ops@example.com"
+    - name: "Supply Chain Security Manager"
+      affiliation: "Procurement and Security"
+      email: "supply-chain-security@example.com"
+  accountable:
+    - name: "Chief Information Security Officer"
+      affiliation: "Information Security"
+      email: "ciso@example.com"
+  consulted:
+    - name: "Legal and Compliance"
+      affiliation: "Legal Department"
+      email: "legal@example.com"
+
+scope:
+  boundaries:
+    - "United States"
+    - "European Union"
+  technologies:
+    - "Cloud Computing"
+    - "Web Applications"
+    - "Open Source Software"
+    - "Third-Party Components"
+  providers:
+    - "Amazon Web Services"
+    - "Microsoft Azure"
+    - "Open Source Communities"
+
+imported-policies:
+  - reference-id: "nist-high-baseline-policy"
+
+control-references:
+  - reference-id: "OSPS-B"
+    control-modifications:
+      - target-id: "OSPS-BR-06"
+        modification-type: "include"
+        modification-rationale: "Include requirement for signed releases to prevent counterfeit components. Maps to NIST 800-161 SR-4 (Prohibition of Counterfeit Components)."
+        extensions:
+          severity: "Critical"
+          auto-remediation-allowed: false
+          deployment-gate-allowed: true
+        assessment-requirement-modifications:
+          - target-id: "OSPS-BR-06.01"
+            modification-type: "clarify"
+            modification-rationale: "Clarify signing requirements for supply chain security"
+            overrides:
+              id: "OSPS-BR-06.01"
+              text: |
+                When an official release is created, that release MUST be signed or
+                accounted for in a signed manifest including each asset's
+                cryptographic hashes. This extends NIST 800-161 SR-4 requirements for
+                component authenticity verification.
+              applicability: ["Maturity Level 2", "Maturity Level 3"]
+              recommendation: "Sign all released software assets with cryptographic signatures (GPG, Sigstore, or SLSA attestations)"
+            extensions:
+              required-evaluators: ["security-team", "baseline-validator"]
+              evaluation-points: ["pre-release", "pre-deploy"]
+              resolution-strategy: "MostSevere"
+
+implementation-plan:
+  evaluation-timeline:
+    start: "2024-02-15T00:00:00Z"
+    end: "2024-12-31T23:59:59Z"
+    notes: "Extended evaluation period for robust baseline controls including supply chain and OSPS requirements"
+  evaluators:
+    - id: "security-team"
+      name: "Security Assessment Team"
+      type: "Human"
+    - id: "baseline-validator"
+      name: "OSPS Baseline Scanner"
+      type: "Software"
+      version: "1.0.0"
+      uri: "https://github.com/revanite-io/osps-baseline-action"
+  enforcement-timeline:
+    start: "2024-04-01T00:00:00Z"
+    notes: "Enforcement begins after extended evaluation period to allow for supply chain assessments"
+  enforcement-methods:
+    - "Deployment Gate"
+    - "Manual Remediation"
+  noncompliance-consequence: |
+    Noncompliance with robust baseline controls will result in:
+    1. Blocking of deployments for critical and high severity controls
+    2. Escalation to CISO for supply chain security violations
+    3. Mandatory remediation within 30 days for medium severity controls

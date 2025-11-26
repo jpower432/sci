@@ -1,5 +1,7 @@
 package layer4
 
+import "github.com/ossf/gemara/common"
+
 // This file is for reusable test data to help seed ideas and reduce duplication.
 
 var (
@@ -28,7 +30,7 @@ func failingAssessmentPtr() *AssessmentLog {
 
 func failingAssessment() AssessmentLog {
 	return AssessmentLog{
-		Requirement: Mapping{
+		Requirement: common.SimpleMapping{
 			EntryId: "failingAssessment()",
 		},
 		Description: "failing assessment",
@@ -46,7 +48,7 @@ func passingAssessmentPtr() *AssessmentLog {
 
 func passingAssessment() AssessmentLog {
 	return AssessmentLog{
-		Requirement: Mapping{
+		Requirement: common.SimpleMapping{
 			EntryId: "passingAssessment()",
 		},
 		Description: "passing assessment",
@@ -63,7 +65,7 @@ func needsReviewAssessmentPtr() *AssessmentLog {
 
 func needsReviewAssessment() AssessmentLog {
 	return AssessmentLog{
-		Requirement: Mapping{
+		Requirement: common.SimpleMapping{
 			EntryId: "needsReviewAssessment()",
 		},
 		Description: "needs review assessment",
@@ -82,7 +84,7 @@ func unknownAssessmentPtr() *AssessmentLog {
 
 func unknownAssessment() AssessmentLog {
 	return AssessmentLog{
-		Requirement: Mapping{
+		Requirement: common.SimpleMapping{
 			EntryId: "unknownAssessment()",
 		},
 		Description: "unknown assessment",
@@ -97,7 +99,7 @@ func unknownAssessment() AssessmentLog {
 
 func badRevertPassingAssessment() AssessmentLog {
 	return AssessmentLog{
-		Requirement: Mapping{
+		Requirement: common.SimpleMapping{
 			EntryId: "badRevertPassingAssessment()",
 		},
 		Description: "bad revert passing assessment",
