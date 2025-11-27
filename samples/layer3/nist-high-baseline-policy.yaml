@@ -9,6 +9,10 @@ metadata:
     id: nist-policy-author-001
     name: Joint Task Force, Interagency Working Group
     type: Human
+    contact:
+      name: Joint Task Force, Interagency Working Group
+      affiliation: National Institute of Standards and Technology
+      email: sec-cert@nist.gov
   mapping-references:
   - id: NIST-800-53
     title: NIST Special Publication 800-53
@@ -23,10 +27,6 @@ purpose: |
   is designed for high-impact systems requiring comprehensive development process controls and
   criticality analysis capabilities.
 contacts:
-  author:
-    name: Joint Task Force, Interagency Working Group
-    affiliation: National Institute of Standards and Technology
-    email: sec-cert@nist.gov
   responsible:
   - name: Computer Security Division
     affiliation: National Institute of Standards and Technology

@@ -23,7 +23,6 @@ import (
 }
 
 #Contacts: {
-	author: common.#Contact
 	responsible: [...common.#Contact] // The person or group responsible for implementing controls for technical requirements
 	accountable: [...common.#Contact] // The person or group accountable for evaluating and enforcing the efficacy of technical controls
 	consulted?: [...common.#Contact] // Optional person or group who may be consulted for more information about the technical requirements

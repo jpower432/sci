@@ -7,6 +7,10 @@ metadata:
     id: "policy-author-002"
     name: "Security Policy Team"
     type: "Human"
+    contact:
+      name: "Security Policy Team"
+      affiliation: "Information Security"
+      email: "advanced-security@example.com"
   mapping-references:
     - id: "NIST-800-53"
       title: "NIST Special Publication 800-53"
@@ -38,10 +42,6 @@ purpose: |
   risk management and open source component security.
 
 contacts:
-  author:
-    name: "Security Policy Team"
-    affiliation: "Information Security"
-    email: "advanced-security@example.com"
   responsible:
     - name: "IT Operations Manager"
       affiliation: "Information Technology"

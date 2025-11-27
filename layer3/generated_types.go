@@ -32,8 +32,6 @@ type Policy struct {
 }
 
 type Contacts struct {
-	Author common.Contact `json:"author" yaml:"author"`
-
 	Responsible []common.Contact `json:"responsible" yaml:"responsible"`
 
 	Accountable []common.Contact `json:"accountable" yaml:"accountable"`
