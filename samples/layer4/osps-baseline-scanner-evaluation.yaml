@@ -1,0 +1,47 @@
+metadata:
+  id: "eval-osps-baseline-scanner-001"
+  description: "Automated baseline scanner evaluation of OSPS Baseline controls"
+  version: "1.0.0"
+  date: "2024-03-25"
+  author:
+    id: "baseline-validator"
+    name: "OSPS Baseline Scanner"
+    type: "Software"
+    version: "1.0.0"
+    uri: "https://github.com/revanite-io/osps-baseline-action"
+  mapping-references:
+    - id: "myorg-policy-001"
+      title: "My Security Policy"
+      version: "1.0.0"
+      url: "file://samples/layer3/myorg-policy.yaml"
+    - id: "OSPS-B"
+      title: "Open Source Project Security Baseline"
+      version: "2024"
+      url: "https://baseline.openssf.org/"
+
+evaluations:
+  - name: "Signed Releases Evaluation - Supply Chain Security"
+    control:
+      entry-id: "OSPS-BR-06"
+    result: "Not Run"
+    message: "No releases found to evaluate. Automated scanner requires at least one release to assess signing."
+    assessment-logs:
+      - requirement:
+          entry-id: "OSPS-BR-06.01"
+        applicability:
+          - "Maturity Level 2"
+          - "Maturity Level 3"
+        description: |
+          When an official release is created, that release MUST be signed or
+          accounted for in a signed manifest including each asset's
+          cryptographic hashes. This extends NIST 800-161 SR-4 requirements for
+          component authenticity verification.
+        result: "Not Run"
+        message: "No releases found in repository. Cannot evaluate release signing."
+        steps:
+          - "github.com/revanite-io/pvtr-github-repo/evaluation_plans/reusable_steps.HasMadeReleases"
+          - "github.com/revanite-io/pvtr-github-repo/evaluation_plans/reusable_steps.HasSecurityInsightsFile"
+          - "github.com/revanite-io/pvtr-github-repo/evaluation_plans/osps/build_release.insightsHasSlsaAttestation"
+        steps-executed: 0
+        start: "2024-03-25T17:00:00Z"
+

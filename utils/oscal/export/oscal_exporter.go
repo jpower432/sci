@@ -20,7 +20,7 @@ func Guidance(path string, args []string) error {
 		return err
 	}
 
-	var guidanceDocument layer1.GuidanceDocument
+	var guidanceDocument layer1.Guidance
 	pathWithScheme := fmt.Sprintf("file://%s", path)
 	if err := guidanceDocument.LoadFile(pathWithScheme); err != nil {
 		return err
@@ -58,7 +58,7 @@ func Catalog(path string, args []string) error {
 		return err
 	}
 
-	catalog := &layer2.Catalog{}
+		catalog := &layer2.ControlObjectives{}
 	pathWithScheme := fmt.Sprintf("file://%s", path)
 	if err := catalog.LoadFile(pathWithScheme); err != nil {
 		return err

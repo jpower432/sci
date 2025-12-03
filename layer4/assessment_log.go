@@ -7,6 +7,8 @@ import (
 	"reflect"
 	"runtime"
 	"time"
+
+	"github.com/ossf/gemara/common"
 )
 
 // AssessmentStep is a function type that inspects the provided targetData and returns a Result with a message.
@@ -33,7 +35,7 @@ func (as AssessmentStep) MarshalYAML() (interface{}, error) {
 // NewAssessment creates a new AssessmentLog object and returns a pointer to it.
 func NewAssessment(requirementId string, description string, applicability []string, steps []AssessmentStep) (*AssessmentLog, error) {
 	a := &AssessmentLog{
-		Requirement: Mapping{
+		Requirement: common.SimpleMapping{
 			EntryId: requirementId,
 		},
 		Description:   description,
@@ -65,7 +67,7 @@ func (a *AssessmentLog) Run(targetData interface{}) Result {
 		return a.Result
 	}
 
-	a.Start = Datetime(time.Now().Format(time.RFC3339))
+	a.Start = common.Datetime(time.Now().Format(time.RFC3339))
 	err := a.precheck()
 	if err != nil {
 		a.Result = Unknown
@@ -76,7 +78,7 @@ func (a *AssessmentLog) Run(targetData interface{}) Result {
 			return Failed
 		}
 	}
-	a.End = Datetime(time.Now().Format(time.RFC3339))
+	a.End = common.Datetime(time.Now().Format(time.RFC3339))
 	return a.Result
 }
 

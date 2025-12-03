@@ -1,0 +1,74 @@
+# This is an example guidance for testing purposes. The canonical version is https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-161r1-upd1.pdf.
+metadata:
+  id: NIST-800-161
+  description: Cybersecurity Supply Chain Risk Management Practices for Systems and Organizations
+  author:
+    id: nist-author-002
+    name: National Institute of Standards and Technology
+    type: Human
+  version: Rev. 1
+  date: '2022-05-12'
+  mapping-references:
+  - id: NIST-800-53
+    title: NIST Special Publication 800-53
+    version: Rev. 5
+    url: https://csrc.nist.gov/publications/detail/sp/800-53/rev-5/final
+  - id: NIST-CSF
+    title: NIST Cybersecurity Framework
+    version: '2.0'
+    url: https://nvlpubs.nist.gov/nistpubs/CSWP/NIST.CSWP.29.pdf
+title: NIST Special Publication 800-161
+front-matter: |
+  This document provides supplemental guidance for managing cybersecurity supply chain risks.
+  It extends NIST 800-53 controls with supply chain-specific considerations and introduces
+  new controls for supply chain risk management. This is supplemental guidance that builds
+  upon the foundation provided by NIST 800-53, not a mapping but an extension of those controls.
+document-type: Standard
+guidelines:
+- id: SA-15
+  title: Development Process, Standards, and Tools
+  family-id: SA
+  objective: |
+    Providing documented and formalized development processes to guide internal and system
+    integrator developers is critical to the enterprise's efforts to effectively mitigate
+    cybersecurity risks throughout the supply chain. The enterprise should apply national
+    and international standards and best practices when implementing this control. Using existing
+    standards promotes consistency of implementation, reliable and defendable processes, and
+    interoperability. The enterprise's development, maintenance, test, and deployment environments
+    should all be covered by this control. The tools included in this control can be manual
+    or automated. The use of automated tools aids thoroughness, efficiency, and the scale
+    of analysis that helps address cybersecurity risks that arise in relation to the development
+    process throughout the supply chain. Additionally, the output of such activities and
+    tools provides useful inputs for C-SCRM processes, as described in Section 2 and Appendix
+    C. This control has applicability to the internal enterprise's processes, information
+    systems, and networks as well as applicable system integrators' processes, systems, and
+    networks. Departments and agencies should refer to Appendix F to implement this guidance
+    in accordance with Executive Order 14028, Improving the Nation's Cybersecurity.
+  extends:
+    reference-id: NIST-800-53
+    entry-id: SA-15
+- id: SA-15.3
+  title: Development Process, Standards, and Tools | Criticality Analysis
+  family-id: SA
+  objective: |
+    This enhancement identifies critical components within the information system, which
+    will help determine the specific C-SCRM activities to be implemented for critical components.
+    See C-SCRM Criticality Analysis described in Appendix C for additional context.
+  extends:
+    reference-id: NIST-800-53
+    entry-id: SA-15.3
+- id: SA-15.8
+  title: Development Process, Standards, and Tools | Reuse of Threat and Vulnerability Information
+  family-id: SA
+  objective: |
+    This enhancement encourages developers to reuse the threat and vulnerability information
+    produced by prior development efforts and lessons learned from using the tools to inform
+    ongoing development efforts. Doing so will help determine the C-SCRM activities described
+    in Section 2 and Appendix C.
+  extends:
+    reference-id: NIST-800-53
+    entry-id: SA-15.8
+families:
+- id: SA
+  title: System and Services Acquisition
+  description: Controls related to the acquisition of systems, system components, and system services

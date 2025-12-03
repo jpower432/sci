@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"go/ast"
+	"go/format"
 	"go/parser"
 	"go/printer"
 	"go/token"
@@ -13,11 +14,12 @@ import (
 )
 
 func main() {
-	filename := os.Args[1]
-	if filename == "" {
-		fmt.Println("Usage: go run utils/types_tagger.go <filename>")
+	if len(os.Args) < 2 {
+		fmt.Println("Usage: go run utils/fix_generated_types.go <filename>")
 		return
 	}
+
+	filename := os.Args[1]
 	src, err := os.ReadFile(filename)
 	if err != nil {
 		panic(err)
@@ -29,6 +31,29 @@ func main() {
 		panic(err)
 	}
 
+	// Fix import paths
+	// Replace "github.com/ossf/gemara/schemas/common" with "github.com/ossf/gemara/common"
+	// Replace "github.com/ossf/gemara/schemas/layer1" with "github.com/ossf/gemara/layer1"
+	// Replace "github.com/ossf/gemara/schemas/layer2" with "github.com/ossf/gemara/layer2"
+	ast.Inspect(file, func(n ast.Node) bool {
+		switch x := n.(type) {
+		case *ast.ImportSpec:
+			if x.Path != nil {
+				importPath := strings.Trim(x.Path.Value, `"`)
+				switch importPath {
+				case "github.com/ossf/gemara/schemas/common":
+					x.Path.Value = `"github.com/ossf/gemara/common"`
+				case "github.com/ossf/gemara/schemas/layer1":
+					x.Path.Value = `"github.com/ossf/gemara/layer1"`
+				case "github.com/ossf/gemara/schemas/layer2":
+					x.Path.Value = `"github.com/ossf/gemara/layer2"`
+				}
+			}
+		}
+		return true
+	})
+
+	// Add YAML tags to struct fields that have JSON tags but no YAML tags
 	ast.Inspect(file, func(n ast.Node) bool {
 		ts, ok := n.(*ast.TypeSpec)
 		if !ok {
@@ -51,7 +76,7 @@ func main() {
 				continue // already has yaml tag
 			}
 			// Compose new tag string
-			tagParts := []string{}
+			var tagParts []string
 			for _, part := range strings.Split(string(tag), " ") {
 				if strings.HasPrefix(part, "yaml:") {
 					continue
@@ -69,8 +94,15 @@ func main() {
 	if err := printer.Fprint(&buf, fset, file); err != nil {
 		panic(err)
 	}
-	if err := os.WriteFile(filename, buf.Bytes(), 0644); err != nil {
+
+	formatted, err := format.Source(buf.Bytes())
+	if err != nil {
 		panic(err)
 	}
-	fmt.Println("YAML tags added to", filename)
+
+	if err := os.WriteFile(filename, formatted, 0644); err != nil {
+		panic(err)
+	}
+
+	fmt.Println("Fixed imports and added YAML tags to", filename)
 }

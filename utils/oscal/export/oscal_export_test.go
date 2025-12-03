@@ -18,10 +18,15 @@ metadata:
   id: Test
   title: Test
   description: ""
-categories:
-  - id: TEST
-    title: Test
-    description: Test
+  author:
+    id: "test-author"
+    name: "Test Author"
+    type: "Human"
+title: Test
+document-type: Framework
+guidelines:
+  - id: TEST-001
+    title: Test Guideline
 `
 	inputFilePath := filepath.Join(tempDir, "guidance.yaml")
 	require.NoError(t, os.WriteFile(inputFilePath, []byte(mockYAML), 0600))

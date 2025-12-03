@@ -1,10 +1,9 @@
 package layer2
 
 // This file contains table tests for the following functions:
-// - loadYaml
-// - LoadControlFamily
-// - LoadControlFamilyFiles
-// - LoadControlFamiliesFile
+// - LoadFile
+// - LoadFiles
+// - LoadNestedCatalog
 // - decodeYAMLFromURL (use decodeYAMLFromURL for URL-based YAML decoding)
 // - loadJson (placeholder, pending implementation)
 // - LoadThreat (placeholder, pending implementation)
@@ -54,16 +53,19 @@ var tests = []struct {
 func Test_LoadFile(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			c := &Catalog{}
+			c := &ControlObjectives{}
 			err := c.LoadFile(tt.sourcePath)
 			if (err == nil) == tt.wantErr {
-				t.Errorf("Catalog.LoadFile() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("ControlObjectives.LoadFile() error = %v, wantErr %v", err, tt.wantErr)
 			}
-			if !tt.wantErr && len(c.ControlFamilies) == 0 {
-				t.Errorf("Catalog.LoadFile() did not load any control families")
-			} else if !tt.wantErr && len(c.ControlFamilies) > 0 {
-				assert.NotEmpty(t, c.ControlFamilies[0].Title, "Control family title should not be empty")
-				assert.NotEmpty(t, c.ControlFamilies[0].Description, "Control family description should not be empty")
+			if !tt.wantErr && len(c.Controls) == 0 {
+				t.Errorf("ControlObjectives.LoadFile() did not load any controls")
+			} else if !tt.wantErr && len(c.Controls) > 0 {
+				assert.NotEmpty(t, c.Controls[0].Title, "Control title should not be empty")
+				if len(c.Families) > 0 {
+					assert.NotEmpty(t, c.Families[0].Title, "Family title should not be empty")
+					assert.NotEmpty(t, c.Families[0].Description, "Family description should not be empty")
+				}
 			}
 		})
 	}
@@ -72,7 +74,7 @@ func Test_LoadFile(t *testing.T) {
 func Test_LoadNestedCatalog(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			c := &Catalog{}
+			c := &ControlObjectives{}
 			err := c.LoadNestedCatalog(tt.sourcePath, "")
 			if err == nil {
 				t.Errorf("Un-nested catalogs are expected to fail")
@@ -132,19 +134,22 @@ func Test_LoadNestedCatalog(t *testing.T) {
 
 	for _, tt := range nestedTests {
 		t.Run(tt.name, func(t *testing.T) {
-			c := &Catalog{}
+			c := &ControlObjectives{}
 			err := c.LoadNestedCatalog(tt.sourcePath, tt.nestedFieldName)
 			if tt.wantErr && err == nil {
 				t.Errorf("Expected error, but got none")
 			} else if !tt.wantErr && err != nil {
 				t.Errorf("Did not expect error, but got '%s'", err.Error())
 			} else if !tt.wantErr {
-				assert.Equal(t, "FINOS Cloud Control Catalog", c.Metadata.Title, "Catalog title should match expected value")
-				if len(c.ControlFamilies) == 0 {
-					t.Errorf("Catalog.LoadControlFamily() did not load any control families")
-				} else if len(c.ControlFamilies) > 0 {
-					assert.NotEmpty(t, c.ControlFamilies[0].Title, "Control family title should not be empty")
-					assert.NotEmpty(t, c.ControlFamilies[0].Description, "Control family description should not be empty")
+				assert.Equal(t, "FINOS Cloud Control Catalog", c.Metadata.Title, "ControlObjectives title should match expected value")
+				if len(c.Controls) == 0 {
+					t.Errorf("ControlObjectives.LoadNestedCatalog() did not load any controls")
+				} else if len(c.Controls) > 0 {
+					assert.NotEmpty(t, c.Controls[0].Title, "Control title should not be empty")
+					if len(c.Families) > 0 {
+						assert.NotEmpty(t, c.Families[0].Title, "Family title should not be empty")
+						assert.NotEmpty(t, c.Families[0].Description, "Family description should not be empty")
+					}
 				}
 			}
 		})
@@ -154,13 +159,13 @@ func Test_LoadNestedCatalog(t *testing.T) {
 func Test_LoadFiles(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			c := &Catalog{}
+			c := &ControlObjectives{}
 			err := c.LoadFiles([]string{tt.sourcePath})
 			if (err == nil) == tt.wantErr {
-				t.Errorf("Catalog.LoadControlFamilyFiles() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("ControlObjectives.LoadFiles() error = %v, wantErr %v", err, tt.wantErr)
 			}
-			if !tt.wantErr && len(c.ControlFamilies) == 0 {
-				t.Errorf("Catalog.LoadControlFamilyFiles() did not load any control families")
+			if !tt.wantErr && len(c.Controls) == 0 {
+				t.Errorf("ControlObjectives.LoadFiles() did not load any controls")
 			}
 		})
 	}
@@ -181,7 +186,7 @@ func Test_LoadFile_UnsupportedFileType(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			c := &Catalog{}
+			c := &ControlObjectives{}
 			err := c.LoadFile(tt.sourcePath)
 			if (err == nil) == tt.wantErr {
 				t.Errorf("Catalog.LoadFile() error = %v, wantErr %v", err, tt.wantErr)

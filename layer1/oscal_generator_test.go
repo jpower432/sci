@@ -11,6 +11,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/ossf/gemara/common"
 	oscalUtils "github.com/ossf/gemara/internal/oscal"
 )
 
@@ -20,7 +21,7 @@ func TestToOSCALCatalog(t *testing.T) {
 
 	tests := []struct {
 		name       string
-		guidance   GuidanceDocument
+		guidance   Guidance
 		wantGroups []oscalTypes.Group
 		wantErr    bool
 	}{
@@ -125,7 +126,7 @@ func TestToOSCALCatalog(t *testing.T) {
 		},
 		{
 			name:     "Failure/EmptyGuidance",
-			guidance: GuidanceDocument{},
+			guidance: Guidance{},
 			wantErr:  true,
 		},
 	}
@@ -136,11 +137,16 @@ func TestToOSCALCatalog(t *testing.T) {
 			if tt.wantErr {
 				assert.Error(t, err)
 			} else {
+				assert.NoError(t, err)
 				oscalDocument := oscalTypes.OscalModels{
 					Catalog: &catalog,
 				}
 				err = oscalUtils.Validate(oscalDocument)
 				assert.NoError(t, err)
+				if catalog.Groups == nil {
+					t.Errorf("catalog.Groups is nil, expected groups")
+					return
+				}
 				if diff := cmp.Diff(tt.wantGroups, *catalog.Groups, cmpopts.IgnoreFields(oscalTypes.Link{}, "Href")); diff != "" {
 					t.Errorf("group mismatch (-want +got):\n%s", diff)
 				}
@@ -155,35 +161,18 @@ func TestToOSCALProfile(t *testing.T) {
 
 	guidanceWithImports := goodAIFG
 	// Add some shared guidelines
-	mapping := MappingReference{
+	mapping := common.MappingReference{
 		Id:          "EXP",
+		Title:       "Example",
 		Description: "Example",
 		Version:     "0.1.0",
 		Url:         "https://example.com",
 	}
-
-	importedGuidelines := Mapping{
-		ReferenceId: "EXP",
-		Entries: []MappingEntry{
-			{
-				ReferenceId: "EX-1",
-			},
-			{
-				// Intentionally adding a control that
-				// needs to be normalized
-				ReferenceId: "EX-1(2)",
-			},
-			{
-				ReferenceId: "EX-2",
-			},
-		},
-	}
 	guidanceWithImports.Metadata.MappingReferences = append(guidanceWithImports.Metadata.MappingReferences, mapping)
-	guidanceWithImports.ImportedGuidelines = append(guidanceWithImports.ImportedGuidelines, importedGuidelines)
 
 	tests := []struct {
 		name        string
-		guidance    GuidanceDocument
+		guidance    Guidance
 		options     []GenerateOption
 		wantImports []oscalTypes.Import
 	}{
@@ -202,18 +191,6 @@ func TestToOSCALProfile(t *testing.T) {
 			guidance: guidanceWithImports,
 			wantImports: []oscalTypes.Import{
 				{
-					Href: "https://example.com",
-					IncludeControls: &[]oscalTypes.SelectControlById{
-						{
-							WithIds: &[]string{
-								"ex-1",
-								"ex-1.2",
-								"ex-2",
-							},
-						},
-					},
-				},
-				{
 					Href:       "testHref",
 					IncludeAll: &oscalTypes.IncludeAll{},
 				},
@@ -228,18 +205,6 @@ func TestToOSCALProfile(t *testing.T) {
 				}),
 			},
 			wantImports: []oscalTypes.Import{
-				{
-					Href: "https://example.com/oscal",
-					IncludeControls: &[]oscalTypes.SelectControlById{
-						{
-							WithIds: &[]string{
-								"ex-1",
-								"ex-1.2",
-								"ex-2",
-							},
-						},
-					},
-				},
 				{
 					Href:       "testHref",
 					IncludeAll: &oscalTypes.IncludeAll{},
@@ -262,15 +227,15 @@ func TestToOSCALProfile(t *testing.T) {
 	}
 }
 
-func goodAIGFExample() (GuidanceDocument, error) {
+func goodAIGFExample() (Guidance, error) {
 	testdataPath := "./test-data/good-aigf.yaml"
 	data, err := os.ReadFile(testdataPath)
 	if err != nil {
-		return GuidanceDocument{}, err
+		return Guidance{}, err
 	}
-	var l1Docs GuidanceDocument
+	var l1Docs Guidance
 	if err := yaml.Unmarshal(data, &l1Docs); err != nil {
-		return GuidanceDocument{}, err
+		return Guidance{}, err
 	}
 	return l1Docs, nil
 }

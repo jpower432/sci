@@ -1,0 +1,46 @@
+metadata:
+  id: "eval-osps-security-team-001"
+  description: "Security team evaluation of OSPS Baseline controls"
+  version: "1.0.0"
+  date: "2024-03-25"
+  author:
+    id: "security-team"
+    name: "Security Team"
+    type: "Human"
+  mapping-references:
+    - id: "myorg-policy-001"
+      title: "My Security Policy"
+      version: "1.0.0"
+      url: "file://samples/layer3/myorg-policy.yaml"
+    - id: "OSPS-B"
+      title: "Open Source Project Security Baseline"
+      version: "2024"
+      url: "https://baseline.openssf.org/"
+
+evaluations:
+  - name: "Signed Releases Evaluation - Supply Chain Security"
+    control:
+      entry-id: "OSPS-BR-06"
+    result: "Passed"
+    message: "All releases are signed with cryptographic signatures. Maps to NIST 800-161 SR-4 (Counterfeit Components)."
+    assessment-logs:
+      - requirement:
+          entry-id: "OSPS-BR-06.01"
+        applicability:
+          - "Maturity Level 2"
+          - "Maturity Level 3"
+        description: |
+          When an official release is created, that release MUST be signed or
+          accounted for in a signed manifest including each asset's
+          cryptographic hashes. This extends NIST 800-161 SR-4 requirements for
+          component authenticity verification.
+        result: "Passed"
+        message: "All releases are signed with Sigstore signatures. Cryptographic hashes are included in signed manifests. Security team verified signature verification process."
+        steps:
+          - "security-team/evaluation_plans/osps/build_release.verifyReleaseSignatures"
+          - "security-team/evaluation_plans/osps/build_release.verifySignedManifests"
+          - "security-team/evaluation_plans/osps/build_release.verifySignatureVerification"
+        steps-executed: 3
+        start: "2024-03-25T14:00:00Z"
+        end: "2024-03-25T14:08:00Z"
+

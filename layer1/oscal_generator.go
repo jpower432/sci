@@ -8,6 +8,7 @@ import (
 	"github.com/defenseunicorns/go-oscal/src/pkg/uuid"
 	oscal "github.com/defenseunicorns/go-oscal/src/types/oscal-1-1-3"
 
+	"github.com/ossf/gemara/common"
 	oscalUtils "github.com/ossf/gemara/internal/oscal"
 )
 
@@ -17,7 +18,7 @@ type generateOpts struct {
 	canonicalHref string
 }
 
-func (g *generateOpts) complete(doc GuidanceDocument) {
+func (g *generateOpts) complete(doc Guidance) {
 	if g.version == "" {
 		g.version = doc.Metadata.Version
 	}
@@ -34,7 +35,7 @@ func (g *generateOpts) complete(doc GuidanceDocument) {
 type GenerateOption func(opts *generateOpts)
 
 // WithVersion is a GenerateOption that sets the version of the OSCAL Document. If set,
-// this will be used instead of the version in GuidanceDocument.
+// this will be used instead of the version in Guidance.
 func WithVersion(version string) GenerateOption {
 	return func(opts *generateOpts) {
 		opts.version = version
@@ -60,7 +61,7 @@ func WithCanonicalHrefFormat(canonicalHref string) GenerateOption {
 
 // ToOSCALProfile creates an OSCAL Profile from the imported and local guidelines from
 // Layer 1 Guidance Document with a given location to the OSCAL Catalog for the guidance document.
-func (g *GuidanceDocument) ToOSCALProfile(guidanceDocHref string, opts ...GenerateOption) (oscal.Profile, error) {
+func (g *Guidance) ToOSCALProfile(guidanceDocHref string, opts ...GenerateOption) (oscal.Profile, error) {
 	options := generateOpts{}
 	for _, opt := range opts {
 		opt(&options)
@@ -77,25 +78,77 @@ func (g *GuidanceDocument) ToOSCALProfile(guidanceDocHref string, opts ...Genera
 		importMap[mappingId] = oscal.Import{Href: mappingRef}
 	}
 
-	for _, mapping := range g.ImportedGuidelines {
-		imp, ok := importMap[mapping.ReferenceId]
-		if !ok {
-			continue
-		}
+	// Process extends mappings from guidelines as imports
+	for _, guideline := range g.Guidelines {
+		refId := guideline.Extends.ReferenceId
+		if refId != "" {
+			// Look up the href for this reference-id from mapping references
+			href, found := options.imports[refId]
+			if !found {
+				// Try to find it in metadata mapping references
+				for _, mappingRef := range g.Metadata.MappingReferences {
+					if mappingRef.Id == refId && mappingRef.Url != "" {
+						href = mappingRef.Url
+						found = true
+						// Also add it to options.imports for consistency
+						if options.imports == nil {
+							options.imports = make(map[string]string)
+						}
+						options.imports[mappingRef.Id] = mappingRef.Url
+						break
+					}
+				}
+			}
 
-		withIds := make([]string, 0, len(mapping.Entries))
-		for _, entry := range mapping.Entries {
-			withIds = append(withIds, oscalUtils.NormalizeControl(entry.ReferenceId, false))
-		}
+			if found && href != "" {
+				imp, exists := importMap[refId]
+				if !exists {
+					imp = oscal.Import{Href: href}
+				}
 
-		selector := oscal.SelectControlById{WithIds: &withIds}
-		imp.IncludeControls = &[]oscal.SelectControlById{selector}
-		importMap[mapping.ReferenceId] = imp
+				if guideline.Extends.EntryId != "" {
+					normalizedId := oscalUtils.NormalizeControl(guideline.Extends.EntryId, false)
+					withIds := []string{normalizedId}
+
+					// Merge with existing IncludeControls if any
+					if imp.IncludeControls == nil {
+						imp.IncludeControls = &[]oscal.SelectControlById{}
+					}
+
+					// Check if we already have a selector for this set of controls
+					// If not, create a new one and merge all control IDs
+					allControlIds := make(map[string]bool)
+					for _, selector := range *imp.IncludeControls {
+						if selector.WithIds != nil {
+							for _, id := range *selector.WithIds {
+								allControlIds[id] = true
+							}
+						}
+					}
+					for _, id := range withIds {
+						allControlIds[id] = true
+					}
+
+					// Create a single selector with all unique control IDs
+					mergedIds := make([]string, 0, len(allControlIds))
+					for id := range allControlIds {
+						mergedIds = append(mergedIds, id)
+					}
+					selector := oscal.SelectControlById{WithIds: &mergedIds}
+					imp.IncludeControls = &[]oscal.SelectControlById{selector}
+				} else if imp.IncludeAll == nil {
+					// If no entries and no existing IncludeAll, use IncludeAll
+					imp.IncludeAll = &oscal.IncludeAll{}
+				}
+
+				importMap[refId] = imp
+			}
+		}
 	}
 
 	var imports []oscal.Import
 	for _, imp := range importMap {
-		if imp.IncludeControls != nil {
+		if imp.IncludeControls != nil || imp.IncludeAll != nil {
 			imports = append(imports, imp)
 		}
 	}
@@ -118,10 +171,10 @@ func (g *GuidanceDocument) ToOSCALProfile(guidanceDocHref string, opts ...Genera
 
 // ToOSCALCatalog creates an OSCAL Catalog from the locally defined guidelines in a given
 // Layer 1 Guidance Document.
-func (g *GuidanceDocument) ToOSCALCatalog(opts ...GenerateOption) (oscal.Catalog, error) {
+func (g *Guidance) ToOSCALCatalog(opts ...GenerateOption) (oscal.Catalog, error) {
 	// Return early for empty documents
-	if len(g.Categories) == 0 {
-		return oscal.Catalog{}, fmt.Errorf("document %s does not have defined guidance categories", g.Metadata.Id)
+	if len(g.Guidelines) == 0 {
+		return oscal.Catalog{}, fmt.Errorf("document %s does not have defined guidelines", g.Title)
 	}
 
 	options := generateOpts{}
@@ -147,28 +200,51 @@ func (g *GuidanceDocument) ToOSCALCatalog(opts ...GenerateOption) (oscal.Catalog
 		}
 	}
 
+	// Build a map of families by ID
+	familyById := make(map[string]common.Family)
+	for _, family := range g.Families {
+		familyById[family.Id] = family
+	}
+
+	// Group controls by family ID
+	familyMap := make(map[string][]Guideline)
+	for _, control := range g.Guidelines {
+		familyId := "none"
+		if control.FamilyId != "" {
+			familyId = control.FamilyId
+		}
+		familyMap[familyId] = append(familyMap[familyId], control)
+	}
+
 	var groups []oscal.Group
-	for _, category := range g.Categories {
-		groups = append(groups, g.createControlGroup(category, resourcesMap))
+	var controls []oscal.Control
+
+	for familyId, guidelines := range familyMap {
+		if family, exists := familyById[familyId]; exists {
+			groups = append(groups, g.createControlGroup(family, guidelines, resourcesMap))
+		} else {
+			controls = append(controls, g.guidelinesToControls(guidelines, resourcesMap)...)
+		}
 	}
 
 	catalog := oscal.Catalog{
 		UUID:       uuid.NewUUID(),
 		Metadata:   metadata,
+		Controls:   oscalUtils.NilIfEmpty(controls),
 		Groups:     oscalUtils.NilIfEmpty(groups),
 		BackMatter: backmatter,
 	}
 	return catalog, nil
 }
 
-func createMetadata(guidance *GuidanceDocument, opts generateOpts) (oscal.Metadata, error) {
+func createMetadata(guidance *Guidance, opts generateOpts) (oscal.Metadata, error) {
 	fallbackTime := time.Now()
 	metadata := oscal.Metadata{
-		Title:        guidance.Metadata.Title,
+		Title:        guidance.Title,
 		OscalVersion: oscal.Version,
 		Version:      opts.version,
-		Published:    oscalUtils.GetTime(guidance.Metadata.PublicationDate),
-		LastModified: oscalUtils.GetTimeWithFallback(guidance.Metadata.LastModified, fallbackTime),
+		Published:    oscalUtils.GetTime(string(guidance.Metadata.Date)),
+		LastModified: oscalUtils.GetTimeWithFallback(string(guidance.Metadata.Date), fallbackTime),
 	}
 
 	if opts.canonicalHref != "" {
@@ -180,6 +256,12 @@ func createMetadata(guidance *GuidanceDocument, opts generateOpts) (oscal.Metada
 		}
 	}
 
+	// Use author from metadata if available
+	authorName := "Unknown"
+	if guidance.Metadata.Author.Name != "" {
+		authorName = guidance.Metadata.Author.Name
+	}
+
 	authorRole := oscal.Role{
 		ID:          "author",
 		Description: "Author and owner of the document",
@@ -189,7 +271,7 @@ func createMetadata(guidance *GuidanceDocument, opts generateOpts) (oscal.Metada
 	author := oscal.Party{
 		UUID: uuid.NewUUID(),
 		Type: "person",
-		Name: guidance.Metadata.Author,
+		Name: authorName,
 	}
 
 	responsibleParty := oscal.ResponsibleParty{
@@ -203,15 +285,20 @@ func createMetadata(guidance *GuidanceDocument, opts generateOpts) (oscal.Metada
 	return metadata, nil
 }
 
-func (g *GuidanceDocument) createControlGroup(category Category, resourcesMap map[string]string) oscal.Group {
+func (g *Guidance) createControlGroup(family common.Family, guidelines []Guideline, resourcesMap map[string]string) oscal.Group {
 	group := oscal.Group{
 		Class: "category",
-		ID:    category.Id,
-		Title: category.Title,
+		ID:    family.Id,
+		Title: family.Title,
 	}
+	controls := g.guidelinesToControls(guidelines, resourcesMap)
+	group.Controls = oscalUtils.NilIfEmpty(controls)
+	return group
+}
 
+func (g *Guidance) guidelinesToControls(guidelines []Guideline, resourcesMap map[string]string) []oscal.Control {
 	controlMap := make(map[string]oscal.Control)
-	for _, guideline := range category.Guidelines {
+	for _, guideline := range guidelines {
 		control, parent := g.guidelineToControl(guideline, resourcesMap)
 
 		if parent == "" {
@@ -230,12 +317,10 @@ func (g *GuidanceDocument) createControlGroup(category Category, resourcesMap ma
 	for _, control := range controlMap {
 		controls = append(controls, control)
 	}
-
-	group.Controls = oscalUtils.NilIfEmpty(controls)
-	return group
+	return controls
 }
 
-func (g *GuidanceDocument) guidelineToControl(guideline Guideline, resourcesMap map[string]string) (oscal.Control, string) {
+func (g *Guidance) guidelineToControl(guideline Guideline, resourcesMap map[string]string) (oscal.Control, string) {
 	controlId := oscalUtils.NormalizeControl(guideline.Id, false)
 
 	control := oscal.Control{
@@ -247,7 +332,7 @@ func (g *GuidanceDocument) guidelineToControl(guideline Guideline, resourcesMap 
 	var links []oscal.Link
 	for _, also := range guideline.SeeAlso {
 		relatedLink := oscal.Link{
-			Href: fmt.Sprintf("#%s", oscalUtils.NormalizeControl(also, false)),
+			Href: fmt.Sprintf("#%s", oscalUtils.NormalizeControl(also.EntryId, false)),
 			Rel:  "related",
 		}
 		links = append(links, relatedLink)
@@ -282,7 +367,7 @@ func (g *GuidanceDocument) guidelineToControl(guideline Guideline, resourcesMap 
 
 	var smtParts []oscal.Part
 	var objParts []oscal.Part
-	for _, part := range guideline.GuidelineParts {
+	for _, part := range guideline.Statements {
 		partId := oscalUtils.NormalizeControl(part.Id, true)
 		smtID := fmt.Sprintf("%s_smt.%s", controlId, partId)
 		itemSubSmt := oscal.Part{
@@ -324,10 +409,10 @@ func (g *GuidanceDocument) guidelineToControl(guideline Guideline, resourcesMap 
 		*control.Parts = append(*control.Parts, overviewPart)
 	}
 
-	return control, oscalUtils.NormalizeControl(guideline.BaseGuidelineID, false)
+	return control, oscalUtils.NormalizeControl(guideline.Extends.EntryId, false)
 }
 
-func mappingToLinks(mappings []Mapping, resourcesMap map[string]string) []oscal.Link {
+func mappingToLinks(mappings []common.Mapping, resourcesMap map[string]string) []oscal.Link {
 	links := make([]oscal.Link, 0, len(mappings))
 	for _, mapping := range mappings {
 		ref, found := resourcesMap[mapping.ReferenceId]
@@ -343,7 +428,7 @@ func mappingToLinks(mappings []Mapping, resourcesMap map[string]string) []oscal.
 	return links
 }
 
-func mappingToBackMatter(resourceRefs []MappingReference) *oscal.BackMatter {
+func mappingToBackMatter(resourceRefs []common.MappingReference) *oscal.BackMatter {
 	var resources []oscal.Resource
 	for _, ref := range resourceRefs {
 		resource := oscal.Resource{
@@ -364,8 +449,7 @@ func mappingToBackMatter(resourceRefs []MappingReference) *oscal.BackMatter {
 			},
 			Citation: &oscal.Citation{
 				Text: fmt.Sprintf(
-					"%s. *%s*. %s",
-					ref.Issuer,
+					"*%s*. %s",
 					ref.Title,
 					ref.Url),
 			},

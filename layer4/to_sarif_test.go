@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"testing"
 
+	"github.com/ossf/gemara/common"
 	"github.com/ossf/gemara/layer2"
 	"github.com/stretchr/testify/require"
 )
@@ -14,7 +15,7 @@ func TestToSARIF(t *testing.T) {
 	tests := []struct {
 		name          string
 		artifactURI   string
-		catalog       *layer2.Catalog
+		catalog       *layer2.ControlObjectives
 		evaluationLog EvaluationLog
 		wantRules     int
 		wantResults   int
@@ -29,7 +30,7 @@ func TestToSARIF(t *testing.T) {
 			name:        "basic conversion with multiple results",
 			artifactURI: "",
 			catalog:     nil,
-			evaluationLog: makeEvaluationLog(Author{
+			evaluationLog: makeEvaluationLog(common.Actor{
 				Name:    "gemara",
 				Uri:     "https://github.com/ossf/gemara",
 				Version: "1.0.0",
@@ -58,7 +59,7 @@ func TestToSARIF(t *testing.T) {
 			name:        "with artifactURI parameter",
 			artifactURI: "README.md",
 			catalog:     nil,
-			evaluationLog: makeEvaluationLog(Author{
+			evaluationLog: makeEvaluationLog(common.Actor{
 				Name:    "gemara",
 				Uri:     "https://github.com/test/repo",
 				Version: "1.0.0",
@@ -83,7 +84,7 @@ func TestToSARIF(t *testing.T) {
 			name:        "empty author URI",
 			artifactURI: "",
 			catalog:     nil,
-			evaluationLog: makeEvaluationLog(Author{
+			evaluationLog: makeEvaluationLog(common.Actor{
 				Name:    "gemara",
 				Uri:     "",
 				Version: "1.0.0",
@@ -108,13 +109,13 @@ func TestToSARIF(t *testing.T) {
 			name:        "with catalog enrichment",
 			artifactURI: "README.md",
 			catalog:     testCatalog,
-			evaluationLog: makeEvaluationLog(Author{
+			evaluationLog: makeEvaluationLog(common.Actor{
 				Name:    "test-tool",
 				Uri:     "https://github.com/test/tool",
 				Version: "1.0.0",
 			}, []*AssessmentLog{
 				{
-					Requirement:    Mapping{EntryId: "REQ-1"},
+					Requirement:    common.SimpleMapping{EntryId: "REQ-1"},
 					Description:    "Test description",
 					Result:         Failed,
 					Message:        "Test failed",
@@ -147,13 +148,13 @@ func TestToSARIF(t *testing.T) {
 			name:        "without catalog",
 			artifactURI: "README.md",
 			catalog:     nil,
-			evaluationLog: makeEvaluationLog(Author{
+			evaluationLog: makeEvaluationLog(common.Actor{
 				Name:    "test-tool",
 				Uri:     "https://github.com/test/tool",
 				Version: "1.0.0",
 			}, []*AssessmentLog{
 				{
-					Requirement:    Mapping{EntryId: "REQ-1"},
+					Requirement:    common.SimpleMapping{EntryId: "REQ-1"},
 					Description:    "Test description",
 					Result:         Failed,
 					Message:        "Test failed",
@@ -182,13 +183,13 @@ func TestToSARIF(t *testing.T) {
 			name:        "catalog recommendation when assessment log has none",
 			artifactURI: "README.md",
 			catalog:     testCatalog,
-			evaluationLog: makeEvaluationLog(Author{
+			evaluationLog: makeEvaluationLog(common.Actor{
 				Name:    "test-tool",
 				Uri:     "https://github.com/test/tool",
 				Version: "1.0.0",
 			}, []*AssessmentLog{
 				{
-					Requirement:   Mapping{EntryId: "REQ-1"},
+					Requirement:   common.SimpleMapping{EntryId: "REQ-1"},
 					Description:   "Test description",
 					Result:        Failed,
 					Message:       "Test failed",
@@ -267,7 +268,7 @@ func TestToSARIF_ResultLevels(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.result.String(), func(t *testing.T) {
-			evaluationLog := makeEvaluationLog(Author{
+			evaluationLog := makeEvaluationLog(common.Actor{
 				Name:    "test",
 				Uri:     "https://test",
 				Version: "1.0.0",
@@ -290,17 +291,21 @@ func TestToSARIF_ResultLevels(t *testing.T) {
 
 // Helper functions
 
-func makeEvaluationLog(author Author, logs []*AssessmentLog) EvaluationLog {
+func makeEvaluationLog(author common.Actor, logs []*AssessmentLog) EvaluationLog {
 	return EvaluationLog{
+		Metadata: common.Metadata{
+			Id:      "test-log",
+			Version: "1.0.0",
+			Author:  author,
+		},
 		Evaluations: []*ControlEvaluation{
 			{
 				Name:           "Example Control",
-				Control:        Mapping{EntryId: "CTRL-1"},
+				Control:        common.SimpleMapping{EntryId: "CTRL-1"},
 				Result:         Passed,
 				AssessmentLogs: logs,
 			},
 		},
-		Metadata: Metadata{Author: author},
 	}
 }
 
@@ -309,7 +314,7 @@ func makeAssessmentLog(entryID, description string, result Result, message strin
 		steps = []AssessmentStep{func(interface{}) (Result, string) { return result, "" }}
 	}
 	return &AssessmentLog{
-		Requirement:   Mapping{EntryId: entryID},
+		Requirement:   common.SimpleMapping{EntryId: entryID},
 		Description:   description,
 		Result:        result,
 		Message:       message,
@@ -318,24 +323,26 @@ func makeAssessmentLog(entryID, description string, result Result, message strin
 	}
 }
 
-func makeCatalog(controlID, controlTitle, controlObjective, reqID, reqText, reqRecommendation string) *layer2.Catalog {
-	return &layer2.Catalog{
-		ControlFamilies: []layer2.ControlFamily{
+func makeCatalog(controlID, controlTitle, controlObjective, reqID, reqText, reqRecommendation string) *layer2.ControlObjectives {
+	return &layer2.ControlObjectives{
+		Families: []common.Family{
 			{
-				Id:    "test-family",
-				Title: "Test Family",
-				Controls: []layer2.Control{
+				Id:          "test-family",
+				Title:       "Test Family",
+				Description: "Test family description",
+			},
+		},
+		Controls: []layer2.Control{
+			{
+				Id:        controlID,
+				Title:     controlTitle,
+				Objective: controlObjective,
+				FamilyId:  "test-family",
+				AssessmentRequirements: []layer2.AssessmentRequirement{
 					{
-						Id:        controlID,
-						Title:     controlTitle,
-						Objective: controlObjective,
-						AssessmentRequirements: []layer2.AssessmentRequirement{
-							{
-								Id:             reqID,
-								Text:           reqText,
-								Recommendation: reqRecommendation,
-							},
-						},
+						Id:             reqID,
+						Text:           reqText,
+						Recommendation: reqRecommendation,
 					},
 				},
 			},

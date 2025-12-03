@@ -1,11 +1,14 @@
-package schemas
+package layer2
+
+import "github.com/ossf/gemara/schemas/common"
 
 @go(layer2)
 
-#Catalog: {
+#ControlObjectives: {
 	metadata?: #Metadata
 
-	"control-families"?: [...#ControlFamily] @go(ControlFamilies)
+	families: [...common.#Family] @go(Families)
+	controls?: [...#Control] @go(Controls)
 	threats?: [...#Threat] @go(Threats)
 	capabilities?: [...#Capability] @go(Capabilities)
 
@@ -31,17 +34,11 @@ package schemas
 	description: string
 }
 
-#ControlFamily: {
-	id:          string
-	title:       string
-	description: string
-	controls: [...#Control]
-}
-
 #Control: {
-	id:        string
-	title:     string
-	objective: string
+	id:           string
+	title:        string
+	objective:    string
+	"family-id"?: string @go(FamilyId) @yaml("family-id,omitempty")
 	"assessment-requirements": [...#AssessmentRequirement] @go(AssessmentRequirements)
 	"guideline-mappings"?: [...#Mapping] @go(GuidelineMappings)
 	"threat-mappings"?: [...#Mapping] @go(ThreatMappings)
@@ -62,25 +59,14 @@ package schemas
 	description: string
 }
 
-#MappingReference: {
-	id:           string
-	title:        string
-	version:      string
-	description?: string
-	url?:         =~"^https?://[^\\s]+$"
-}
+// MappingReference uses the common definition
+#MappingReference: common.#MappingReference
 
-#Mapping: {
-	"reference-id": string @go(ReferenceId)
-	entries: [...#MappingEntry]
-	remarks?: string
-}
+// Mapping uses the common definition
+#Mapping: common.#Mapping
 
-#MappingEntry: {
-	"reference-id": string @go(ReferenceId)
-	strength:       int & >=1 & <=10
-	remarks?:       string
-}
+// MappingEntry uses the common definition
+#MappingEntry: common.#MappingEntry
 
 #AssessmentRequirement: {
 	id:   string

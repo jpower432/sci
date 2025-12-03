@@ -1,0 +1,42 @@
+metadata:
+  id: osps-example-policy
+  version: 1.0.0
+  last-modified: '2024-12-01'
+  mapping-references:
+  - id: OSPS-B
+    title: Open Source Project Security Baseline
+    version: 1.0
+    description: OSPS Baseline Controls
+    url: file://../layer2/test-data/good-osps.yml
+contacts:
+  author:
+    name: Example Security Team
+    primary: true
+    affiliation: Security Department
+    email: security@example.com
+  responsible:
+  - name: DevOps Team
+    primary: true
+    affiliation: Engineering
+    email: devops@example.com
+title: Example OSPS Security Policy
+organization-id: example-org
+purpose: Example policy demonstrating OSPS Baseline Controls
+control-references:
+- reference-id: OSPS-B
+  control-modifications:
+  - target-id: OSPS-AC-01
+    modification-type: clarify
+    modification-rationale: Enhanced MFA requirements for our organization
+    overrides:
+      title: Enhanced Multi-Factor Authentication Requirements
+    assessment-requirement-modifications:
+    - target-id: OSPS-AC-01.01
+      modification-type: clarify
+      modification-rationale: Clarified MFA requirements for cloud environments
+      overrides:
+        text: When a user attempts to access a sensitive resource in the project's version control system, the system MUST require the user to complete a multi-factor authentication process using hardware tokens or passkeys.
+        recommendation: Implement hardware security keys or passkeys for all administrative access
+  - target-id: OSPS-AC-03
+    modification-type: clarify
+    modification-rationale: Stricter branch protection requirements

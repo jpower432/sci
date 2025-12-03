@@ -1,7 +1,7 @@
 package layer3
 
 // This file contains table tests for the following functions:
-// - PolicyDocument.LoadFile
+// - Policy.LoadFile
 
 // The test data is pulled from ./test-data/
 
@@ -41,16 +41,16 @@ var tests = []struct {
 func Test_LoadFile(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			p := &PolicyDocument{}
+			p := &Policy{}
 			err := p.LoadFile(tt.sourcePath)
 			if (err == nil) == tt.wantErr {
-				t.Errorf("PolicyDocument.LoadFile() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("Policy.LoadFile() error = %v, wantErr %v", err, tt.wantErr)
 			}
 			if !tt.wantErr {
 				// Validate that the policy document was loaded successfully
 				assert.NotEmpty(t, p.Metadata.Id, "Policy document ID should not be empty")
-				assert.NotEmpty(t, p.Metadata.Title, "Policy document title should not be empty")
-				assert.NotEmpty(t, p.Metadata.Objective, "Policy document objective should not be empty")
+				assert.NotEmpty(t, p.Title, "Policy document title should not be empty")
+				assert.NotEmpty(t, p.Purpose, "Policy document purpose should not be empty")
 				assert.NotEmpty(t, p.Metadata.Version, "Policy document version should not be empty")
 			}
 		})
@@ -72,10 +72,10 @@ func Test_LoadFile_UnsupportedFileType(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			p := &PolicyDocument{}
+			p := &Policy{}
 			err := p.LoadFile(tt.sourcePath)
 			if (err == nil) == tt.wantErr {
-				t.Errorf("PolicyDocument.LoadFile() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("Policy.LoadFile() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}
@@ -108,7 +108,7 @@ func Test_LoadFile_Uri(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			data := &PolicyDocument{}
+			data := &Policy{}
 			err := data.LoadFile(tt.sourcePath)
 			if err != nil && tt.wantErr {
 				assert.Containsf(t, err.Error(), tt.errorExpected, "expected error containing %q, got %s", tt.errorExpected, err)

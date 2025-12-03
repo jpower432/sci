@@ -9,16 +9,16 @@ import (
 
 // LoadFile loads data from a YAML or JSON file at the provided path.
 // If run multiple times for the same data type, this method will override previous data.
-func (c *PolicyDocument) LoadFile(sourcePath string) error {
+func (p *Policy) LoadFile(sourcePath string) error {
 	ext := path.Ext(sourcePath)
 	switch ext {
 	case ".yaml", ".yml":
-		err := loaders.LoadYAML(sourcePath, c)
+		err := loaders.LoadYAML(sourcePath, p)
 		if err != nil {
 			return err
 		}
 	case ".json":
-		err := loaders.LoadJSON(sourcePath, c)
+		err := loaders.LoadJSON(sourcePath, p)
 		if err != nil {
 			return fmt.Errorf("error loading json: %w", err)
 		}

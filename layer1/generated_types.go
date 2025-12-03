@@ -2,159 +2,78 @@
 
 package layer1
 
-type GuidanceDocument struct {
-	Metadata	Metadata	`json:"metadata,omitempty" yaml:"metadata,omitempty"`
+import (
+	"github.com/ossf/gemara/common"
+)
 
-	// Introductory text for the document to be used during rendering
-	FrontMatter	string	`json:"front-matter,omitempty" yaml:"front-matter,omitempty"`
+// Guidance represents a Layer 1 guidance document
+type Guidance struct {
+	Metadata common.Metadata `json:"metadata,omitempty" yaml:"metadata,omitempty"`
 
-	Categories	[]Category	`json:"categories,omitempty" yaml:"categories,omitempty"`
+	Title string `json:"title" yaml:"title"`
 
-	// For inheriting from other guidance documents to create tailored documents/baselines
-	ImportedGuidelines	[]Mapping	`json:"imported-guidelines,omitempty" yaml:"imported-guidelines,omitempty"`
+	DocumentType DocumentType `json:"document-type" yaml:"document-type"`
 
-	ImportedPrinciples	[]Mapping	`json:"imported-principles,omitempty" yaml:"imported-principles,omitempty"`
-}
+	FrontMatter string `json:"front-matter,omitempty" yaml:"front-matter,omitempty"`
 
-type Metadata struct {
-	Id	string	`json:"id" yaml:"id"`
+	Exemptions []Exemption `json:"exemptions,omitempty" yaml:"exemptions,omitempty"`
 
-	Title	string	`json:"title" yaml:"title"`
+	Families []common.Family `json:"families" yaml:"families"`
 
-	Description	string	`json:"description" yaml:"description"`
-
-	Author	string	`json:"author" yaml:"author"`
-
-	Version	string	`json:"version,omitempty" yaml:"version,omitempty"`
-
-	LastModified	string	`json:"last-modified,omitempty" yaml:"last-modified,omitempty"`
-
-	PublicationDate	string	`json:"publication-date,omitempty" yaml:"publication-date,omitempty"`
-
-	MappingReferences	[]MappingReference	`json:"mapping-references,omitempty" yaml:"mapping-references,omitempty"`
-
-	DocumentType	DocumentType	`json:"document-type,omitempty" yaml:"document-type,omitempty"`
-
-	Applicability	*Applicability	`json:"applicability,omitempty" yaml:"applicability,omitempty"`
-
-	Exemptions	[]string	`json:"exemptions,omitempty" yaml:"exemptions,omitempty"`
-}
-
-// Mapping references is the same from Layer2, but intended for Layer 1 to Layer 1 mappings
-// instead of Layer 2 to Layer 1 mappings.
-type MappingReference struct {
-	Id	string	`json:"id" yaml:"id"`
-
-	Title	string	`json:"title" yaml:"title"`
-
-	Version	string	`json:"version" yaml:"version"`
-
-	Description	string	`json:"description,omitempty" yaml:"description,omitempty"`
-
-	Issuer	string	`json:"issuer,omitempty" yaml:"issuer,omitempty"`
-
-	Url	string	`json:"url,omitempty" yaml:"url,omitempty"`
+	Guidelines []Guideline `json:"guidelines" yaml:"guidelines"`
 }
 
 type DocumentType string
 
-type Applicability struct {
-	// Inclusion by geographical or legal areas
-	Jurisdictions	[]string	`json:"jurisdictions,omitempty" yaml:"jurisdictions,omitempty"`
+// Exemption represents an exemption with a reason and optional redirect
+type Exemption struct {
+	Reason string `json:"reason" yaml:"reason"`
 
-	// Inclusion by types of technology or technological environments
-	TechnologyDomains	[]string	`json:"technology-domains,omitempty" yaml:"technology-domains,omitempty"`
-
-	// Inclusion by industry sectors or verticals
-	IndustrySectors	[]string	`json:"industry-sectors,omitempty" yaml:"industry-sectors,omitempty"`
+	Redirect common.Mapping `json:"redirect,omitempty" yaml:"redirect,omitempty"`
 }
 
-// Category represents a logical group of guidelines (i.e. control family)
-type Category struct {
-	Id	string	`json:"id" yaml:"id"`
-
-	Title	string	`json:"title" yaml:"title"`
-
-	Description	string	`json:"description" yaml:"description"`
-
-	Guidelines	[]Guideline	`json:"guidelines,omitempty" yaml:"guidelines,omitempty"`
-}
-
+// Guideline represents a single guideline within a guidance document
 type Guideline struct {
-	Id	string	`json:"id" yaml:"id"`
+	Id string `json:"id" yaml:"id"`
 
-	Title	string	`json:"title" yaml:"title"`
+	Title string `json:"title" yaml:"title"`
 
-	Objective	string	`json:"objective,omitempty" yaml:"objective,omitempty"`
+	Objective string `json:"objective,omitempty" yaml:"objective,omitempty"`
 
-	// Maps to fields commonly seen in controls with implementation guidance
-	Recommendations	[]string	`json:"recommendations,omitempty" yaml:"recommendations,omitempty"`
+	FamilyId string `json:"family-id,omitempty" yaml:"family-id,omitempty"`
 
-	// For control enhancements (ex. AC-2(1) in 800-53)
-	// The base-guideline-id is needed to achieve full context for the enhancement
-	BaseGuidelineID	string	`json:"base-guideline-id,omitempty" yaml:"base-guideline-id,omitempty"`
+	Recommendations []string `json:"recommendations,omitempty" yaml:"recommendations,omitempty"`
 
-	Rationale	*Rationale	`json:"rationale,omitempty" yaml:"rationale,omitempty"`
+	// Extends allows you to add supplemental guidance within a local guidance document
+	// like a control enhancement or from an imported guidance document.
+	Extends common.SimpleMapping `json:"extends,omitempty" yaml:"extends,omitempty"`
 
-	// Represents individual guideline parts/statements
-	GuidelineParts	[]Part	`json:"guideline-parts,omitempty" yaml:"guideline-parts,omitempty"`
+	Rationale *Rationale `json:"rationale,omitempty" yaml:"rationale,omitempty"`
 
-	// Crosswalking this guideline to other guidelines in other documents
-	GuidelineMappings	[]Mapping	`json:"guideline-mappings,omitempty" yaml:"guideline-mappings,omitempty"`
+	Statements []Statement `json:"statements,omitempty" yaml:"statements,omitempty"`
 
-	// A list for associated key principle ids
-	PrincipleMappings	[]Mapping	`json:"principle-mappings,omitempty" yaml:"principle-mappings,omitempty"`
+	GuidelineMappings []common.Mapping `json:"guideline-mappings,omitempty" yaml:"guideline-mappings,omitempty"`
 
-	// This is akin to related controls, but using more explicit terminology
-	SeeAlso	[]string	`json:"see-also,omitempty" yaml:"see-also,omitempty"`
+	PrincipleMappings []common.Mapping `json:"principle-mappings,omitempty" yaml:"principle-mappings,omitempty"`
+
+	SeeAlso []common.SimpleMapping `json:"see-also,omitempty" yaml:"see-also,omitempty"`
 }
 
 // Rationale provides contextual information to help with development and understanding of
 // guideline intent.
 type Rationale struct {
-	// Negative results expected from the guideline's lack of implementation
-	Risks	[]Risk	`json:"risks" yaml:"risks"`
+	Importance string `json:"importance" yaml:"importance"`
 
-	// Positive results expected from the guideline's implementation
-	Outcomes	[]Outcome	`json:"outcomes" yaml:"outcomes"`
+	Goals []string `json:"goals" yaml:"goals"`
 }
 
-type Risk struct {
-	Title	string	`json:"title" yaml:"title"`
+// Statement represents a sub-statement within a guideline
+type Statement struct {
+	Id string `json:"id" yaml:"id"`
 
-	Description	string	`json:"description" yaml:"description"`
-}
+	Title string `json:"title,omitempty" yaml:"title,omitempty"`
 
-type Outcome struct {
-	Title	string	`json:"title" yaml:"title"`
+	Text string `json:"text" yaml:"text"`
 
-	Description	string	`json:"description" yaml:"description"`
-}
-
-// Parts include sub-statements of a guideline that can be assessed individually
-type Part struct {
-	Id	string	`json:"id" yaml:"id"`
-
-	Title	string	`json:"title,omitempty" yaml:"title,omitempty"`
-
-	Text	string	`json:"text" yaml:"text"`
-
-	Recommendations	[]string	`json:"recommendations,omitempty" yaml:"recommendations,omitempty"`
-}
-
-type Mapping struct {
-	ReferenceId	string	`json:"reference-id" yaml:"reference-id"`
-
-	Entries	[]MappingEntry	`json:"entries,omitempty" yaml:"entries,omitempty"`
-
-	// Adding context about this particular mapping and why it was mapped.
-	Remarks	string	`json:"remarks,omitempty" yaml:"remarks,omitempty"`
-}
-
-type MappingEntry struct {
-	ReferenceId	string	`json:"reference-id" yaml:"reference-id"`
-
-	Strength	int64	`json:"strength" yaml:"strength"`
-
-	Remarks	string	`json:"remarks,omitempty" yaml:"remarks,omitempty"`
+	Recommendations []string `json:"recommendations,omitempty" yaml:"recommendations,omitempty"`
 }
