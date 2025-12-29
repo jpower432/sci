@@ -26,7 +26,7 @@ func ExampleGuidanceDocument() {
 **Objective:** {{ .Objective }}
 {{- if .SeeAlso }}
 
-**See Also:** {{ range $index, $item := .SeeAlso }}{{ if $index }} {{ end }}{{ $item }}{{ end }}
+**See Also:** {{ range $index, $item := .SeeAlso }}{{ if $index }} {{ end }}{{ $item.EntryId }}{{ end }}
 {{- end }}
 
 {{- end }}{{ end -}}
