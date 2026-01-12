@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"flag"
 	"fmt"
 	"os"
@@ -40,14 +41,17 @@ func compileLexicon(lexiconPath, outputPath, version string) error {
 	}
 
 	if version != "" {
-		lxn.Metadata.Version = version
+		lxn.Version = version
 	}
 
-	outputFile, err := os.Create(outputPath)
-	if err != nil {
-		return fmt.Errorf("creating output file: %w", err)
+	var buf bytes.Buffer
+	if err := lxn.ToMarkdownPage(&buf); err != nil {
+		return err
 	}
-	defer outputFile.Close()
 
-	return lxn.ToMarkdownPage(outputFile)
+	if err := os.WriteFile(outputPath, buf.Bytes(), 0644); err != nil {
+		return fmt.Errorf("writing output file: %w", err)
+	}
+
+	return nil
 }
