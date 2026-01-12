@@ -3,20 +3,15 @@ layout: page
 title: Release & Maintenance
 ---
 
-Project release deliverables are divided into the **Core Specification** and language-specific **SDKs**.
+This document describes versioning and release procedures for the **CUE Schemas** and **SDK Releases**.
 
-* **Core Specification Release:** Bundles the Model, Lexicon, and CUE Schemas together. These are versioned and released as a single unit because they are tightly coupled.
-* **SDK Releases:** Language-specific implementations that provide tooling, types, and helpers to work with Gemara documents. SDK types are generated from the CUE schemas.
+## Schema Versioning
 
-Each **maintains its own** independent [SemVer](https://semver.org/) lifecycle.
-
-## Specification Release Versioning
-
-The core specification release bundles the Model, Lexicon, and CUE Schemas together and versions them as a single unit.
+CUE schemas are the machine-readable implementation of the specification and are versioned independently using [SemVer](https://semver.org/).
 
 | Change Type | Version Bump | Examples                                                     |
 |:------------|:-------------|:-------------------------------------------------------------|
-| Major       | v2.0.0       | Breaking changes to the Model, Lexicon, or Stable schemas.   |
+| Major       | v2.0.0       | Breaking changes to Stable schemas.                         |
 | Minor       | v1.(x+1).0   | Additive changes, schema promotions, or new optional fields. |
 | Patch       | v1.x.(y+1)   | Bug fixes in schema logic or documentation.                  |
 
@@ -61,11 +56,12 @@ The following table illustrates how schemas progress through their lifecycle and
 
 ## SDK Release Versioning
 
-SDK releases are versioned independently to allow for rapid iteration on tooling, bug fixes, and utilities without requiring core specification version bumps.
+SDK releases are versioned independently using [SemVer](https://semver.org/) to allow for rapid iteration on tooling, bug fixes, and utilities without requiring specification version bumps.
 
-* The CUE schemas in the core specification release are the source of truth for validation.
-* SDKs must explicitly document which core specification release version they support.
-* When a new core specification release is published, SDKs regenerate their types from the updated schemas and release new versions that support the updated specification.
+* The CUE schemas are the source of truth for validation.
+* SDKs must explicitly document which schema version they support.
+* When new schemas are published, SDKs regenerate their types from the updated schemas and release new versions that support the updated schemas.
+* SDKs may also release versions independently for tooling improvements, bug fixes, or new features that don't require schema changes.
 
 ## Questions or Feedback
 

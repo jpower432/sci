@@ -3,11 +3,9 @@ layout: page
 title: Gemara Implementation
 ---
 
-**Status**: <span class="badge badge-active">Active Development</span>
-
 ## Layer Schemas
 
-Machine-readable schemas (CUE format) standardize the expression of elements in the model. Click on a layer to view its schema:
+Machine-readable schemas (CUE format) implement the specification and standardize the expression of elements in the model. Click on a layer to view its schema:
 
 <div class="layer-grid">
   <a href="https://github.com/ossf/gemara/blob/main/schemas/layer-1.cue" class="layer-card">

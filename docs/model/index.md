@@ -3,8 +3,6 @@ layout: page
 title: The Gemara Model
 ---
 
-**Status**: <span class="badge badge-stable">Stable</span>
-
 The Gemara Model describes six categorical layers of GRC (Governance, Risk, Compliance) activities, representing how GRC activities are organized and interact.
 
 ## The Six Layers
