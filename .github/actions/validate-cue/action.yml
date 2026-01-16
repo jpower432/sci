@@ -1,0 +1,25 @@
+name: 'Validate CUE Schemas'
+description: 'Validates CUE schema formatting and syntax'
+
+inputs:
+  cue-version:
+    description: 'CUE version to use'
+    required: false
+    default: 'v0.15.1'
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Setup Cue
+      uses: cue-lang/setup-cue@a93fa358375740cd8b0078f76355512b9208acb1 # v1.0.1
+      with:
+        version: ${{ inputs.cue-version }}
+      shell: bash
+
+    - name: Validate the formatting of cue schema files
+      run: make cuefmtcheck
+      shell: bash
+
+    - name: Validate the syntax of cue schema files
+      run: make lintcue
+      shell: bash

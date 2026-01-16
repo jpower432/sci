@@ -5,7 +5,7 @@ on:
   pull_request:
     paths:
       - 'docs/**'
-      - 'schemas/**'
+      - '*.cue'
       - '.github/workflows/jekyll-site.yml'
 
   # Deploy on pushes to main
@@ -14,7 +14,7 @@ on:
       - main
     paths:
       - 'docs/**'
-      - 'schemas/**'
+      - '*.cue'
       - '.github/workflows/jekyll-site.yml'
 
   # Allow manual workflow dispatch
