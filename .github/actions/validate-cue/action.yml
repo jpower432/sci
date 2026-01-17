@@ -14,7 +14,6 @@ runs:
       uses: cue-lang/setup-cue@a93fa358375740cd8b0078f76355512b9208acb1 # v1.0.1
       with:
         version: ${{ inputs.cue-version }}
-      shell: bash
 
     - name: Validate the formatting of cue schema files
       run: make cuefmtcheck
