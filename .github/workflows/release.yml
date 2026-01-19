@@ -13,10 +13,10 @@ jobs:
       release-config-name: release-drafter.yml
     secrets:
       github-token: ${{ secrets.GITHUB_TOKEN }}
-  publish-cue-module:
+  publish-cue:
     needs: release
+    if: needs.release.outputs.full-tag != ''
     runs-on: ubuntu-latest
-    if: startsWith(github.ref_name, 'v')
     permissions:
       contents: read
     steps:
@@ -32,4 +32,4 @@ jobs:
       - name: Login to Central Registry
         run: cue login --token=${{ secrets.CUE_REG_TOKEN }}
       - name: Publish the module
-        run: cue mod publish ${{ github.ref_name }}
+        run: cue mod publish ${{ needs.release.outputs.full-tag }}
