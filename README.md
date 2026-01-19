@@ -1,4 +1,4 @@
-# Gemara: GRC Engineering Model for Automated Risk Assessment  [![Go Reference](https://pkg.go.dev/badge/github.com/ossf/gemara.svg)](https://pkg.go.dev/github.com/ossf/gemara)
+# Gemara: GRC Engineering Model for Automated Risk Assessment  [![Go Reference](https://pkg.go.dev/badge/github.com/gemaraproj/gemara.svg)](https://pkg.go.dev/github.com/gemaraproj/gemara)
 
 > Pronounced: Juh-MAH-ruh (think :gem:)
 
@@ -53,7 +53,7 @@ These guidance documents are high-level, abstract controls that may be reference
 
 #### Layer 1 Schema
 
-The Gemara [Layer 1 Schema](./schemas/layer-1.cue) describes the machine-readable format of Layer 1 guidelines.
+The Gemara [Layer 1 Schema](./layer-1.cue) describes the machine-readable format of Layer 1 guidelines.
 
 Both simple and more complex, multipart guidelines can be expressed with associated recommendations. Guideline mappings or "crosswalk references" can be expressed, allowing correlation between multiple Layer 1 guidance documents.
 
@@ -69,7 +69,7 @@ The recommended process for developing Layer 2 controls is to first assess the t
 
 #### Layer 2 Schema
 
-The Gemara [Layer 2 Schema](./schemas/layer-2.cue) describes the machine-readable format of Layer 2 controls.
+The Gemara [Layer 2 Schema](./layer-2.cue) describes the machine-readable format of Layer 2 controls.
 
 The schema allows controls to be mapped to threats or Layer 1 controls by their unique identifiers. Threats may also be expressed in the schema, with mappings to the technology-specific capabilities which may be vulnerable to the threat.
 
@@ -87,7 +87,7 @@ These policy documents may be referenced by other policy documents, or used as a
 
 #### Layer 3 Schema
 
-The Gemara [Layer 3 Schema](./schemas/layer-3.cue) describes the machine-readable format of Layer 3 policies. This allows for the programmatic validation and processing of policy documents, ensuring they adhere to a defined structure.
+The Gemara [Layer 3 Schema](./layer-3.cue) describes the machine-readable format of Layer 3 policies. This allows for the programmatic validation and processing of policy documents, ensuring they adhere to a defined structure.
 
 ### Layer 4: Evaluation
 
@@ -97,7 +97,7 @@ Evaluation activities may be built based on outputs from layers 2 or 3. While au
 
 #### Layer 4 Schema
 
-The Gemara [Layer 4 Schema](./schemas/layer-4.cue) describes the machine-readable format of Layer 4 evaluation results.
+The Gemara [Layer 4 Schema](./layer-4.cue) describes the machine-readable format of Layer 4 evaluation results.
 
 The schema allows evaluations to be mapped to Layer 2 controls by their unique identifiers.
 
@@ -117,7 +117,7 @@ Audits consider information from all of the lower layers. These activities are t
 
 ## Usage
 
-Install the go module with `go get github.com/ossf/gemara` and consult our [go docs](https://pkg.go.dev/github.com/ossf/gemara)
+Install the go module with `go get github.com/gemaraproj/gemara` and consult our [go docs](https://pkg.go.dev/github.com/gemaraproj/gemara)
 
 Use the schemas directly with [cue](https://cuelang.org/) for validating Gemara data payloads against the schemas and more.
 

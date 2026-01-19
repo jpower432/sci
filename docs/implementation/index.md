@@ -10,22 +10,22 @@ title: Gemara Implementation
 Machine-readable schemas (CUE format) standardize the expression of elements in the model. Click on a layer to view its schema:
 
 <div class="layer-grid">
-  <a href="https://github.com/ossf/gemara/blob/main/schemas/layer-1.cue" class="layer-card">
+  <a href="https://github.com/gemaraproj/gemara/blob/main/layer-1.cue" class="layer-card">
     <h3>Layer 1: Guidance</h3>
     <p>High-level guidance on cybersecurity measures from industry groups and standards bodies.</p>
   </a>
 
-  <a href="https://github.com/ossf/gemara/blob/main/schemas/layer-2.cue" class="layer-card">
+  <a href="https://github.com/gemaraproj/gemara/blob/main/layer-2.cue" class="layer-card">
     <h3>Layer 2: Controls</h3>
     <p>Technology-specific, threat-informed security controls for protecting information systems.</p>
   </a>
 
-  <a href="https://github.com/ossf/gemara/blob/main/schemas/layer-3.cue" class="layer-card">
+  <a href="https://github.com/gemaraproj/gemara/blob/main/layer-3.cue" class="layer-card">
     <h3>Layer 3: Policy</h3>
     <p>Risk-informed guidance tailored to your organization's specific needs and risk appetite.</p>
   </a>
 
-  <a href="https://github.com/ossf/gemara/blob/main/schemas/layer-4.cue" class="layer-card">
+  <a href="https://github.com/gemaraproj/gemara/blob/main/layer-4.cue" class="layer-card">
     <h3>Layer 4: Evaluation</h3>
     <p>Inspection of code, configurations, and deployments against policies and controls.</p>
   </a>
@@ -41,7 +41,7 @@ Machine-readable schemas (CUE format) standardize the expression of elements in 
   </div>
 </div>
 
-**[Browse all schemas on GitHub →](https://github.com/ossf/gemara/tree/main/schemas)**
+**[Browse all schemas on GitHub →](https://github.com/gemaraproj/gemara)**
 
 ### Validation
 
@@ -49,19 +49,19 @@ Validate data against Gemara schemas using CUE:
 
 ```bash
 go install cuelang.org/go/cmd/cue@latest
-cue vet ./your-controls.yaml ./schemas/layer-2.cue
+cue vet ./your-controls.yaml ./layer-2.cue
 ```
 
 ## Go SDK
 
 The Go SDK provides APIs for reading, writing, and manipulating Gemara documents.
 
-**[Go Package Reference →](https://pkg.go.dev/github.com/ossf/gemara)**
+**[Go Package Reference →](https://pkg.go.dev/github.com/gemaraproj/gemara)**
 
 ### Installation
 
 ```bash
-go get github.com/ossf/gemara
+go get github.com/gemaraproj/gemara
 ```
 
 ### Usage Example
@@ -71,7 +71,7 @@ package main
 
 import (
     "fmt"
-    "github.com/ossf/gemara"
+    "github.com/gemaraproj/gemara"
 )
 
 func main() {
@@ -84,7 +84,7 @@ func main() {
 }
 ```
 
-See [repository examples](https://github.com/ossf/gemara/tree/main/test-data) for more.
+See [repository examples](https://github.com/gemaraproj/gemara/tree/main/test-data) for more.
 
 ## Contributing
 
@@ -95,7 +95,7 @@ The Implementation evolves based on community needs:
 - **Found a bug?** Report it
 - **Significant architectural changes?** Document in an [ADR](../adr.html)
 
-See the [Contributing Guide](https://github.com/ossf/gemara/blob/main/CONTRIBUTING.md) for details.
+See the [Contributing Guide](https://github.com/gemaraproj/gemara/blob/main/CONTRIBUTING.md) for details.
 
 ## Architecture Decisions
 

@@ -25,7 +25,7 @@ The Lexicon evolves based on community needs:
 - **Propose a new definition?** Submit a PR
 - **Found an inconsistency?** Report it
 
-See the [Contributing Guide](https://github.com/ossf/gemara/blob/main/CONTRIBUTING.md) for details.
+See the [Contributing Guide](https://github.com/gemaraproj/gemara/blob/main/CONTRIBUTING.md) for details.
 
 ## Relationship to Other Components
 

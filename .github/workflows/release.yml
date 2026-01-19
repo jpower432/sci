@@ -13,26 +13,23 @@ jobs:
       release-config-name: release-drafter.yml
     secrets:
       github-token: ${{ secrets.GITHUB_TOKEN }}
-  goreleaser:
+  publish-cue-module:
     needs: release
     runs-on: ubuntu-latest
+    if: startsWith(github.ref_name, 'v')
     permissions:
-      contents: write
+      contents: read
     steps:
       - name: Checkout
         uses: actions/checkout@v6.0.1
         with:
           fetch-depth: 0
           persist-credentials: false
-      - name: Set up Go
-        uses: actions/setup-go@v6
+      - name: Setup Cue
+        uses: cue-lang/setup-cue@a93fa358375740cd8b0078f76355512b9208acb1 # v1.0.1
         with:
-          go-version: 1.23.4
-      - name: Run GoReleaser
-        uses: goreleaser/goreleaser-action@e435ccd777264be153ace6237001ef4d979d3a7a
-        with:
-          distribution: goreleaser
-          version: "~> v2"
-          args: release --clean
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          version: "v0.15.1"
+      - name: Login to Central Registry
+        run: cue login --token=${{ secrets.CUE_REG_TOKEN }}
+      - name: Publish the module
+        run: cue mod publish ${{ github.ref_name }}

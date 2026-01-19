@@ -1,36 +1,12 @@
 header:
   schema-version: 2.0.0
-  last-updated: '2025-11-14'
-  last-reviewed: '2025-11-14'
-  url: https://github.com/ossf/gemara
-
-project:
-  name: "Gemara: GRC Engineering Model for Automated Risk Assessment"
-  administrators:
-    - name: Eddie Knight
-      affiliation: Sonatype
-      email: knight@linux.com
-      primary: true
-    - name: Jason Meridth
-      affiliation: GitHub
-      email: jmeridth@gmail.com
-      primary: false
-  documentation:
-    detailed-guide: https://pkg.go.dev/github.com/ossf/gemara
-    quickstart-guide: https://github.com/ossf/gemara/blob/main/README.md#usage
-    code-of-conduct: https://github.com/ossf/gemara?tab=coc-ov-file#readme
-  repositories:
-    - name: gemara
-      url: https://github.com/ossf/gemara
-      comment: |
-        The main repository for the GRC Engineering Model for Automated Risk Assessment (Gemara) project.
-        It contains the core codebase and documentation for the project.
-  vulnerability-reporting:
-    reports-accepted: false
-    bug-bounty-available: false
+  last-updated: '2026-01-15'
+  last-reviewed: '2026-01-15'
+  url: https://github.com/gemaraproj/gemara
+  project-si-source: https://raw.githubusercontent.com/gemaraproj/.github/refs/heads/main/.github/security-insights.yml
 
 repository:
-  url: https://github.com/ossf/gemara
+  url: https://github.com/gemaraproj/gemara
   status: active
   accepts-change-request: true
   accepts-automated-change-request: true
@@ -38,7 +14,7 @@ repository:
     - name: Eddie Knight
       affiliation: Sonatype
       email: knight@linux.com
-      primary: true
+      primary: false
     - name: Jenn Power
       affiliation: Red Hat
       email: barnabei.jennifer@gmail.com
@@ -56,9 +32,9 @@ repository:
       email: alex.speasmaker@gmail.com
       primary: false
   documentation:
-    contributing-guide: https://github.com/ossf/gemara/blob/main/CONTRIBUTING.md
+    contributing-guide: https://github.com/gemaraproj/gemara/blob/main/CONTRIBUTING.md
   license:
-    url: https://github.com/ossf/gemara?tab=Apache-2.0-1-ov-file#readme
+    url: https://github.com/gemaraproj/gemara?tab=Apache-2.0-1-ov-file#readme
     expression: Apache-2.0
   security:
     assessments:
@@ -75,7 +51,7 @@ repository:
           adhoc:
             name: Scheduled SCA Scan Results
             predicate-uri: https://docs.github.com/en/graphql/reference/objects#repositoryvulnerabilityalert
-            location: https://github.com/ossf/gemara/security/dependabot
+            location: https://github.com/gemaraproj/gemara/security/dependabot
             comment: |
               The results of the scheduled SCA scan are available in the Dependabot tab of the Security Insights page.
         integration:
@@ -92,13 +68,13 @@ repository:
           adhoc:
             name: Scheduled SAST Results
             predicate-uri: https://docs.oasis-open.org/sarif/sarif/v2.1.0/cs01/schemas/sarif-schema-2.1.0.json
-            location: https://github.com/ossf/gemara/security/code-scanning
+            location: https://github.com/gemaraproj/gemara/security/code-scanning
             comment: |
               The results of the scheduled SAST scan are available in the Code Scanning tab of the Security Insights page and as an artifact on the scheduled job.
           ci:
             name: CI SAST Results
             predicate-uri: https://docs.oasis-open.org/sarif/sarif/v2.1.0/cs01/schemas/sarif-schema-2.1.0.json
-            location: https://github.com/ossf/gemara/security/code-scanning
+            location: https://github.com/gemaraproj/gemara/security/code-scanning
             comment: |
               The results of the CI SAST scan are available in the Code Scanning tab of the Security Insights page.
         integration:

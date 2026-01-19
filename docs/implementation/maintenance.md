@@ -71,6 +71,6 @@ SDK releases are versioned independently to allow for rapid iteration on tooling
 
 For questions about versioning strategy or to propose changes:
 
-* Open an issue on [GitHub](https://github.com/ossf/gemara/issues)
+* Open an issue on [GitHub](https://github.com/gemaraproj/gemara/issues)
 * Discuss in the [OpenSSF Slack #gemara channel](https://openssf.slack.com/archives/C09A9PP765Q)
 * Attend the [biweekly Gemara meeting](https://calendar.google.com/calendar/u/0?cid=czYzdm9lZmhwNWk5cGZsdGI1cTY3bmdwZXNAZ3JvdXAuY2FsZW5kYXIuZ29vZ2xlLmNvbQ)

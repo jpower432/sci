@@ -54,7 +54,7 @@ defaults:
       layout: "page"
 
 # GitHub metadata
-repository: ossf/gemara
+repository: gemaraproj/gemara
 github:
   is_project_page: true
 
