@@ -5,7 +5,7 @@ title: Unified Go SDK Package Structure
 
 - **ADR:** 0006
 - **Proposal Author(s):** @jpower432
-- **Status:** Accepted
+- **Status:** Accepted; Modified by ADR 0007
 
 ## Context
 
