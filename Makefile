@@ -4,6 +4,16 @@ tidy:
 	@echo "  >  Tidying cue.mod ..."
 	@cue mod tidy
 
+tidycheck: tidy
+	@echo "  >  Checking CUE module tidiness ..."
+	@if [ -n "$$(git status --porcelain cue.mod 2>/dev/null)" ]; then \
+		echo "Error: cue.mod is not tidy. Please run 'make tidy' and commit the changes."; \
+		git diff cue.mod; \
+		exit 1; \
+	fi
+	@echo "  >  CUE module is tidy."
+
+
 # Verify CUE formatting
 cuefmtcheck:
 	@echo "  >  Verifying CUE formatting ..."
@@ -48,4 +58,4 @@ stop:
 
 restart: stop serve
 
-.PHONY: tidy cuefmtcheck lintcue lintinsights serve build clean stop restart check-jekyll
+.PHONY: tidy tidycheck cuefmtcheck lintcue lintinsights serve build clean stop restart check-jekyll
