@@ -9,11 +9,11 @@ These are high-level strategic initiatives, not actionable tasks. They represent
 These priorities were discussed and agreed upon in the Gemara Roadmapping 2026 Workshop, representing community consensus on strategic direction.
 We welcome input and participation in future roadmapping discussions—join our [biweekly meetings](https://github.com/gemaraproj/gemara/blob/main/README.md#contributing) to help shape the project's direction.
 
-# 2026 Goal
+## 2026 Goal
 
 Moving the Gemara project to a stable ecosystem providing the technical foundation required to build automation tools on.
 
-# Strategic Priorities
+### Strategic Priorities
 
 * **Stabilize Schemas**: Finalize and publish stable releases for each Layer schema to provide a predictable foundation for ecosystem adopters. *Why: Unstable schemas prevent adoption and tooling development.*
 
@@ -27,14 +27,14 @@ Moving the Gemara project to a stable ecosystem providing the technical foundati
 
 * **Create MCP Tooling**: Integrate and standardize the Model Context Protocol (MCP) server to support authoring Gemara artifacts via Agentic AI workflows. *Why: AI-assisted authoring lowers the barrier to creating Gemara-compliant artifacts and explores new use cases.*
 
-# Completed Milestones
+## Completed Milestones
 
-## 2025
+### 2025
 
 * Establishment of the layered data approach (Layers 1-4)
 * Adoption by OpenSSF OSPS Baseline and FINOS CCC
 
-# Contributing
+## Contributing
 
 If you have suggestions for the roadmap:
 
