@@ -58,13 +58,31 @@ Schema documentation generated from CUE. One page per schema file:
 
 <!-- SCHEMA_LIST_END -->
 
-### Validation
+### Validation with CUE
 
-Validate data against Gemara schemas using CUE:
+**Install and initialize**
 
 ```bash
 go install cuelang.org/go/cmd/cue@latest
-cue vet ./your-controls.yaml ./layer-2.cue
+
+# Initialize a CUE module in your project
+cue mod init
+```
+
+**Import the Gemara Module**
+```cue
+#myapp.cue
+package myapp
+
+import gemara "github.com/gemaraproj/gemara:schemas"
+
+gemara.#ControlCatalog
+```
+
+**Validate with the cue CLI**
+
+```bash
+cue vet your-controls.yaml myapp.cue 
 ```
 
 ## Contributing
