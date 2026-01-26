@@ -1,5 +1,7 @@
 - title: Home
   url: /
+- title: Roadmap
+  url: /roadmap.html
 - title: ADRs
   url: /adr.html
 - title: Community
