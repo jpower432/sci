@@ -130,4 +130,4 @@ Create a `common/` package for shared types (e.g., `Metadata`, `Actor`, `Mapping
 
 - [Go Package Design](https://go.dev/blog/package-names)
 - [Effective Go - Packages](https://go.dev/doc/effective_go#names)
-- [Gemara Model Documentation](https://github.com/gemaraproj/gemara/blob/main/README.md#the-model)
+- [Gemara Model Documentation](/model)
