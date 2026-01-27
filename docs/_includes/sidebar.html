@@ -6,11 +6,12 @@
         {%- assign is_index_page = false -%}
         {%- assign dir_name = "" -%}
         {%- if item.url != "/" -%}
-          {%- if item.url contains "/index.html" -%}
-            {%- assign url_parts = item.url | split: "/" -%}
+          {%- assign url_normalized = item.url | remove: "/index.html" -%}
+          {%- if url_normalized != "/" -%}
+            {%- assign url_parts = url_normalized | split: "/" -%}
             {%- assign dir_name = "" -%}
             {%- for part in url_parts -%}
-              {%- if part != "" and part != "index.html" -%}
+              {%- if part != "" -%}
                 {%- if dir_name == "" -%}
                   {%- assign dir_name = part -%}
                 {%- else -%}
