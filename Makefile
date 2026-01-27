@@ -60,7 +60,7 @@ test-links:
 
 clean:
 	@echo "  >  Cleaning generated files..."
-	@rm -rf docs/_site docs/.jekyll-cache docs/.jekyll-metadata
+	@rm -rf generated docs/_site docs/.jekyll-cache docs/.jekyll-metadata
 	@echo "  >  Clean complete!"
 
 stop:
@@ -68,4 +68,57 @@ stop:
 
 restart: stop serve
 
-.PHONY: tidy tidycheck cuefmtcheck lintcue lintinsights serve build test-links clean stop restart check-jekyll
+GENERATED_DIR := generated
+OPENAPI_YAML := $(GENERATED_DIR)/openapi.yaml
+MANIFEST_JSON := $(GENERATED_DIR)/schema-manifest.json
+SPEC_DIR := $(GENERATED_DIR)/spec
+DOCS_SCHEMA_DIR := docs/schema
+
+genopenapi:
+	@echo "  >  Converting CUE schema to OpenAPI ..."
+	@mkdir -p $(GENERATED_DIR)
+	@cd cmd/cue2openapi && go run . -schema ../.. -output ../../$(OPENAPI_YAML) -manifest ../../$(MANIFEST_JSON)
+	@echo "  >  OpenAPI schema generation complete!"
+
+genmd: genopenapi
+	@echo "  >  Generating markdown from OpenAPI ..."
+	@mkdir -p $(SPEC_DIR)
+	@cd cmd/openapi2md && go run . -input ../../$(OPENAPI_YAML) -output ../../$(SPEC_DIR) -manifest ../../$(MANIFEST_JSON)
+	@echo "  >  Markdown generation complete!"
+
+gendocs: genmd
+	@echo "  >  Copying schema pages to $(DOCS_SCHEMA_DIR)/ for website ..."
+	@mkdir -p $(DOCS_SCHEMA_DIR)
+	@for f in $(SPEC_DIR)/*.md; do \
+		[ -f "$$f" ] || continue; \
+		base=$$(basename "$$f" .md); \
+		title=$$(sh "$(CURDIR)/cmd/scripts/schema-display-name.sh" "$$base"); \
+		{ \
+			echo "---"; \
+			echo "layout: page"; \
+			echo "title: $$title"; \
+			echo "---"; \
+			echo ""; \
+			cat "$$f"; \
+		} > "$(DOCS_SCHEMA_DIR)/$$base.md"; \
+	done
+	@echo "  >  Generating $(DOCS_SCHEMA_DIR)/index.md ..."
+	@{ \
+		echo "---"; \
+		echo "layout: page"; \
+		echo "title: Schema"; \
+		echo "nav-title: Schema"; \
+		echo "---"; \
+		echo ""; \
+		echo "Schema documentation generated from CUE. One page per schema file."; \
+		echo ""; \
+		for f in $(SPEC_DIR)/base.md $(SPEC_DIR)/metadata.md $(SPEC_DIR)/mapping.md $(SPEC_DIR)/layer-1.md $(SPEC_DIR)/layer-2.md $(SPEC_DIR)/layer-3.md $(SPEC_DIR)/layer-5.md; do \
+			[ -f "$$f" ] || continue; \
+			base=$$(basename "$$f" .md); \
+			title=$$(sh "$(CURDIR)/cmd/scripts/schema-display-name.sh" "$$base"); \
+			echo "- [$$title]($$base.html)"; \
+		done; \
+	} > "$(DOCS_SCHEMA_DIR)/index.md"
+	@echo "  >  Documentation generation complete!"
+
+.PHONY: tidy tidycheck cuefmtcheck lintcue lintinsights serve build test-links clean stop restart check-jekyll genopenapi genmd gendocs
