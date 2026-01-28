@@ -21,7 +21,6 @@ pages:
       - "MultiEntryMapping"
       - "EntryMapping"
       - "ArtifactMapping"
-      
       - "MappingEntry"
   - title: "Layer 1"
     filename: "layer-1"
