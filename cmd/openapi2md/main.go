@@ -97,28 +97,6 @@ func splitRoots(s string) []string {
 	return out
 }
 
-// displayNameFor returns a human-readable title for a schema file base name.
-func displayNameFor(base string) string {
-	switch base {
-	case "base":
-		return "Base"
-	case "metadata":
-		return "Metadata"
-	case "mapping":
-		return "Mapping"
-	case "layer-1":
-		return "Layer 1"
-	case "layer-2":
-		return "Layer 2"
-	case "layer-3":
-		return "Layer 3"
-	case "layer-5":
-		return "Layer 5"
-	default:
-		return strings.ReplaceAll(base, "-", " ")
-	}
-}
-
 func loadManifest(path string) (map[string][]string, error) {
 	data, err := os.ReadFile(path)
 	if err != nil {
@@ -176,17 +154,21 @@ func convertFromNav(inputFile, outputDir, navPath string) error {
 		return fmt.Errorf("failed to create output directory: %w", err)
 	}
 
-	version := spec.Info.Version
-	if version == "" {
-		version = "unknown"
+	// Build schema-to-filename map for generating links
+	schemaToFile := make(map[string]string)
+	for _, page := range nav.Pages {
+		filename := page.Filename
+		if filename == "" {
+			filename = slugify(page.Title)
+		}
+		for _, schemaName := range page.Schemas {
+			schemaToFile[schemaName] = filename
+		}
 	}
 
 	// For each page in nav
 	for _, page := range nav.Pages {
-		// Initialize a markdown buffer
 		var buf strings.Builder
-		// Initialize a visited map (for tracking circular references in field sections)
-		visited := make(map[string]bool)
 
 		// For each schema name listed in the page's schemas array
 		for _, schemaName := range page.Schemas {
@@ -205,9 +187,9 @@ func convertFromNav(inputFile, outputDir, navPath string) error {
 
 			// Use isAlias() to determine schema type
 			if isAlias(schema) {
-				buf.WriteString(generateAliasBlock(schemaName, schema))
+				buf.WriteString(generateAliasBlock(schemaName, schema, false))
 			} else {
-				buf.WriteString(generateRootSection(schemaName, schema, spec, version, visited))
+				buf.WriteString(generateRootSection(schemaName, schema, spec, schemaToFile))
 			}
 		}
 
@@ -246,18 +228,14 @@ func convertPerFile(inputFile, outputDir, manifestPath string) error {
 		return fmt.Errorf("failed to create output directory: %w", err)
 	}
 
-	version := spec.Info.Version
-	if version == "" {
-		version = "unknown"
-	}
-
 	fileOrder := make([]string, 0, len(manifest))
 	for k := range manifest {
 		fileOrder = append(fileOrder, k)
 	}
 	sort.Strings(fileOrder)
 
-	visited := make(map[string]bool)
+	// Empty map since we don't have nav file info in this mode
+	schemaToFile := make(map[string]string)
 
 	for _, cueFile := range fileOrder {
 		schemaNames := manifest[cueFile]
@@ -279,9 +257,9 @@ func convertPerFile(inputFile, outputDir, manifestPath string) error {
 				continue
 			}
 			if isAlias(schema) {
-				buf.WriteString(generateAliasBlock(name, schema))
+				buf.WriteString(generateAliasBlock(name, schema, false))
 			} else {
-				buf.WriteString(generateRootSection(name, schema, spec, version, visited))
+				buf.WriteString(generateRootSection(name, schema, spec, schemaToFile))
 			}
 		}
 
@@ -294,9 +272,13 @@ func convertPerFile(inputFile, outputDir, manifestPath string) error {
 	return nil
 }
 
-func generateAliasBlock(name string, schema Schema) string {
+func generateAliasBlock(name string, schema Schema, subheading bool) string {
 	var buf strings.Builder
-	buf.WriteString(fmt.Sprintf("## `%s`\n\n", name))
+	level := "##"
+	if subheading {
+		level = "###"
+	}
+	buf.WriteString(fmt.Sprintf("%s `%s`\n\n", level, name))
 	if schema.Description != "" {
 		buf.WriteString(schema.Description + "\n\n")
 	}
@@ -314,16 +296,16 @@ func generateAliasBlock(name string, schema Schema) string {
 func convertOpenAPIToMarkdown(inputFile, outputDir string, roots []string) error {
 	data, err := os.ReadFile(inputFile)
 	if err != nil {
-		return fmt.Errorf("failed to read OpenAPI file: %v", err)
+		return fmt.Errorf("failed to read OpenAPI file: %w", err)
 	}
 
 	var spec OpenAPISpec
 	if err := yaml.Unmarshal(data, &spec); err != nil {
-		return fmt.Errorf("failed to parse OpenAPI YAML: %v", err)
+		return fmt.Errorf("failed to parse OpenAPI YAML: %w", err)
 	}
 
 	if err := os.MkdirAll(outputDir, 0755); err != nil {
-		return fmt.Errorf("failed to create output directory: %v", err)
+		return fmt.Errorf("failed to create output directory: %w", err)
 	}
 
 	rootSet := make(map[string]bool)
@@ -341,7 +323,7 @@ func convertOpenAPIToMarkdown(inputFile, outputDir string, roots []string) error
 		var s Schema
 		bytes, _ := yaml.Marshal(data)
 		if err := yaml.Unmarshal(bytes, &s); err != nil {
-			return fmt.Errorf("failed to parse root schema %q: %v", name, err)
+			return fmt.Errorf("failed to parse root schema %q: %w", name, err)
 		}
 		rootSchemas[name] = s
 	}
@@ -361,7 +343,7 @@ func convertOpenAPIToMarkdown(inputFile, outputDir string, roots []string) error
 			aliasTypes = append(aliasTypes, schemaName)
 		}
 	}
-	sortStrings(aliasTypes)
+	sort.Strings(aliasTypes)
 
 	title := spec.Info.Title
 	if title == "" {
@@ -373,7 +355,8 @@ func convertOpenAPIToMarkdown(inputFile, outputDir string, roots []string) error
 	}
 
 	var buf strings.Builder
-	visited := make(map[string]bool)
+	// Empty map since we don't have nav file info in this mode
+	schemaToFile := make(map[string]string)
 
 	// H1 and optional intro
 	buf.WriteString(fmt.Sprintf("# %s _(%s)_\n\n", title, version))
@@ -390,7 +373,7 @@ func convertOpenAPIToMarkdown(inputFile, outputDir string, roots []string) error
 	// One major section per root
 	for _, name := range roots {
 		schema := rootSchemas[name]
-		buf.WriteString(generateRootSection(name, schema, spec, version, visited))
+		buf.WriteString(generateRootSection(name, schema, spec, schemaToFile))
 	}
 
 	// Aliases section
@@ -401,33 +384,19 @@ func convertOpenAPIToMarkdown(inputFile, outputDir string, roots []string) error
 		for _, name := range aliasTypes {
 			schemaBytes, _ := yaml.Marshal(spec.Components.Schemas[name])
 			var schema Schema
-			yaml.Unmarshal(schemaBytes, &schema)
-
-			buf.WriteString(fmt.Sprintf("### `%s`\n\n", strings.ToLower(name)))
-			if schema.Description != "" {
-				buf.WriteString(schema.Description + "\n\n")
+			if err := yaml.Unmarshal(schemaBytes, &schema); err != nil {
+				continue
 			}
-			buf.WriteString(fmt.Sprintf("- **Type**: `%s`\n", schema.Type))
-			if schema.Format != "" {
-				buf.WriteString(fmt.Sprintf("- **Format**: `%s`\n", schema.Format))
-			}
-			if schema.Pattern != "" {
-				buf.WriteString(fmt.Sprintf("- **Value**: `%s`\n", schema.Pattern))
-			}
-			buf.WriteString("\n---\n\n")
+			buf.WriteString(generateAliasBlock(name, schema, true))
 		}
 	}
 
 	outputPath := filepath.Join(outputDir, "schema.md")
 	if err := os.WriteFile(outputPath, []byte(buf.String()), 0644); err != nil {
-		return fmt.Errorf("failed to write %s: %v", outputPath, err)
+		return fmt.Errorf("failed to write %s: %w", outputPath, err)
 	}
 
 	return nil
-}
-
-func sortStrings(s []string) {
-	sort.Strings(s)
 }
 
 func isAlias(schema Schema) bool {
@@ -456,7 +425,105 @@ func resolveSchemaRef(ref string, spec OpenAPISpec) (*Schema, error) {
 	return &schema, nil
 }
 
-func generateRootSection(rootName string, schema Schema, spec OpenAPISpec, version string, visited map[string]bool) string {
+// formatFieldInline formats a field's information and returns (fieldLine, description)
+// fieldLine format: `field` **type** _Required_ or `field` **type**
+// description is returned separately
+func formatFieldInline(fieldName string, fieldSchema Schema, spec OpenAPISpec, prefix string, isRequired bool, schemaToFile map[string]string) (string, string) {
+	// Field name with full path
+	fieldPath := fieldName
+	if prefix != "" {
+		fieldPath = prefix + "." + fieldName
+	}
+
+	// Type
+	typeStr := formatFieldType(fieldSchema, spec, schemaToFile)
+
+	// Build field line: `field` **type** _Required_ or `field` **type**
+	var fieldLineParts []string
+	fieldLineParts = append(fieldLineParts, fmt.Sprintf("`%s`", fieldPath))
+	if typeStr != "" {
+		fieldLineParts = append(fieldLineParts, fmt.Sprintf("**%s**", typeStr))
+	}
+	if isRequired {
+		fieldLineParts = append(fieldLineParts, "_Required_")
+	}
+	fieldLine := strings.Join(fieldLineParts, " ")
+
+	// Description
+	description := fieldSchema.Description
+	if fieldSchema.Ref != "" {
+		refSchema, err := resolveSchemaRef(fieldSchema.Ref, spec)
+		if err == nil {
+			if description == "" {
+				description = refSchema.Description
+			}
+		}
+	}
+
+	return fieldLine, description
+}
+
+// formatFieldType returns the type string for a field with markdown links for custom types
+func formatFieldType(fieldSchema Schema, spec OpenAPISpec, schemaToFile map[string]string) string {
+	if fieldSchema.Ref != "" {
+		refType := strings.TrimPrefix(fieldSchema.Ref, "#/components/schemas/")
+		// Check if this is a custom type that should be linked
+		if filename, exists := schemaToFile[refType]; exists {
+			// Create markdown link: [TypeName](filename#typename) - no .md extension for Jekyll
+			anchor := strings.ToLower(refType)
+			return fmt.Sprintf("[%s](%s#%s)", refType, filename, anchor)
+		}
+		// Return just the type name if not found in schema map
+		return refType
+	}
+
+	if fieldSchema.Type != "" {
+		typeStr := fieldSchema.Type
+
+		// Handle array items - format as array[Type]
+		if fieldSchema.Type == "array" && fieldSchema.Items != nil {
+			itemsBytes, _ := yaml.Marshal(fieldSchema.Items)
+			var itemsSchema Schema
+			if err := yaml.Unmarshal(itemsBytes, &itemsSchema); err == nil {
+				var itemType string
+				var itemTypeLink string
+				if itemsSchema.Ref != "" {
+					refType := strings.TrimPrefix(itemsSchema.Ref, "#/components/schemas/")
+					// Check if this is a custom type that should be linked
+					if filename, exists := schemaToFile[refType]; exists {
+						anchor := strings.ToLower(refType)
+						itemTypeLink = fmt.Sprintf("[%s](%s#%s)", refType, filename, anchor)
+					} else {
+						itemTypeLink = refType
+					}
+					itemType = itemTypeLink
+				} else if itemsSchema.Type != "" {
+					itemType = itemsSchema.Type
+				}
+				if itemType != "" {
+					typeStr = fmt.Sprintf("array[%s]", itemType)
+				}
+			}
+		}
+
+		return typeStr
+	}
+
+	return ""
+}
+
+// formatFieldWithNested formats a field inline (nested expansion disabled).
+func formatFieldWithNested(fieldName string, fieldSchema Schema, spec OpenAPISpec, isRequired bool, schemaToFile map[string]string) string {
+	var buf strings.Builder
+	fieldLine, description := formatFieldInline(fieldName, fieldSchema, spec, "", isRequired, schemaToFile)
+	buf.WriteString(fieldLine + "\n\n")
+	if description != "" {
+		buf.WriteString(description + "\n")
+	}
+	return buf.String()
+}
+
+func generateRootSection(rootName string, schema Schema, spec OpenAPISpec, schemaToFile map[string]string) string {
 	var buf strings.Builder
 
 	buf.WriteString(fmt.Sprintf("## `%s`\n\n", rootName))
@@ -464,41 +531,6 @@ func generateRootSection(rootName string, schema Schema, spec OpenAPISpec, versi
 		buf.WriteString(schema.Description + "\n\n")
 	}
 
-	if len(schema.Required) > 0 || schema.Properties != nil {
-		if len(schema.Required) > 0 {
-			buf.WriteString("Required:\n\n")
-			required := make([]string, len(schema.Required))
-			copy(required, schema.Required)
-			sort.Strings(required)
-			for _, req := range required {
-				buf.WriteString(fmt.Sprintf("- `%s`\n", req))
-			}
-		}
-		if schema.Properties != nil {
-			var optional []string
-			for propName := range schema.Properties {
-				isRequired := false
-				for _, req := range schema.Required {
-					if req == propName {
-						isRequired = true
-						break
-					}
-				}
-				if !isRequired {
-					optional = append(optional, propName)
-				}
-			}
-			sort.Strings(optional)
-			if len(optional) > 0 {
-				buf.WriteString("\nOptional:\n\n")
-				for _, opt := range optional {
-					buf.WriteString(fmt.Sprintf("- `%s`\n", opt))
-				}
-			}
-		}
-		buf.WriteString("\n---\n\n")
-	}
-
 	if schema.Properties != nil {
 		propNames := make([]string, 0, len(schema.Properties))
 		for propName := range schema.Properties {
@@ -506,12 +538,16 @@ func generateRootSection(rootName string, schema Schema, spec OpenAPISpec, versi
 		}
 		sort.Strings(propNames)
 
+		// Output all fields in order (required first, then optional)
+		// Sort by required status, then by name
+		type fieldInfo struct {
+			name      string
+			schema    Schema
+			required  bool
+		}
+		var fields []fieldInfo
+		
 		for _, propName := range propNames {
-			propData := schema.Properties[propName]
-			propBytes, _ := yaml.Marshal(propData)
-			var prop Schema
-			yaml.Unmarshal(propBytes, &prop)
-
 			isRequired := false
 			for _, req := range schema.Required {
 				if req == propName {
@@ -519,332 +555,32 @@ func generateRootSection(rootName string, schema Schema, spec OpenAPISpec, versi
 					break
 				}
 			}
-			buf.WriteString(generateFieldSection(propName, prop, spec, 3, "", visited, !isRequired))
-		}
-	}
 
-	return buf.String()
-}
-
-func generateFieldSection(fieldName string, fieldSchema Schema, spec OpenAPISpec, headingLevel int, prefix string, visited map[string]bool, isOptional bool) string {
-	var buf strings.Builder
-
-	// Build field path
-	fieldPath := fieldName
-	if prefix != "" {
-		fieldPath = prefix + "." + fieldName
-	}
-
-	// Generate heading
-	heading := strings.Repeat("#", headingLevel)
-	optionalText := ""
-	if isOptional {
-		optionalText = " (optional)"
-	}
-	buf.WriteString(fmt.Sprintf("%s `%s`%s\n\n", heading, fieldPath, optionalText))
-
-	// Handle $ref - resolve and recurse
-	if fieldSchema.Ref != "" {
-		refType := strings.TrimPrefix(fieldSchema.Ref, "#/components/schemas/")
-
-		// Check if it's an alias - if so, just show the type reference
-		refSchema, err := resolveSchemaRef(fieldSchema.Ref, spec)
-		if err == nil && isAlias(*refSchema) {
-			// Just show description and type reference
-			if fieldSchema.Description != "" {
-				buf.WriteString(fieldSchema.Description + "\n\n")
+			propData := schema.Properties[propName]
+			propBytes, _ := yaml.Marshal(propData)
+			var prop Schema
+			if err := yaml.Unmarshal(propBytes, &prop); err != nil {
+				continue
 			}
-			buf.WriteString(fmt.Sprintf("- **Type**: [%s]\n", refType))
-			buf.WriteString("\n---\n\n")
-			return buf.String()
+			fields = append(fields, fieldInfo{
+				name: propName,
+				schema: prop,
+				required: isRequired,
+			})
 		}
-
-		// Prevent infinite recursion
-		if visited[refType] {
-			if fieldSchema.Description != "" {
-				buf.WriteString(fieldSchema.Description + "\n\n")
+		
+		// Sort: required first, then by name
+		sort.Slice(fields, func(i, j int) bool {
+			if fields[i].required != fields[j].required {
+				return fields[i].required // required fields come first
 			}
-			buf.WriteString(fmt.Sprintf("- **Type**: [%s]\n\n", refType))
-			buf.WriteString("---\n\n")
-			return buf.String()
-		}
+			return fields[i].name < fields[j].name
+		})
 
-		visited[refType] = true
-		defer delete(visited, refType)
-
-		// Resolve the referenced schema
-		refSchema, err = resolveSchemaRef(fieldSchema.Ref, spec)
-		if err != nil {
-			buf.WriteString(fmt.Sprintf("Error resolving reference: %v\n\n", err))
-			return buf.String()
-		}
-
-		// Show description (from field or referenced type)
-		description := fieldSchema.Description
-		if description == "" {
-			description = refSchema.Description
-		}
-		if description != "" {
-			buf.WriteString(description + "\n\n")
-		}
-
-		// Show type reference (refType already declared above)
-		buf.WriteString(fmt.Sprintf("- **Type**: [%s]\n", refType))
-
-		// Show required vs optional for the referenced type
-		if len(refSchema.Required) > 0 || refSchema.Properties != nil {
+		// Output all fields
+		for _, field := range fields {
+			buf.WriteString(formatFieldWithNested(field.name, field.schema, spec, field.required, schemaToFile))
 			buf.WriteString("\n")
-			if len(refSchema.Required) > 0 {
-				buf.WriteString(fmt.Sprintf("Required if `%s` is present:\n\n", fieldPath))
-				required := make([]string, len(refSchema.Required))
-				copy(required, refSchema.Required)
-				sort.Strings(required)
-				for _, req := range required {
-					buf.WriteString(fmt.Sprintf("- `%s`\n", req))
-				}
-			}
-			if refSchema.Properties != nil {
-				var optional []string
-				for propName := range refSchema.Properties {
-					isRequired := false
-					for _, req := range refSchema.Required {
-						if req == propName {
-							isRequired = true
-							break
-						}
-					}
-					if !isRequired {
-						optional = append(optional, propName)
-					}
-				}
-				sort.Strings(optional)
-				if len(optional) > 0 {
-					buf.WriteString("\nOptional:\n\n")
-					for _, opt := range optional {
-						buf.WriteString(fmt.Sprintf("- `%s`\n", opt))
-					}
-				}
-			}
-			buf.WriteString("\n---\n\n")
-		}
-
-		// Recursively generate nested fields
-		if refSchema.Properties != nil {
-			// Sort property names for deterministic output
-			propNames := make([]string, 0, len(refSchema.Properties))
-			for propName := range refSchema.Properties {
-				propNames = append(propNames, propName)
-			}
-			sort.Strings(propNames)
-
-			for _, propName := range propNames {
-				propData := refSchema.Properties[propName]
-				propBytes, _ := yaml.Marshal(propData)
-				var prop Schema
-				yaml.Unmarshal(propBytes, &prop)
-
-				propIsRequired := false
-				for _, req := range refSchema.Required {
-					if req == propName {
-						propIsRequired = true
-						break
-					}
-				}
-
-				buf.WriteString(generateFieldSection(propName, prop, spec, headingLevel+1, fieldPath, visited, !propIsRequired))
-			}
-		}
-	} else if fieldSchema.Type == "object" && fieldSchema.Properties != nil {
-		// Inline object with properties - recurse into it
-		if fieldSchema.Description != "" {
-			buf.WriteString(fieldSchema.Description + "\n\n")
-		}
-
-		// Show required vs optional for the inline object
-		if len(fieldSchema.Required) > 0 || fieldSchema.Properties != nil {
-			if len(fieldSchema.Required) > 0 {
-				buf.WriteString(fmt.Sprintf("Required if `%s` is present:\n\n", fieldPath))
-				required := make([]string, len(fieldSchema.Required))
-				copy(required, fieldSchema.Required)
-				sort.Strings(required)
-				for _, req := range required {
-					buf.WriteString(fmt.Sprintf("- `%s`\n", req))
-				}
-			}
-			if fieldSchema.Properties != nil {
-				var optional []string
-				for propName := range fieldSchema.Properties {
-					isRequired := false
-					for _, req := range fieldSchema.Required {
-						if req == propName {
-							isRequired = true
-							break
-						}
-					}
-					if !isRequired {
-						optional = append(optional, propName)
-					}
-				}
-				sort.Strings(optional)
-				if len(optional) > 0 {
-					buf.WriteString("\nOptional:\n\n")
-					for _, opt := range optional {
-						buf.WriteString(fmt.Sprintf("- `%s`\n", opt))
-					}
-				}
-			}
-			buf.WriteString("\n---\n\n")
-		}
-
-		// Recursively generate nested fields
-		// Sort property names for deterministic output
-		propNames := make([]string, 0, len(fieldSchema.Properties))
-		for propName := range fieldSchema.Properties {
-			propNames = append(propNames, propName)
-		}
-		sort.Strings(propNames)
-
-		for _, propName := range propNames {
-			propData := fieldSchema.Properties[propName]
-			propBytes, _ := yaml.Marshal(propData)
-			var prop Schema
-			yaml.Unmarshal(propBytes, &prop)
-
-			propIsRequired := false
-			for _, req := range fieldSchema.Required {
-				if req == propName {
-					propIsRequired = true
-					break
-				}
-			}
-
-			buf.WriteString(generateFieldSection(propName, prop, spec, headingLevel+1, fieldPath, visited, !propIsRequired))
-		}
-	} else {
-		// Simple field (no $ref, no inline object)
-		if fieldSchema.Description != "" {
-			buf.WriteString(fieldSchema.Description + "\n\n")
-		}
-
-		if fieldSchema.Type != "" {
-			buf.WriteString(fmt.Sprintf("- **Type**: `%s`\n", fieldSchema.Type))
-		}
-
-		if fieldSchema.Pattern != "" {
-			buf.WriteString(fmt.Sprintf("- **Matches Pattern**: `%s`\n", fieldSchema.Pattern))
-		}
-
-		// Handle array items
-		if fieldSchema.Type == "array" && fieldSchema.Items != nil {
-			itemsBytes, _ := yaml.Marshal(fieldSchema.Items)
-			var itemsSchema Schema
-			if err := yaml.Unmarshal(itemsBytes, &itemsSchema); err == nil {
-				if itemsSchema.Ref != "" {
-					refType := strings.TrimPrefix(itemsSchema.Ref, "#/components/schemas/")
-					buf.WriteString(fmt.Sprintf("- **Items**: [%s]\n", refType))
-				} else if itemsSchema.Type != "" {
-					buf.WriteString(fmt.Sprintf("- **Items**: `%s`\n", itemsSchema.Type))
-				}
-			}
-		}
-
-		buf.WriteString("\n---\n\n")
-	}
-
-	return buf.String()
-}
-
-func generateSchemaMarkdown(name string, schema Schema, spec OpenAPISpec, version string) string {
-	var buf strings.Builder
-
-	// Title
-	buf.WriteString(fmt.Sprintf("# `%s` _(%s)_\n\n", strings.ToLower(name), version))
-
-	// Description
-	if schema.Description != "" {
-		buf.WriteString(schema.Description + "\n\n")
-	}
-
-	// Required vs Optional
-	if len(schema.Required) > 0 || schema.Properties != nil {
-		if len(schema.Required) > 0 {
-			buf.WriteString(fmt.Sprintf("Required if `%s` is present:\n\n", strings.ToLower(name)))
-			required := make([]string, len(schema.Required))
-			copy(required, schema.Required)
-			sort.Strings(required)
-			for _, req := range required {
-				buf.WriteString(fmt.Sprintf("- `%s`\n", req))
-			}
-		}
-		if schema.Properties != nil {
-			var optional []string
-			for propName := range schema.Properties {
-				isRequired := false
-				for _, req := range schema.Required {
-					if req == propName {
-						isRequired = true
-						break
-					}
-				}
-				if !isRequired {
-					optional = append(optional, propName)
-				}
-			}
-			sort.Strings(optional)
-			if len(optional) > 0 {
-				buf.WriteString("\nOptional:\n\n")
-				for _, opt := range optional {
-					buf.WriteString(fmt.Sprintf("- `%s`\n", opt))
-				}
-			}
-		}
-		buf.WriteString("\n---\n\n")
-	}
-
-	// Properties
-	if schema.Properties != nil {
-		// Sort property names for deterministic output
-		propNames := make([]string, 0, len(schema.Properties))
-		for propName := range schema.Properties {
-			propNames = append(propNames, propName)
-		}
-		sort.Strings(propNames)
-
-		for _, propName := range propNames {
-			propData := schema.Properties[propName]
-			propBytes, _ := yaml.Marshal(propData)
-			var prop Schema
-			yaml.Unmarshal(propBytes, &prop)
-
-			buf.WriteString(fmt.Sprintf("## `%s.%s", strings.ToLower(name), propName))
-			isRequired := false
-			for _, req := range schema.Required {
-				if req == propName {
-					isRequired = true
-					break
-				}
-			}
-			if !isRequired {
-				buf.WriteString(" (optional)")
-			}
-			buf.WriteString("`\n\n")
-
-			if prop.Description != "" {
-				buf.WriteString(fmt.Sprintf("- **Description**: %s\n", prop.Description))
-			}
-
-			if prop.Ref != "" {
-				refType := strings.TrimPrefix(prop.Ref, "#/components/schemas/")
-				buf.WriteString(fmt.Sprintf("- **Type**: [%s]\n", refType))
-			} else if prop.Type != "" {
-				buf.WriteString(fmt.Sprintf("- **Type**: `%s`\n", prop.Type))
-			}
-
-			if prop.Pattern != "" {
-				buf.WriteString(fmt.Sprintf("- **Matches Pattern**: `%s`\n", prop.Pattern))
-			}
-
-			buf.WriteString("\n---\n\n")
 		}
 	}
 

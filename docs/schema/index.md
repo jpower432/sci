@@ -4,6 +4,9 @@ title: Gemara Schemas
 nav-title: Schema
 ---
 
+<<<<<<< HEAD
+Schema documentation generated from CUE. One page per schema file.
+=======
 Schemas (CUE format) standardize the expression of elements in the model and enable automated interoperability between GRC tools. These schemas provide validation across all layers.
 
 Click on a layer to view its schema: 
@@ -47,6 +50,7 @@ Click on a layer to view its schema:
 Schema documentation generated from CUE. One page per schema file:
 
 <!-- SCHEMA_LIST_START -->
+>>>>>>> 250539be1e7f4c131afe3bffb25fa27c3662324b
 
 - [Aliases & Base Types](base.html)
 - [Metadata](metadata.html)
@@ -55,6 +59,8 @@ Schema documentation generated from CUE. One page per schema file:
 - [Layer 2](layer-2.html)
 - [Layer 3](layer-3.html)
 - [Layer 5](layer-5.html)
+<<<<<<< HEAD
+=======
 
 <!-- SCHEMA_LIST_END -->
 
@@ -154,3 +160,4 @@ For questions about versioning strategy or to propose changes:
 * Open an issue on [GitHub](https://github.com/gemaraproj/gemara/issues)
 * Discuss in the [OpenSSF Slack #gemara channel](https://openssf.slack.com/archives/C09A9PP765Q)
 * Attend the [biweekly Gemara meeting](https://calendar.google.com/calendar/u/0?cid=czYzdm9lZmhwNWk5cGZsdGI1cTY3bmdwZXNAZ3JvdXAuY2FsZW5kYXIuZ29vZ2xlLmNvbQ)
+>>>>>>> 250539be1e7f4c131afe3bffb25fa27c3662324b
