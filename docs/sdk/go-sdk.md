@@ -5,18 +5,18 @@ title: Go SDK
 
 The Go SDK provides type-safe APIs for reading, writing, and manipulating Gemara documents. Types are generated from CUE schemas using [cuegen](https://github.com/gemaraproj/cuegen).
 
-**[Go Package Reference →](https://pkg.go.dev/github.com/gemaraproj/gemara)**
+**[Go Package Reference →](https://pkg.go.dev/github.com/gemaraproj/go-gemara)**
 
 ## Installation
 
 ```bash
-go get github.com/gemaraproj/gemara
+go get github.com/gemaraproj/go-gemara
 ```
 
 ## Usage
 
 ```go
-import "github.com/gemaraproj/gemara"
+import "github.com/gemaraproj/go-gemara"
 
 // Load a control catalog
 catalog := &gemara.Catalog{}
