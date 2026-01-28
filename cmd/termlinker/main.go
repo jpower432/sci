@@ -439,8 +439,27 @@ func processLine(line string, termInfos []TermInfo, defPath string) string {
 	// Clean up any extra closing parentheses that might be left after fixing nested links
 	// This handles cases where the original nested link had malformed hash fragments
 	// Pattern: markdown link followed by extra ) and then **, whitespace, or end of string
+	// BUT: Don't match if the link is inside parentheses (e.g., ([ACR](link)) - that's intentional)
 	extraParenPattern := regexp.MustCompile(`(\[([^\]]+)\]\([^\)]+\))\)(\s*\*\*|\s|[,.;:!?)]|$)`)
-	result = extraParenPattern.ReplaceAllString(result, `$1$3`)
+	extraParenMatches := extraParenPattern.FindAllStringIndex(result, -1)
+	// Process from end to start to preserve indices
+	for i := len(extraParenMatches) - 1; i >= 0; i-- {
+		match := extraParenMatches[i]
+		start, end := match[0], match[1]
+		// Check if there's an opening parenthesis immediately before the link
+		// If so, this is an intentional acronym pattern like ([ACR](link)), don't remove the paren
+		if start > 0 && result[start-1] == '(' {
+			continue // Skip this match, it's intentional
+		}
+		// Otherwise, remove the extra closing parenthesis
+		matchStr := result[start:end]
+		submatches := extraParenPattern.FindStringSubmatch(matchStr)
+		if len(submatches) >= 4 {
+			// Replace with link + trailing content, without extra )
+			replacement := submatches[1] + submatches[3]
+			result = result[:start] + replacement + result[end:]
+		}
+	}
 
 	// Also clean up cases where there are double closing parentheses: ](...)))
 	// This handles cases like [term](#slug)) or *[term](#slug))*

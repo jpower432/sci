@@ -4,7 +4,7 @@ layout: page
 
 # The Gemara Model
 
-Integrating [Governance](02-definitions.html#governance), [Risk](02-definitions.html#risk), and [Compliance](02-definitions.html#compliance) ([GRC](02-definitions.html#grc) into software development pipelines presents a formidable challenge. 
+Integrating [Governance](02-definitions.html#governance), [Risk](02-definitions.html#risk), and [Compliance](02-definitions.html#compliance) ([GRC](02-definitions.html#grc)) into software development pipelines presents a formidable challenge. 
 
 Traditional, often manual, approaches to [GRC](02-definitions.html#grc) are ill-suited for the pace of contemporary development. This has given rise to the discipline of [GRC](02-definitions.html#grc) Engineering, which strategically applies engineering principles to [GRC](02-definitions.html#grc) processes to make them more efficient and integrated. Its ultimate goal is to achieve Automated [Governance](02-definitions.html#governance), where [compliance](02-definitions.html#compliance) tracking is embedded throughout the deployment pipeline, acting as a required quality gate before code reaches production.
 
