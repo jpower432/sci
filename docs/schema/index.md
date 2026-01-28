@@ -4,7 +4,7 @@ title: Gemara Schemas
 nav-title: Schema
 ---
 
-Schemas (CUE format) standardize the expression of elements in the model and enable automated interoperability between GRC tools. These schemas provide validation across all layers.
+Schemas (CUE format) standardize the expression of elements in the model and enable automated interoperability between [GRC](../model/02-definitions.html#grc) tools. These schemas provide validation across all layers.
 
 Click on a layer to view its schema: 
 

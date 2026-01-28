@@ -18,7 +18,7 @@ The Gemara model was created to codify these concepts. As the GRC Engineering Mo
 
 Gemara organizes compliance activities into seven categorical layers, each building upon the previous. 
 
-Layers 1 through 3 provide definitions to inform the execution of sensitive activities, while layers 5 through 8 provide measurements to inform next steps.
+Layers 1 through 3 provide definitions to inform the execution of sensitive activities, while layers 5 through 7 provide measurements to inform next steps.
 
 <div class="gemara-layer-diagram">
   <div class="layer-banner layer-7">

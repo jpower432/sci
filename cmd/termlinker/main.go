@@ -217,6 +217,8 @@ func processContent(content string, termInfos []TermInfo, defPath string) string
 	inCodeBlock := false
 	inFrontMatter := false
 	frontMatterCount := 0
+	inHTMLBlock := false
+	htmlTagStack := 0
 
 	for i, line := range lines {
 		originalLine := line
@@ -258,8 +260,29 @@ func processContent(content string, termInfos []TermInfo, defPath string) string
 			continue
 		}
 
-		// Skip headers (lines starting with #)
-		if strings.HasPrefix(trimmed, "#") {
+		// Track HTML blocks - check for opening and closing HTML tags
+		// This handles multi-line HTML blocks like <div>...</div>
+		htmlTagPattern := regexp.MustCompile(`<[^>]+>`)
+		htmlTags := htmlTagPattern.FindAllString(line, -1)
+		for _, tag := range htmlTags {
+			tagLower := strings.ToLower(strings.TrimSpace(tag))
+			// Check for opening tags (not self-closing and not closing tags)
+			if !strings.HasPrefix(tagLower, "</") && !strings.HasSuffix(tagLower, "/>") {
+				htmlTagStack++
+				inHTMLBlock = true
+			}
+			// Check for closing tags
+			if strings.HasPrefix(tagLower, "</") {
+				htmlTagStack--
+				if htmlTagStack <= 0 {
+					htmlTagStack = 0
+					inHTMLBlock = false
+				}
+			}
+		}
+
+		// Skip headers and HTML Blocks (lines starting with #)
+		if strings.HasPrefix(trimmed, "#") || inHTMLBlock || htmlTagStack > 0 {
 			result.WriteString(originalLine)
 			if i < len(lines)-1 {
 				result.WriteString("\n")
@@ -298,10 +321,10 @@ func processLine(line string, termInfos []TermInfo, defPath string) string {
 			_ = submatches[2] // First word URL (unused)
 			restOfTerm := strings.TrimSpace(submatches[3])
 			_ = submatches[4] // Outer URL with malformed hash (unused)
-			
+
 			// Combine to form the full compound term
 			fullTerm := firstWord + " " + restOfTerm
-			
+
 			// Check if this matches a known compound term
 			for _, termInfo := range termInfos {
 				if strings.EqualFold(fullTerm, termInfo.OriginalTerm) {
@@ -315,7 +338,7 @@ func processLine(line string, termInfos []TermInfo, defPath string) string {
 		}
 		return match
 	})
-	
+
 	// Pattern 2: [Term [Subterm](...)](...) - general nested link pattern
 	// This pattern needs to handle nested parentheses in the hash fragment
 	nestedLinkPattern := regexp.MustCompile(`\[([^\[]*)\[([^\]]+)\]\(([^\)]+)\)\]\(([^\)]+)\)`)
@@ -326,7 +349,7 @@ func processLine(line string, termInfos []TermInfo, defPath string) string {
 			outerTerm := strings.TrimSpace(submatches[1] + submatches[2]) // Combine prefix and inner term
 			_ = submatches[3]                                             // The inner link URL (unused)
 			_ = submatches[4]                                             // The outer link URL (may contain malformed hash)
-			
+
 			// Check if this matches a known compound term
 			for _, termInfo := range termInfos {
 				if strings.EqualFold(outerTerm, termInfo.OriginalTerm) {
@@ -341,7 +364,7 @@ func processLine(line string, termInfos []TermInfo, defPath string) string {
 		}
 		return match // Return unchanged if we can't parse it
 	})
-	
+
 	// Pattern 3: Clean up extremely long hash fragments that contain way too much text
 	// This handles cases where the hash includes entire definitions or sentences
 	// Pattern: ](url#extremely-long-hash-that-contains-too-much-text) or ](url#extremely-long-hash-that-contains-too-much-text))
@@ -350,9 +373,9 @@ func processLine(line string, termInfos []TermInfo, defPath string) string {
 		submatches := longHashPattern.FindStringSubmatch(match)
 		if len(submatches) >= 4 {
 			linkStart := submatches[1] // ](url#
-			longHash := submatches[2]   // The extremely long hash
-			_ = submatches[3]           // ) or )) (unused - we always return single )
-			
+			longHash := submatches[2]  // The extremely long hash
+			_ = submatches[3]          // ) or )) (unused - we always return single )
+
 			// Try to extract a reasonable slug from the long hash
 			// Look for common compound term patterns at the end
 			for _, termInfo := range termInfos {
@@ -386,7 +409,7 @@ func processLine(line string, termInfos []TermInfo, defPath string) string {
 		}
 		return match
 	})
-	
+
 	// Clean up trailing patterns left from malformed hash fragments
 	// Pattern: ](#term-slug)-last-part) should become just ](#term-slug)
 	// This handles cases like [Control Catalog](#control-catalog)-catalog) -> [Control Catalog](#control-catalog)
@@ -412,20 +435,39 @@ func processLine(line string, termInfos []TermInfo, defPath string) string {
 		}
 		return match
 	})
-	
+
 	// Clean up any extra closing parentheses that might be left after fixing nested links
 	// This handles cases where the original nested link had malformed hash fragments
 	// Pattern: markdown link followed by extra ) and then **, whitespace, or end of string
+	// BUT: Don't match if the link is inside parentheses (e.g., ([ACR](link)) - that's intentional)
 	extraParenPattern := regexp.MustCompile(`(\[([^\]]+)\]\([^\)]+\))\)(\s*\*\*|\s|[,.;:!?)]|$)`)
-	result = extraParenPattern.ReplaceAllString(result, `$1$3`)
-	
+	extraParenMatches := extraParenPattern.FindAllStringIndex(result, -1)
+	// Process from end to start to preserve indices
+	for i := len(extraParenMatches) - 1; i >= 0; i-- {
+		match := extraParenMatches[i]
+		start, end := match[0], match[1]
+		// Check if there's an opening parenthesis immediately before the link
+		// If so, this is an intentional acronym pattern like ([ACR](link)), don't remove the paren
+		if start > 0 && result[start-1] == '(' {
+			continue // Skip this match, it's intentional
+		}
+		// Otherwise, remove the extra closing parenthesis
+		matchStr := result[start:end]
+		submatches := extraParenPattern.FindStringSubmatch(matchStr)
+		if len(submatches) >= 4 {
+			// Replace with link + trailing content, without extra )
+			replacement := submatches[1] + submatches[3]
+			result = result[:start] + replacement + result[end:]
+		}
+	}
+
 	// Also clean up cases where there are double closing parentheses: ](...)))
 	// This handles cases like [term](#slug)) or *[term](#slug))*
 	// Match ](url)) and replace with ](url) - be careful to only match link endings
 	// Pattern: ]( followed by non-) chars, then )), but make sure it's a link ending
 	linkDoubleParenPattern := regexp.MustCompile(`(\]\([^\)]+\))\)\)([^*\w]|$)`)
 	result = linkDoubleParenPattern.ReplaceAllString(result, `$1)$2`)
-	
+
 	// Clean up any double opening brackets that might have been created
 	// Pattern: **[[text](...)]** should be **[text](...)]**
 	doubleBracketPattern := regexp.MustCompile(`\*\*\[\[([^\]]+)\]\(([^\)]+)\)\]\*\*`)
@@ -440,7 +482,7 @@ func processLine(line string, termInfos []TermInfo, defPath string) string {
 		linkRanges := linkPattern.FindAllStringIndex(result, -1)
 		codeRanges := inlineCodePattern.FindAllStringIndex(result, -1)
 		htmlRanges := htmlTagPattern.FindAllStringIndex(result, -1)
-		
+
 		// Find HTML tag pairs (opening and closing tags) to skip ALL content between them
 		htmlContentRanges := findHTMLContentRanges(result, htmlRanges)
 
@@ -497,7 +539,7 @@ func processLine(line string, termInfos []TermInfo, defPath string) string {
 				// The matched text contains a markdown link, skip it
 				continue
 			}
-			
+
 			// Check if match overlaps with any link's text portion (the part between [ and ])
 			// This prevents linking shorter terms that are part of longer terms that were already linked
 			for _, linkRange := range linkRanges {
@@ -526,7 +568,7 @@ func processLine(line string, termInfos []TermInfo, defPath string) string {
 					break
 				}
 			}
-			
+
 			if shouldSkip {
 				continue
 			}
@@ -550,24 +592,24 @@ type rangeInfo struct {
 // findHTMLContentRanges finds ranges of content between opening and closing HTML tags
 func findHTMLContentRanges(text string, tagRanges [][]int) []rangeInfo {
 	var contentRanges []rangeInfo
-	
+
 	if len(tagRanges) == 0 {
 		return contentRanges
 	}
-	
+
 	// Extract tag information
 	type tagInfo struct {
-		start, end int
-		tagName    string
-		isClosing  bool
+		start, end  int
+		tagName     string
+		isClosing   bool
 		isSelfClose bool
 	}
-	
+
 	var tags []tagInfo
 	// Improved regex: matches tag name at the start (after </? and optional whitespace)
 	// Handles: <tag>, <tag attr="...">, </tag>, <tag/>, etc.
 	tagNamePattern := regexp.MustCompile(`</?\s*([a-zA-Z][a-zA-Z0-9]*)`)
-	
+
 	for _, r := range tagRanges {
 		tagText := text[r[0]:r[1]]
 		matches := tagNamePattern.FindStringSubmatch(tagText)
@@ -575,33 +617,33 @@ func findHTMLContentRanges(text string, tagRanges [][]int) []rangeInfo {
 			// If we can't extract tag name, skip this tag but still mark it as a skip range
 			continue
 		}
-		
+
 		tagName := matches[1]
 		isClosing := strings.HasPrefix(tagText, "</")
 		isSelfClose := strings.HasSuffix(tagText, "/>") || (strings.HasSuffix(tagText, " />") && !isClosing)
-		
+
 		tags = append(tags, tagInfo{
-			start:      r[0],
-			end:        r[1],
-			tagName:    tagName,
-			isClosing:  isClosing,
+			start:       r[0],
+			end:         r[1],
+			tagName:     tagName,
+			isClosing:   isClosing,
 			isSelfClose: isSelfClose,
 		})
 	}
-	
+
 	// Match opening and closing tags using a stack to handle nesting
 	type tagStackItem struct {
 		tagName string
 		start   int
 	}
 	var stack []tagStackItem
-	
+
 	for _, tag := range tags {
 		if tag.isSelfClose {
 			// Self-closing tags don't have content
 			continue
 		}
-		
+
 		if !tag.isClosing {
 			// Opening tag - push to stack
 			stack = append(stack, tagStackItem{
@@ -615,14 +657,14 @@ func findHTMLContentRanges(text string, tagRanges [][]int) []rangeInfo {
 					// Found matching opening tag
 					contentStart := stack[i].start
 					contentEnd := tag.start // Content ends before the closing tag
-					
+
 					if contentEnd > contentStart {
 						contentRanges = append(contentRanges, rangeInfo{
 							start: contentStart,
 							end:   contentEnd,
 						})
 					}
-					
+
 					// Remove this tag and all tags after it (they were nested inside)
 					stack = stack[:i]
 					break
@@ -630,7 +672,7 @@ func findHTMLContentRanges(text string, tagRanges [][]int) []rangeInfo {
 			}
 		}
 	}
-	
+
 	// Handle any unclosed tags (opening tags without matching closing tags)
 	// This can happen with malformed HTML or tags that span multiple lines
 	for _, item := range stack {
@@ -640,7 +682,7 @@ func findHTMLContentRanges(text string, tagRanges [][]int) []rangeInfo {
 			end:   len(text),
 		})
 	}
-	
+
 	return contentRanges
 }
 
