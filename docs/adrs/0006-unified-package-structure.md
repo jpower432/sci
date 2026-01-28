@@ -22,7 +22,7 @@ However, over time some issues emerged:
 1. **Type Sharing**: Many types are shared across layers (e.g., `Metadata`, `Contact`, `Mapping`, `Date`). These were duplicated between packages.
 
 2. **Cross-Layer Usage**: Higher layers frequently reference lower layers:
-   - Layer 4 (Evaluation references Layer 2 (Catalog) controls
+   - Layer 4 (Evaluation) references Layer 2 (Catalog) controls
    - Converters need types from multiple layers
    - Loaders share common logic
 
