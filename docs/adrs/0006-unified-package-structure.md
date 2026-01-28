@@ -10,10 +10,10 @@ title: Unified Go SDK Package Structure
 ## Context
 
 The Gemara Go module initially organized code by the conceptual layers of the Gemara model:
-- `layer1/` - Guidance documents (Layer 1)
-- `layer2/` - Control catalogs (Layer 2)  
-- `layer3/` - Policy documents (Layer 3)
-- `layer4/` - Evaluation logs and results (Layer 4)
+- `layer1/` - [Guidance](../model/02-definitions.html#guidance) documents (Layer 1)
+- `layer2/` - [Control](../model/02-definitions.html#control) catalogs (Layer 2)  
+- `layer3/` - [Policy](../model/02-definitions.html#policy) documents (Layer 3)
+- `layer4/` - [Evaluation](../model/02-definitions.html#evaluation) logs and results (Layer 4)
 
 This structure mirrored the conceptual model described in the README, where each layer builds upon lower layers.
 
@@ -22,7 +22,7 @@ However, over time some issues emerged:
 1. **Type Sharing**: Many types are shared across layers (e.g., `Metadata`, `Contact`, `Mapping`, `Date`). These were duplicated between packages.
 
 2. **Cross-Layer Usage**: Higher layers frequently reference lower layers:
-   - Layer 4 (Evaluation) references Layer 2 (Catalog) controls
+   - Layer 4 ([Evaluation](../model/02-definitions.html#evaluation) references Layer 2 (Catalog) controls
    - Converters need types from multiple layers
    - Loaders share common logic
 
@@ -44,9 +44,9 @@ We consolidated all layer Go packages into a single unified package: `package ge
 All Go files are now in the root package:
 - `generated_types.go` - All types from all layers (generated from CUE schemas)
 - `loaders.go` - Unified loader functions for all document types
-- `assessment_log.go` - Layer 4 evaluation functionality
-- `control_evaluation.go` - Layer 4 control evaluation
-- `evaluation_plan.go` - Layer 4 evaluation planning
+- `assessment_log.go` - Layer 4 [evaluation](../model/02-definitions.html#evaluation) functionality
+- `control_evaluation.go` - Layer 4 [control](../model/02-definitions.html#control) [evaluation](../model/02-definitions.html#evaluation)
+- `evaluation_plan.go` - Layer 4 [evaluation](../model/02-definitions.html#evaluation) planning
 - `result.go` - Layer 4 result types
 - `actor_type.go` - Actor type definitions
 - `document_example_test.go` - Layer 1 examples
@@ -105,7 +105,7 @@ All Go files are now in the root package:
 
 2. **Testing**: Tests remain organized by functionality, not package boundaries
 
-3. **Schema Organization**: CUE schemas remain organized by layer (`schemas/layer-1.cue`, etc.)
+3. **Schema [Organization](../model/02-definitions.html#organization)**: CUE schemas remain organized by layer (`schemas/layer-1.cue`, etc.)
 
 ## Alternatives Considered
 

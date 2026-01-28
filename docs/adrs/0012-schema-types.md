@@ -31,13 +31,13 @@ Below are the current top-level types at the time of this proposal:
 
 The specific artifacts may evolve over time, but the top-level schema terms should be roughly:
 
-- Layer 1: Vector Catalog, Guidance Catalog
-- Layer 2: Threat Catalog, Control Catalog
-- Layer 3: Risk Catalog, Policy Document
+- Layer 1: [Vector](../model/02-definitions.html#vector) Catalog, [Guidance](../model/02-definitions.html#guidance) Catalog
+- Layer 2: [Threat](../model/02-definitions.html#threat) Catalog, [Control Catalog](../model/02-definitions.html#control-catalog)
+- Layer 3: [Risk Catalog](../model/02-definitions.html#risk-catalog), [Policy](../model/02-definitions.html#policy) Document
 - Layer 4: n/a
-- Layer 5: Evaluation Log
-- Layer 6: Enforcement Log
-- Layer 7: Monitoring Log, Audit Log
+- Layer 5: [Evaluation](../model/02-definitions.html#evaluation) Log
+- Layer 6: [Enforcement](../model/02-definitions.html#enforcement) Log
+- Layer 7: Monitoring Log, [Audit](../model/02-definitions.html#audit) Log
 
 ## Consequences
 

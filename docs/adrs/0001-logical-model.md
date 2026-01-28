@@ -9,7 +9,7 @@ title: Create A Logical Model for GRC Engineering Activities
 
 ## Context
 
-During the writing of the CNCF's [Automated Governance Maturity Model (AGMM)](https://www.cncf.io/blog/2025/05/05/announcing-the-automated-governance-maturity-model/), the authors of that document came to a key observation: to build a _Secure Software Factory_ or a fully automated governance program, maturity can be measured in at least four different areas: "Policy, Evaluation, Enforcement, and Audit."
+During the writing of the CNCF's [Automated Governance Maturity Model (AGMM)](https://www.cncf.io/blog/2025/05/05/announcing-the-automated-governance-maturity-model/), the authors of that document came to a key observation: to build a _Secure Software Factory_ or a fully automated [governance](../model/02-definitions.html#governance) program, maturity can be measured in at least four different areas: "[Policy](../model/02-definitions.html#policy), [Evaluation](../model/02-definitions.html#evaluation), [Enforcement](../model/02-definitions.html#enforcement), and [Audit](../model/02-definitions.html#audit)."
 
 Both the FINOS _Common Cloud Controls (CCC)_ and OpenSSF's _Open Source Project Security Baseline (OSPSB)_ projects began using the language from the AGMM, with the addition of two more areas to describe the difference between documents that give high-level recommendations alongside those which create technology-specific objectives. It was observed that these six different areas build upon eachother, similar to how the OSI Model describes the layers of digital networking.
 

@@ -9,15 +9,15 @@ title: Formalize Sensitive Activities as a Layer
 
 ## Context
 
-We have often recieved feedback regarding the lack of a "Layer" to describe sensitive activities that live between Policy and Evaluation.
+We have often recieved feedback regarding the lack of a "Layer" to describe sensitive activities that live between [Policy](../model/02-definitions.html#policy) and [Evaluation](../model/02-definitions.html#evaluation).
 
-- Layer 1: Guidance
+- Layer 1: [Guidance](../model/02-definitions.html#guidance)
 - Layer 2: Controls
-- Layer 3: Policy
+- Layer 3: [Policy](../model/02-definitions.html#policy)
 - (No Layer) Sensitive Activities
-- Layer 4: Evaluation
-- Layer 5: Enforcement
-- Layer 6: Audit
+- Layer 4: [Evaluation](../model/02-definitions.html#evaluation)
+- Layer 5: [Enforcement](../model/02-definitions.html#enforcement)
+- Layer 6: [Audit](../model/02-definitions.html#audit)
 
 The argument has been that since we don't provide schemas for the diverse array of possible sensitive activities, we shouldn't assign a layer to it. However, as we move closer to a versioned release of the model, it has become clear that the model is not dependent on having schemas for every component.
 
@@ -29,9 +29,9 @@ We will assign a layer to sensitive activities in the model.
 
 - This will require +1 renumbering of layers 4, 5, and 6 (to 5, 6, and 7 respectve)
   - Layer 4: Sensitive Activities
-  - Layer 5: Evaluation
-  - Layer 6: Enforcement
-  - Layer 7: Audit
+  - Layer 5: [Evaluation](../model/02-definitions.html#evaluation)
+  - Layer 6: [Enforcement](../model/02-definitions.html#enforcement)
+  - Layer 7: [Audit](../model/02-definitions.html#audit)
 - No impact on schemas and SDKs, as they have already removed any reference to numberic layer identifiers
 - All documentation and web content must be updated
 - Adopters of previous versions will be disrupted by this change in terminology

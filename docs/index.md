@@ -7,11 +7,11 @@ title: Home
 
 <img src="{{ '/assets/gemara-logo.png' | relative_url }}" alt="Gemara Logo" class="gemara-logo" />
 
-**GRC Engineering Model for Automated Risk Assessment**
+**[GRC](model/02-definitions.html#grc) Engineering Model for Automated [Risk](model/02-definitions.html#risk) [Assessment](model/02-definitions.html#assessment)**
 
-Gemara provides a logical model to describe the categories of compliance activities, how they interact, and the schemas to enable automated interoperability between them.
+Gemara provides a logical model to describe the categories of [compliance](model/02-definitions.html#compliance) activities, how they interact, and the schemas to enable automated interoperability between them.
 
-In order to better facilitate cross-functional communication, the Gemara Model seeks to outline the categorical layers of activities related to automated governance.
+In order to better facilitate cross-functional communication, the Gemara Model seeks to outline the categorical layers of activities related to automated [governance](model/02-definitions.html#governance).
 
 <!--
 ## Quick Start
@@ -24,7 +24,7 @@ In order to better facilitate cross-functional communication, the Gemara Model s
 
 ## The Three Components
 
-Gemara delivers three core components that work together to support automated GRC:
+Gemara delivers three core components that work together to support automated [GRC](model/02-definitions.html#grc):
 
 <div class="component-grid">
   <a href="./model/" class="component-card">
@@ -70,7 +70,7 @@ Gemara delivers three core components that work together to support automated GR
 
 Choose your starting point based on your needs:
 
-- **Understanding GRC structure?** Start with **[The Model](./model)** component
+- **Understanding [GRC](model/02-definitions.html#grc) structure?** Start with **[The Model](./model)** component
 - **Validating documents?** Use **[The Schemas](./schema/)** component
 - **Building tools?** Jump to **[The SDKs](./sdk/)** component
 
@@ -82,4 +82,4 @@ Gemara is being used today in production environments:
 
 - **[FINOS Common Cloud Controls](https://www.finos.org/common-cloud-controls-project)** - Layer 2 controls for cloud environments
 - **[Open Source Project Security Baseline](https://baseline.openssf.org/)** - Layer 2 security baseline for open source projects
-- **[Privateer](https://github.com/privateerproj/privateer)** - Layer 5 evaluation framework with plugins like the [OSPS Baseline Plugin](https://github.com/revanite-io/pvtr-github-repo)
+- **[Privateer](https://github.com/privateerproj/privateer)** - Layer 5 [evaluation](model/02-definitions.html#evaluation) framework with plugins like the [OSPS Baseline Plugin](https://github.com/revanite-io/pvtr-github-repo)

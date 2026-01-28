@@ -13,14 +13,14 @@ nav-title: Community
 ### Meet the Maintainers
 
 {% for maintainer in site.data.maintainers.maintainers %}
-- {{ maintainer.name }}, {{ maintainer.organization }} (@{{ maintainer.github }})
+- {{ maintainer.name }}, {{ maintainer.[organization](../model/02-definitions.html#organization) }} (@{{ maintainer.github }})
 {% endfor %}
 
 ### Projects and Working Groups 
 
 We are always looking for additional perspective on the Gemara project. Community members and maintainers are involved in several projects, working groups, and initiatives.
 
-* [FINOS Common Cloud Controls Catalog](https://github.com/finos/common-cloud-controls/tree/main/catalogs/core/ccc): FINOS CCC is a collaborative project aiming to develop a unified set of cybersecurity, resiliency, and compliance controls for common services across the major cloud service providers.
+* [FINOS Common Cloud Controls Catalog](https://github.com/finos/common-cloud-controls/tree/main/catalogs/core/ccc): FINOS CCC is a collaborative project aiming to develop a unified set of cybersecurity, resiliency, and [compliance](../model/02-definitions.html#compliance) controls for common services across the major cloud service providers.
 * [OpenSSF ORBIT Working Group](https://github.com/ossf/wg-orbit): The development and maintenance of interoperable resource for identification and presentation of security-relevant data. Gemara falls under the ORBIT WG.
 * [Open Source Project Security Baseline](https://baseline.openssf.org/): OSPS Baseline is an effort to establish controls that help project maintainers understand security best practices and expectations. 
 
