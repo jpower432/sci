@@ -9,7 +9,7 @@ title: Finish Development on the Model and Common Terms
 
 ## Context
 
-While we marked the model as stable in pre-v1 releases, it has been understood that it is still open to modification. This has resulted in occasional suggestions for minor or even breaking changes to improve the clarity and accuracy of the model as it seeks to categoricallly describe aspects of [GRC](../model/02-definitions.html#grc).
+While we marked the model as stable in pre-v1 releases, it has been understood that it is still open to modification. This has resulted in occasional suggestions for minor or even breaking changes to improve the clarity and accuracy of the model as it seeks to categoricallly describe aspects of GRC.
 
 ## Decision
 

@@ -9,9 +9,9 @@ title: Extend Go SDK for "Layer 4" Based on the Privateer Project
 
 ## Context
 
-_FINOS Common Cloud Controls (CCC)_ community maintains a custom tool, [Privateer](https://privateerproj.com), which uses our SDK to ingest CCC documents for the automatic generation of plugins designed to assess that "Layer 2" catalog's [assessment](../model/02-definitions.html#assessment) requirements.
+_FINOS Common Cloud Controls (CCC)_ community maintains a custom tool, [Privateer](https://privateerproj.com), which uses our SDK to ingest CCC documents for the automatic generation of plugins designed to assess that "Layer 2" catalog's assessment requirements.
 
-The plugin generates an output which is designed to streamline the [organization](../model/02-definitions.html#organization) and presentation of evidence following an [assessment](../model/02-definitions.html#assessment). The Privateer schema has already served as the foundation for the "Layer 4" schema. We may be able to extract much of the Privateer logic into a shared SDK that can be used by Privateer or other tools seeking to be compatible with our schemas.
+The plugin generates an output which is designed to streamline the organization and presentation of evidence following an assessment. The Privateer schema has already served as the foundation for the "Layer 4" schema. We may be able to extract much of the Privateer logic into a shared SDK that can be used by Privateer or other tools seeking to be compatible with our schemas.
 
 ## Action
 

@@ -7,9 +7,9 @@ title: The Model
 
 A fundamental principle of this architecture is that each layer builds upon the one below it. Higher-level layers leverage the outputs and services of lower layers to perform their functions.
 
-For instance, an [evaluation](02-definitions.html#evaluation) at Layer 5 is designed to test for conformance with a [policy](02-definitions.html#policy) defined at Layer 3, which is in turn informed by controls at Layer 2. This hierarchical dependency creates a clear logical flow of information and authority through the [governance](02-definitions.html#governance) lifecycle.
+For instance, an evaluation at Layer 5 is designed to test for conformance with a policy defined at Layer 3, which is in turn informed by controls at Layer 2. This hierarchical dependency creates a clear logical flow of information and authority through the governance lifecycle.
 
-This structure reverses the traditional document-centric view with [policy](02-definitions.html#policy) building upon [control](02-definitions.html#control). Since many organizations start with a [policy](02-definitions.html#policy) which includes controls, the idea that [policy](02-definitions.html#policy) would follow controls may seem counter-intuitive. However, this example is demonstrative of the model: A [policy](02-definitions.html#policy) is not ready for implementation and [evaluation](02-definitions.html#evaluation) until the controls are written.
+This structure reverses the traditional document-centric view with policy building upon control. Since many organizations start with a policy which includes controls, the idea that policy would follow controls may seem counter-intuitive. However, this example is demonstrative of the model: A policy is not ready for implementation and evaluation until the controls are written.
 
 ## The Complete Model
 
@@ -17,7 +17,7 @@ The model is organized into two primary categories of activity These categories 
 
 Activities in the “definition” layers, one through three, should each produce document assets that may be referenced by higher layers or within their own layer. The “measurement” layers, five through seven, should each produce timestamped logs as outputs.
 
-As noted in [_Foundational Concepts_](./03-foundational-concepts), the fourth layer defines sensitive activities connecting the two halves. The first three layers point toward the sensitive activities to define what is "good" and what is "bad". Meanwhile, the last three layers all look back at the sensitive activities — or their outcomes — to determine whether they comply with the definition of good (and in the case of Layer 7: [Audit](02-definitions.html#audit), to also determine the quality of results from all the lower layers). **Figure 4.1** shows these layers in cascading order.
+As noted in [_Foundational Concepts_](./03-foundational-concepts), the fourth layer defines sensitive activities connecting the two halves. The first three layers point toward the sensitive activities to define what is "good" and what is "bad". Meanwhile, the last three layers all look back at the sensitive activities — or their outcomes — to determine whether they comply with the definition of good (and in the case of Layer 7: Audit, to also determine the quality of results from all the lower layers). **Figure 4.1** shows these layers in cascading order.
 
 The rest of this documentation describes each layers with examples.
 

@@ -5,7 +5,7 @@ title: Authors & Acknowledgements
 
 ## Authors & Acknowledgements
 
-As mentioned throughout this document, the text herein draws from a myriad of lessons and sources in a way that defies any attempt to establish holistic attribution. Below is a list of authors who compiled the findings into this model, and acknowledgements of key contributors who provided [guidance](02-definitions.html#guidance) and context to influence its final shape.
+As mentioned throughout this document, the text herein draws from a myriad of lessons and sources in a way that defies any attempt to establish holistic attribution. Below is a list of authors who compiled the findings into this model, and acknowledgements of key contributors who provided guidance and context to influence its final shape.
 
 **Authors:** Eddie Knight, Jennifer Power
 

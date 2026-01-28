@@ -22,4 +22,4 @@ Negative: All Go types will need to live in the same file, instead of being orga
 
 ## Alternatives Considered
 
-We could make a contributor [policy](../model/02-definitions.html#policy) which requires this, and a reviewer guide to ensure it is manually enforced every time.
+We could make a contributor policy which requires this, and a reviewer guide to ensure it is manually enforced every time.
