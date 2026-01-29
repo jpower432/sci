@@ -1,6 +1,6 @@
 // Schema lifecycle: experimental | stable | deprecated
 @status("stable")
-package schemas
+package gemara
 
 // Metadata represents common metadata fields shared across all layers
 #Metadata: {
