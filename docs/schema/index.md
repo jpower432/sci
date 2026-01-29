@@ -64,25 +64,7 @@ Schema documentation generated from CUE. One page per schema file:
 
 ```bash
 go install cuelang.org/go/cmd/cue@latest
-
-# Initialize a CUE module in your project
-cue mod init
-```
-
-**Import the Gemara Module**
-```cue
-#myapp.cue
-package myapp
-
-import gemara "github.com/gemaraproj/gemara:schemas"
-
-gemara.#ControlCatalog
-```
-
-**Validate with the cue CLI**
-
-```bash
-cue vet your-controls.yaml myapp.cue 
+cue vet -c -d '#ControlCatalog' github.com/gemaraproj/gemara@latest your-controls.yaml
 ```
 
 ## Contributing

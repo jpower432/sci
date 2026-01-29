@@ -1,7 +1,7 @@
 // Schema lifecycle: experimental | stable | deprecated
 @status("stable")
 
-package schemas
+package gemara
 
 // MappingReference represents a reference to an external document with full metadata.
 #MappingReference: {
