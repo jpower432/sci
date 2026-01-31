@@ -40,7 +40,7 @@ Click on a layer to view its schema:
   </div>
 </div>
 
-**[Browse all schemas on GitHub →](https://github.com/gemaraproj/gemara)**
+**[Browse all schemas in the CUE Central Registry →](https://registry.cue.works/docs/github.com/gemaraproj/gemara@latest)**
 
 ## Schema Documentation
 
@@ -60,34 +60,37 @@ Schema documentation generated from CUE. One page per schema file:
 
 ### Validation with CUE
 
-**Install and initialize**
-
 ```bash
+# Install CUE
 go install cuelang.org/go/cmd/cue@latest
+
+# Validate a control catalog using the Layer 2 ControlCatalog definition
 cue vet -c -d '#ControlCatalog' github.com/gemaraproj/gemara@latest your-controls.yaml
 ```
-
-## Contributing
-
-The Schemas evolve based on community needs:
-
-- **Schema improvements?** Open an issue or submit a PR
-- **Found a bug?** Report it
-- **Significant architectural changes?** Document in an [ADR](../adrs/index.html)
-
-See the [Contributing Guide](https://github.com/gemaraproj/gemara/blob/main/CONTRIBUTING.md) for details.
 
 ## Architecture Decisions
 
 Significant implementation changes are documented in [Architecture Decision Records (ADRs)](../adrs/index.html).
 
-## Relationship to Other Components
+## Schema Standards
 
-### [The Model](../model)
-The Model is published separately and provides the conceptual foundation. These CUE schemas are an implementation of the model, with each schema corresponding to a layer in the model.
+Schemas follow these naming standards:
 
-### [The SDKs](../sdk/)
-SDKs support programmatic access to Gemara documents. SDK types are generated from these schemas, ensuring consistency between validation and programmatic access.
+| Layer | Category    | Atomic Unit (Interactive) | Atomic Unit (Defensive) | Collection (Interactive) | Collection (Defensive) |
+|:------|:------------|:--------------------------|:------------------------|:-------------------------|:-----------------------|
+| 1     | Definition  | Vector                    | Guidance                | Vector Catalog           | Guidance Catalog       |
+| 2     | Definition  | Threat                    | Control                 | Threat Catalog           | Control Catalog        |
+| 3     | Definition  | Risk                      | Policy                  | Risk Catalog             | —                      |
+| 4     | —           | —                         | —                       | —                        | —                      |
+| 5     | Measurement | Evaluation Result         | Evaluation Result       | Evaluation Log           | Evaluation Log         |
+| 6     | Measurement | Enforcement Result        | Enforcement Result      | Enforcement Log          | Enforcement Log        |
+| 7     | Measurement | —                         | Audit Result            | —                        | Audit Log              |
+
+**Note:** "—" indicates no planned schema implementation.
+
+**Naming conventions**:
+- **Definition layers (1-3)**: Collections of atomic units are called **Catalogs**
+- **Measurement layers (5-7)**: Collections of atomic units are called **Logs**
 
 ## Versioning and Maintenance
 
@@ -146,6 +149,24 @@ The following table illustrates how schemas progress through their lifecycle and
 * Replacement schema or field must be added in Experimental status and promoted to Stable before deprecation.
 * Deprecated schemas and fields maintain the same support guarantees as Stable schemas and remain functional.
 * Deprecated schemas are removed in the next major version release.
+
+## Contributing
+
+The Schemas evolve based on community needs:
+
+- **Schema improvements?** Open an issue or submit a PR
+- **Found a bug?** Report it
+- **Significant architectural changes?** Document in an [ADR](../adrs/index.html)
+
+See the [Contributing Guide](https://github.com/gemaraproj/gemara/blob/main/CONTRIBUTING.md) for details.
+
+## Relationship to Other Components
+
+### [The Model](../model)
+The Model is published separately and provides the conceptual foundation. These CUE schemas are an implementation of the model, with each schema corresponding to a layer in the model.
+
+### [The SDKs](../sdk/)
+SDKs support programmatic access to Gemara documents. SDK types are generated from these schemas, ensuring consistency between validation and programmatic access.
 
 ## Questions or Feedback
 

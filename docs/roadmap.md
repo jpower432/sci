@@ -39,6 +39,6 @@ Moving the Gemara project to a stable ecosystem providing the technical foundati
 If you have suggestions for the roadmap:
 
 * Open an [Issue](https://github.com/gemaraproj/gemara/issues/new/choose) to start a discussion
-* Join our biweekly meetings (see [README.md](https://github.com/gemaraproj/gemara/blob/main/README.md#contributing) for details) to discuss roadmap changes
+* Join our biweekly meetings (see the Community [page](./community) for details) to discuss roadmap changes
 
 Changes to strategic priorities require community consensus through discussion in meetings or issues, not direct edits to this document.
