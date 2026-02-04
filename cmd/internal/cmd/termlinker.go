@@ -1,7 +1,6 @@
-package main
+package cmd
 
 import (
-	"flag"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -11,6 +10,7 @@ import (
 	"unicode"
 
 	"github.com/goccy/go-yaml"
+	"github.com/spf13/cobra"
 )
 
 type Term struct {
@@ -26,27 +26,42 @@ type TermInfo struct {
 	Regex        *regexp.Regexp
 }
 
-func main() {
-	lexiconFile := flag.String("lexicon", "docs/lexicon.yaml", "Input lexicon YAML file")
-	docsDir := flag.String("docs", "docs", "Documentation directory to process")
-	cleanup := flag.Bool("cleanup", false, "Remove termlinker-generated links instead of adding them")
-	flag.Parse()
+var termLinkerCmd = &cobra.Command{
+	Use:   "termlinker",
+	Short: "Link defined terms across documentation",
+	Long: `Link defined terms from the lexicon across all markdown files in the documentation.
+This command finds occurrences of terms defined in the lexicon and creates markdown
+links to the definitions page. Use the --cleanup flag to remove previously generated links.`,
+	RunE: runTermLinker,
+}
 
+var termLinkerFlags struct {
+	lexiconFile string
+	docsDir     string
+	cleanup     bool
+}
+
+func newTermLinkerCmd() *cobra.Command {
+	termLinkerCmd.Flags().StringVarP(&termLinkerFlags.lexiconFile, "lexicon", "l", "docs/lexicon.yaml", "Input lexicon YAML file")
+	termLinkerCmd.Flags().StringVarP(&termLinkerFlags.docsDir, "docs", "d", "docs", "Documentation directory to process")
+	termLinkerCmd.Flags().BoolVarP(&termLinkerFlags.cleanup, "cleanup", "c", false, "Remove termlinker-generated links instead of adding them")
+	return termLinkerCmd
+}
+
+func runTermLinker(cmd *cobra.Command, args []string) error {
 	// Load terms from lexicon
-	terms, err := loadTerms(*lexiconFile)
+	terms, err := loadTerms(termLinkerFlags.lexiconFile)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error loading terms: %v\n", err)
-		os.Exit(1)
+		return fmt.Errorf("Error loading terms: %v", err)
 	}
 
 	// Build term info with regex patterns (sorted by length, longest first)
 	termInfos := buildTermInfos(terms)
 
 	// Find all markdown files
-	mdFiles, err := findMarkdownFiles(*docsDir)
+	mdFiles, err := findMarkdownFiles(termLinkerFlags.docsDir)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error finding markdown files: %v\n", err)
-		os.Exit(1)
+		return fmt.Errorf("Error finding markdown files: %v", err)
 	}
 
 	// Process each file
@@ -57,13 +72,13 @@ func main() {
 			continue
 		}
 
-		if *cleanup {
-			if err := cleanupFile(file, termInfos, *docsDir); err != nil {
+		if termLinkerFlags.cleanup {
+			if err := cleanupFile(file, termInfos, termLinkerFlags.docsDir); err != nil {
 				fmt.Fprintf(os.Stderr, "Error cleaning up %s: %v\n", file, err)
 				continue
 			}
 		} else {
-			if err := processFile(file, termInfos, *docsDir); err != nil {
+			if err := processFile(file, termInfos, termLinkerFlags.docsDir); err != nil {
 				fmt.Fprintf(os.Stderr, "Error processing %s: %v\n", file, err)
 				continue
 			}
@@ -71,11 +86,12 @@ func main() {
 		processedCount++
 	}
 
-	if *cleanup {
+	if termLinkerFlags.cleanup {
 		fmt.Printf("Successfully cleaned up %d markdown files\n", processedCount)
 	} else {
 		fmt.Printf("Successfully processed %d markdown files\n", processedCount)
 	}
+	return nil
 }
 
 func loadTerms(lexiconFile string) ([]Term, error) {
