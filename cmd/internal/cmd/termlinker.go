@@ -230,75 +230,14 @@ func processContent(content string, termInfos []TermInfo, defPath string) string
 	lines := strings.Split(content, "\n")
 	var result strings.Builder
 
-	inCodeBlock := false
-	inFrontMatter := false
-	frontMatterCount := 0
-	inHTMLBlock := false
-	htmlTagStack := 0
+	state := &contentState{}
 
 	for i, line := range lines {
 		originalLine := line
+		state.update(line)
+		skip := state.skipLine(line)
 
-		// Track front matter
-		if strings.HasPrefix(strings.TrimSpace(line), "---") {
-			if !inFrontMatter {
-				inFrontMatter = true
-				frontMatterCount = 1
-			} else {
-				frontMatterCount++
-				if frontMatterCount == 2 {
-					inFrontMatter = false
-				}
-			}
-		}
-
-		// Skip processing in front matter
-		if inFrontMatter {
-			result.WriteString(originalLine)
-			if i < len(lines)-1 {
-				result.WriteString("\n")
-			}
-			continue
-		}
-
-		// Track code blocks (fenced with ```)
-		trimmed := strings.TrimSpace(line)
-		if strings.HasPrefix(trimmed, "```") {
-			inCodeBlock = !inCodeBlock
-		}
-
-		// Skip code blocks
-		if inCodeBlock {
-			result.WriteString(originalLine)
-			if i < len(lines)-1 {
-				result.WriteString("\n")
-			}
-			continue
-		}
-
-		// Track HTML blocks - check for opening and closing HTML tags
-		// This handles multi-line HTML blocks like <div>...</div>
-		htmlTagPattern := regexp.MustCompile(`<[^>]+>`)
-		htmlTags := htmlTagPattern.FindAllString(line, -1)
-		for _, tag := range htmlTags {
-			tagLower := strings.ToLower(strings.TrimSpace(tag))
-			// Check for opening tags (not self-closing and not closing tags)
-			if !strings.HasPrefix(tagLower, "</") && !strings.HasSuffix(tagLower, "/>") {
-				htmlTagStack++
-				inHTMLBlock = true
-			}
-			// Check for closing tags
-			if strings.HasPrefix(tagLower, "</") {
-				htmlTagStack--
-				if htmlTagStack <= 0 {
-					htmlTagStack = 0
-					inHTMLBlock = false
-				}
-			}
-		}
-
-		// Skip headers and HTML Blocks (lines starting with #)
-		if strings.HasPrefix(trimmed, "#") || inHTMLBlock || htmlTagStack > 0 {
+		if skip {
 			result.WriteString(originalLine)
 			if i < len(lines)-1 {
 				result.WriteString("\n")
@@ -315,6 +254,89 @@ func processContent(content string, termInfos []TermInfo, defPath string) string
 	}
 
 	return result.String()
+}
+
+type contentState struct {
+	inCodeBlock     bool
+	inFrontMatter   bool
+	inHTMLBlock     bool
+	htmlTagStack    int
+	inJekyllInclude bool
+}
+
+func (s *contentState) update(line string) {
+	trimmed := strings.TrimSpace(line)
+
+	// Track front matter - (fenced with ---)
+	if strings.HasPrefix(trimmed, "---") {
+		s.inFrontMatter = !s.inFrontMatter
+	}
+
+	// Track code blocks (fenced with ```)
+	if strings.HasPrefix(trimmed, "```") {
+		s.inCodeBlock = !s.inCodeBlock
+	}
+
+	// Track Jekyll includes - starts with {% include and ends with %}
+	if strings.Contains(trimmed, "{%") && strings.Contains(trimmed, "include") {
+		s.inJekyllInclude = true
+	}
+	if s.inJekyllInclude && strings.Contains(trimmed, "%}") {
+		s.inJekyllInclude = false
+	}
+
+	// Track HTML blocks - check for opening and closing HTML tags
+	// This handles multi-line HTML blocks like <div>...</div>
+	htmlTagPattern := regexp.MustCompile(`<[^>]+>`)
+	htmlTags := htmlTagPattern.FindAllString(line, -1)
+	for _, tag := range htmlTags {
+		tagLower := strings.ToLower(strings.TrimSpace(tag))
+		// Check for opening tags (not self-closing and not closing tags)
+		if !strings.HasPrefix(tagLower, "</") && !strings.HasSuffix(tagLower, "/>") {
+			s.htmlTagStack++
+			s.inHTMLBlock = true
+		}
+		// Check for closing tags
+		if strings.HasPrefix(tagLower, "</") {
+			s.htmlTagStack--
+			if s.htmlTagStack <= 0 {
+				s.htmlTagStack = 0
+				s.inHTMLBlock = false
+			}
+		}
+	}
+}
+
+// skipLine determines whether a line should be skipped when linking terms
+func (s *contentState) skipLine(line string) bool {
+	trimmed := strings.TrimSpace(line)
+
+	// Skip processing in front matter (including title and other front matter fields)
+	if s.inFrontMatter {
+		return true
+	}
+
+	// Skip code blocks
+	if s.inCodeBlock {
+		return true
+	}
+
+	// Skip Jekyll includes (entire block including caption parameters)
+	if s.inJekyllInclude {
+		return true
+	}
+
+	// Skip HTML Blocks
+	if s.inHTMLBlock || s.htmlTagStack > 0 {
+		return true
+	}
+
+	// Skip headers (lines starting with #)
+	if strings.HasPrefix(trimmed, "#") {
+		return true
+	}
+
+	return false
 }
 
 func processLine(line string, termInfos []TermInfo, defPath string) string {
