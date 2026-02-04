@@ -1,23 +1,16 @@
-package main
+package cmd
 
 import (
-	"flag"
 	"fmt"
 	"os"
 	"path/filepath"
 	"regexp"
 	"sort"
 	"strings"
-	"unicode"
 
 	"github.com/goccy/go-yaml"
+	"github.com/spf13/cobra"
 )
-
-type Term struct {
-	Term       string   `yaml:"term"`
-	Definition string   `yaml:"definition"`
-	References []string `yaml:"references"`
-}
 
 type TermInfo struct {
 	OriginalTerm string
@@ -26,44 +19,58 @@ type TermInfo struct {
 	Regex        *regexp.Regexp
 }
 
-func main() {
-	lexiconFile := flag.String("lexicon", "docs/lexicon.yaml", "Input lexicon YAML file")
-	docsDir := flag.String("docs", "docs", "Documentation directory to process")
-	cleanup := flag.Bool("cleanup", false, "Remove termlinker-generated links instead of adding them")
-	flag.Parse()
+type rangeInfo struct {
+	start, end int
+}
 
-	// Load terms from lexicon
-	terms, err := loadTerms(*lexiconFile)
+var termLinkerCmd = &cobra.Command{
+	Use:   "termlinker",
+	Short: "Link defined terms across documentation",
+	Long: `Link defined terms from the lexicon across all markdown files in the documentation.
+This command finds occurrences of terms defined in the lexicon and creates markdown
+links to the definitions page. Use the --cleanup flag to remove previously generated links.`,
+	RunE: runTermLinker,
+}
+
+var termLinkerFlags struct {
+	lexiconFile string
+	docsDir     string
+	cleanup     bool
+}
+
+func newTermLinkerCmd() *cobra.Command {
+	termLinkerCmd.Flags().StringVarP(&termLinkerFlags.lexiconFile, "lexicon", "l", "docs/lexicon.yaml", "Input lexicon YAML file")
+	termLinkerCmd.Flags().StringVarP(&termLinkerFlags.docsDir, "docs", "d", "docs", "Documentation directory to process")
+	termLinkerCmd.Flags().BoolVarP(&termLinkerFlags.cleanup, "cleanup", "c", false, "Remove termlinker-generated links instead of adding them")
+	return termLinkerCmd
+}
+
+func runTermLinker(cmd *cobra.Command, args []string) error {
+	terms, err := loadTerms(termLinkerFlags.lexiconFile)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error loading terms: %v\n", err)
-		os.Exit(1)
+		return fmt.Errorf("Error loading terms: %v", err)
 	}
 
-	// Build term info with regex patterns (sorted by length, longest first)
 	termInfos := buildTermInfos(terms)
 
-	// Find all markdown files
-	mdFiles, err := findMarkdownFiles(*docsDir)
+	mdFiles, err := findMarkdownFiles(termLinkerFlags.docsDir)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error finding markdown files: %v\n", err)
-		os.Exit(1)
+		return fmt.Errorf("Error finding markdown files: %v", err)
 	}
 
-	// Process each file
 	processedCount := 0
 	for _, file := range mdFiles {
-		// Skip the definitions page itself
 		if strings.HasSuffix(file, "model/02-definitions.md") {
 			continue
 		}
 
-		if *cleanup {
-			if err := cleanupFile(file, termInfos, *docsDir); err != nil {
+		if termLinkerFlags.cleanup {
+			if err := cleanupFile(file, termInfos, termLinkerFlags.docsDir); err != nil {
 				fmt.Fprintf(os.Stderr, "Error cleaning up %s: %v\n", file, err)
 				continue
 			}
 		} else {
-			if err := processFile(file, termInfos, *docsDir); err != nil {
+			if err := processFile(file, termInfos, termLinkerFlags.docsDir); err != nil {
 				fmt.Fprintf(os.Stderr, "Error processing %s: %v\n", file, err)
 				continue
 			}
@@ -71,11 +78,12 @@ func main() {
 		processedCount++
 	}
 
-	if *cleanup {
+	if termLinkerFlags.cleanup {
 		fmt.Printf("Successfully cleaned up %d markdown files\n", processedCount)
 	} else {
 		fmt.Printf("Successfully processed %d markdown files\n", processedCount)
 	}
+	return nil
 }
 
 func loadTerms(lexiconFile string) ([]Term, error) {
@@ -124,20 +132,6 @@ func buildTermInfos(terms []Term) []TermInfo {
 	})
 
 	return termInfos
-}
-
-func termToSlug(term string) string {
-	// Convert to lowercase and replace spaces with hyphens
-	slug := strings.ToLower(term)
-	slug = strings.ReplaceAll(slug, " ", "-")
-	// Remove any other non-alphanumeric characters except hyphens
-	var result strings.Builder
-	for _, r := range slug {
-		if unicode.IsLetter(r) || unicode.IsDigit(r) || r == '-' {
-			result.WriteRune(r)
-		}
-	}
-	return result.String()
 }
 
 func findMarkdownFiles(docsDir string) ([]string, error) {
@@ -210,79 +204,85 @@ func calculateRelativePath(filePath, docsDir string) string {
 	return filepath.ToSlash(relPath)
 }
 
+type skipState struct {
+	inCodeBlock      bool
+	inFrontMatter    bool
+	frontMatterCount int
+	inHTMLBlock      bool
+	htmlTagStack     int
+}
+
+func shouldSkipLine(line string, state *skipState) bool {
+	trimmed := strings.TrimSpace(line)
+
+	// Track and skip front matter
+	if strings.HasPrefix(trimmed, "---") {
+		if !state.inFrontMatter {
+			state.inFrontMatter = true
+			state.frontMatterCount = 1
+		} else {
+			state.frontMatterCount++
+			if state.frontMatterCount == 2 {
+				state.inFrontMatter = false
+			}
+		}
+	}
+	if state.inFrontMatter {
+		return true
+	}
+
+	// Track and skip code blocks (fenced with ```)
+	if strings.HasPrefix(trimmed, "```") {
+		state.inCodeBlock = !state.inCodeBlock
+	}
+	if state.inCodeBlock {
+		return true
+	}
+
+	// Track HTML blocks - check for opening and closing HTML tags
+	htmlTagPattern := regexp.MustCompile(`<[^>]+>`)
+	htmlTags := htmlTagPattern.FindAllString(line, -1)
+	for _, tag := range htmlTags {
+		tagLower := strings.ToLower(strings.TrimSpace(tag))
+		// Check for opening tags (not self-closing and not closing tags)
+		if !strings.HasPrefix(tagLower, "</") && !strings.HasSuffix(tagLower, "/>") {
+			state.htmlTagStack++
+			state.inHTMLBlock = true
+		}
+		// Check for closing tags
+		if strings.HasPrefix(tagLower, "</") {
+			state.htmlTagStack--
+			if state.htmlTagStack <= 0 {
+				state.htmlTagStack = 0
+				state.inHTMLBlock = false
+			}
+		}
+	}
+
+	// Skip headers and HTML blocks
+	if strings.HasPrefix(trimmed, "#") || state.inHTMLBlock || state.htmlTagStack > 0 {
+		return true
+	}
+
+	// Skip lines containing figure references (e.g., "Figure 6.1", "**Figure 7.2**", caption="Figure X.X")
+	figurePattern := regexp.MustCompile(`(?i)(figure\s+\d+\.\d+|caption\s*=\s*["']?\s*figure)`)
+	if figurePattern.MatchString(line) {
+		return true
+	}
+
+	return false
+}
+
 func processContent(content string, termInfos []TermInfo, defPath string) string {
 	lines := strings.Split(content, "\n")
 	var result strings.Builder
 
-	inCodeBlock := false
-	inFrontMatter := false
-	frontMatterCount := 0
-	inHTMLBlock := false
-	htmlTagStack := 0
+	state := &skipState{}
 
 	for i, line := range lines {
 		originalLine := line
 
-		// Track front matter
-		if strings.HasPrefix(strings.TrimSpace(line), "---") {
-			if !inFrontMatter {
-				inFrontMatter = true
-				frontMatterCount = 1
-			} else {
-				frontMatterCount++
-				if frontMatterCount == 2 {
-					inFrontMatter = false
-				}
-			}
-		}
-
-		// Skip processing in front matter
-		if inFrontMatter {
-			result.WriteString(originalLine)
-			if i < len(lines)-1 {
-				result.WriteString("\n")
-			}
-			continue
-		}
-
-		// Track code blocks (fenced with ```)
-		trimmed := strings.TrimSpace(line)
-		if strings.HasPrefix(trimmed, "```") {
-			inCodeBlock = !inCodeBlock
-		}
-
-		// Skip code blocks
-		if inCodeBlock {
-			result.WriteString(originalLine)
-			if i < len(lines)-1 {
-				result.WriteString("\n")
-			}
-			continue
-		}
-
-		// Track HTML blocks - check for opening and closing HTML tags
-		// This handles multi-line HTML blocks like <div>...</div>
-		htmlTagPattern := regexp.MustCompile(`<[^>]+>`)
-		htmlTags := htmlTagPattern.FindAllString(line, -1)
-		for _, tag := range htmlTags {
-			tagLower := strings.ToLower(strings.TrimSpace(tag))
-			// Check for opening tags (not self-closing and not closing tags)
-			if !strings.HasPrefix(tagLower, "</") && !strings.HasSuffix(tagLower, "/>") {
-				htmlTagStack++
-				inHTMLBlock = true
-			}
-			// Check for closing tags
-			if strings.HasPrefix(tagLower, "</") {
-				htmlTagStack--
-				if htmlTagStack <= 0 {
-					htmlTagStack = 0
-					inHTMLBlock = false
-				}
-			}
-		}
-
-		// Skip headers and HTML Blocks (lines starting with #)
-		if strings.HasPrefix(trimmed, "#") || inHTMLBlock || htmlTagStack > 0 {
+		if shouldSkipLine(line, state) {
 			result.WriteString(originalLine)
 			if i < len(lines)-1 {
 				result.WriteString("\n")
@@ -582,11 +582,6 @@ func processLine(line string, termInfos []TermInfo, defPath string) string {
 	}
 
 	return result
-}
-
-// rangeInfo represents a range of text to skip
-type rangeInfo struct {
-	start, end int
 }
 
 // findHTMLContentRanges finds ranges of content between opening and closing HTML tags

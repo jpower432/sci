@@ -1,8 +1,7 @@
-package main
+package cmd
 
 import (
 	"encoding/json"
-	"flag"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -11,23 +10,8 @@ import (
 	"unicode"
 
 	"github.com/goccy/go-yaml"
+	"github.com/spf13/cobra"
 )
-
-type OpenAPISpec struct {
-	OpenAPI    string            `yaml:"openapi"`
-	Info       OpenAPIInfo       `yaml:"info"`
-	Components OpenAPIComponents `yaml:"components"`
-}
-
-type OpenAPIInfo struct {
-	Title       string `yaml:"title"`
-	Version     string `yaml:"version"`
-	Description string `yaml:"description"`
-}
-
-type OpenAPIComponents struct {
-	Schemas map[string]interface{} `yaml:"schemas"`
-}
 
 type Schema struct {
 	Type        string                 `yaml:"type"`
@@ -50,37 +34,55 @@ type NavConfig struct {
 	Pages []NavPage `yaml:"pages"`
 }
 
-func main() {
-	inputFile := flag.String("input", "openapi.yaml", "Input OpenAPI YAML file")
-	outputDir := flag.String("output", "spec", "Output directory for markdown files")
-	manifestPath := flag.String("manifest", "", "Path to schema-manifest.json for per-file mode")
-	navPath := flag.String("nav", "", "Path to schema-nav.yml for nav-based mode")
-	rootsFlag := flag.String("roots", "", "Comma-separated list of root schema names (used when -manifest and -nav are not set)")
-	flag.Parse()
+var openAPI2MDCmd = &cobra.Command{
+	Use:   "openapi2md",
+	Short: "Convert OpenAPI YAML to Markdown documentation",
+	Long: `Convert OpenAPI 3.0.3 YAML specifications to Markdown documentation.
+Supports three modes:
+  - Navigation-based: Uses a nav.yml file to organize schemas into pages
+  - Manifest-based: Uses a manifest.json to map CUE files to schemas
+  - Roots-based: Uses a comma-separated list of root schema names`,
+	RunE: runOpenAPI2MD,
+}
 
-	if *navPath != "" {
-		if err := convertFromNav(*inputFile, *outputDir, *navPath); err != nil {
-			fmt.Fprintf(os.Stderr, "Error: %v\n", err)
-			os.Exit(1)
+var openAPI2MDFlags struct {
+	inputFile    string
+	outputDir    string
+	manifestPath string
+	navPath      string
+	rootsFlag    string
+}
+
+func newOpenAPI2MDCmd() *cobra.Command {
+	openAPI2MDCmd.Flags().StringVarP(&openAPI2MDFlags.inputFile, "input", "i", "openapi.yaml", "Input OpenAPI YAML file")
+	openAPI2MDCmd.Flags().StringVarP(&openAPI2MDFlags.outputDir, "output", "o", "spec", "Output directory for markdown files")
+	openAPI2MDCmd.Flags().StringVarP(&openAPI2MDFlags.manifestPath, "manifest", "m", "", "Path to schema-manifest.json for per-file mode")
+	openAPI2MDCmd.Flags().StringVarP(&openAPI2MDFlags.navPath, "nav", "n", "", "Path to schema-nav.yml for nav-based mode")
+	openAPI2MDCmd.Flags().StringVarP(&openAPI2MDFlags.rootsFlag, "roots", "r", "", "Comma-separated list of root schema names (used when -manifest and -nav are not set)")
+	return openAPI2MDCmd
+}
+
+func runOpenAPI2MD(cmd *cobra.Command, args []string) error {
+	if openAPI2MDFlags.navPath != "" {
+		if err := convertFromNav(openAPI2MDFlags.inputFile, openAPI2MDFlags.outputDir, openAPI2MDFlags.navPath); err != nil {
+			return err
 		}
-	} else if *manifestPath != "" {
-		if err := convertPerFile(*inputFile, *outputDir, *manifestPath); err != nil {
-			fmt.Fprintf(os.Stderr, "Error: %v\n", err)
-			os.Exit(1)
+	} else if openAPI2MDFlags.manifestPath != "" {
+		if err := convertPerFile(openAPI2MDFlags.inputFile, openAPI2MDFlags.outputDir, openAPI2MDFlags.manifestPath); err != nil {
+			return err
 		}
 	} else {
-		roots := splitRoots(*rootsFlag)
+		roots := splitRoots(openAPI2MDFlags.rootsFlag)
 		if len(roots) == 0 {
-			fmt.Fprintf(os.Stderr, "Error: -roots is required when -manifest and -nav are not set\n")
-			os.Exit(1)
+			return fmt.Errorf("Error: -roots is required when -manifest and -nav are not set")
 		}
-		if err := convertOpenAPIToMarkdown(*inputFile, *outputDir, roots); err != nil {
-			fmt.Fprintf(os.Stderr, "Error: %v\n", err)
-			os.Exit(1)
+		if err := convertOpenAPIToMarkdown(openAPI2MDFlags.inputFile, openAPI2MDFlags.outputDir, roots); err != nil {
+			return err
 		}
 	}
 
-	fmt.Printf("Markdown documentation generated successfully in %s/\n", *outputDir)
+	fmt.Printf("Markdown documentation generated successfully in %s/\n", openAPI2MDFlags.outputDir)
+	return nil
 }
 
 func splitRoots(s string) []string {
@@ -234,7 +236,6 @@ func convertPerFile(inputFile, outputDir, manifestPath string) error {
 	}
 	sort.Strings(fileOrder)
 
-	// Empty map since we don't have nav file info in this mode
 	schemaToFile := make(map[string]string)
 
 	for _, cueFile := range fileOrder {
@@ -313,7 +314,6 @@ func convertOpenAPIToMarkdown(inputFile, outputDir string, roots []string) error
 		rootSet[r] = true
 	}
 
-	// Resolve root schemas and fail if any are missing
 	rootSchemas := make(map[string]Schema)
 	for _, name := range roots {
 		data, exists := spec.Components.Schemas[name]
@@ -328,7 +328,6 @@ func convertOpenAPIToMarkdown(inputFile, outputDir string, roots []string) error
 		rootSchemas[name] = s
 	}
 
-	// Collect aliases (exclude all roots)
 	var aliasTypes []string
 	for schemaName, schemaData := range spec.Components.Schemas {
 		if rootSet[schemaName] {
@@ -355,28 +354,23 @@ func convertOpenAPIToMarkdown(inputFile, outputDir string, roots []string) error
 	}
 
 	var buf strings.Builder
-	// Empty map since we don't have nav file info in this mode
 	schemaToFile := make(map[string]string)
 
-	// H1 and optional intro
 	buf.WriteString(fmt.Sprintf("# %s _(%s)_\n\n", title, version))
 	if spec.Info.Description != "" {
 		buf.WriteString(spec.Info.Description + "\n\n")
 	}
 
-	// Table of Contents
 	buf.WriteString("**Table of Contents**\n\n")
 	buf.WriteString("* \n")
 	buf.WriteString("{:toc}\n\n")
 	buf.WriteString("---\n\n")
 
-	// One major section per root
 	for _, name := range roots {
 		schema := rootSchemas[name]
 		buf.WriteString(generateRootSection(name, schema, spec, schemaToFile))
 	}
 
-	// Aliases section
 	if len(aliasTypes) > 0 {
 		buf.WriteString("\n## Aliases\n\n")
 		buf.WriteString("The following aliases are used throughout the schema for consistency.\n\n")
@@ -400,8 +394,6 @@ func convertOpenAPIToMarkdown(inputFile, outputDir string, roots []string) error
 }
 
 func isAlias(schema Schema) bool {
-	// Aliases are anything that is NOT an object with properties
-	// This includes: string types (with or without patterns), boolean, and simple object types
 	return schema.Properties == nil
 }
 
@@ -425,20 +417,14 @@ func resolveSchemaRef(ref string, spec OpenAPISpec) (*Schema, error) {
 	return &schema, nil
 }
 
-// formatFieldInline formats a field's information and returns (fieldLine, description)
-// fieldLine format: `field` **type** _Required_ or `field` **type**
-// description is returned separately
 func formatFieldInline(fieldName string, fieldSchema Schema, spec OpenAPISpec, prefix string, isRequired bool, schemaToFile map[string]string) (string, string) {
-	// Field name with full path
 	fieldPath := fieldName
 	if prefix != "" {
 		fieldPath = prefix + "." + fieldName
 	}
 
-	// Type
 	typeStr := formatFieldType(fieldSchema, spec, schemaToFile)
 
-	// Build field line: `field` **type** _Required_ or `field` **type**
 	var fieldLineParts []string
 	fieldLineParts = append(fieldLineParts, fmt.Sprintf("`%s`", fieldPath))
 	if typeStr != "" {
@@ -449,7 +435,6 @@ func formatFieldInline(fieldName string, fieldSchema Schema, spec OpenAPISpec, p
 	}
 	fieldLine := strings.Join(fieldLineParts, " ")
 
-	// Description
 	description := fieldSchema.Description
 	if fieldSchema.Ref != "" {
 		refSchema, err := resolveSchemaRef(fieldSchema.Ref, spec)
@@ -463,24 +448,19 @@ func formatFieldInline(fieldName string, fieldSchema Schema, spec OpenAPISpec, p
 	return fieldLine, description
 }
 
-// formatFieldType returns the type string for a field with markdown links for custom types
 func formatFieldType(fieldSchema Schema, spec OpenAPISpec, schemaToFile map[string]string) string {
 	if fieldSchema.Ref != "" {
 		refType := strings.TrimPrefix(fieldSchema.Ref, "#/components/schemas/")
-		// Check if this is a custom type that should be linked
 		if filename, exists := schemaToFile[refType]; exists {
-			// Create markdown link: [TypeName](filename#typename) - no .md extension for Jekyll
 			anchor := strings.ToLower(refType)
 			return fmt.Sprintf("[%s](%s#%s)", refType, filename, anchor)
 		}
-		// Return just the type name if not found in schema map
 		return refType
 	}
 
 	if fieldSchema.Type != "" {
 		typeStr := fieldSchema.Type
 
-		// Handle array items - format as array[Type]
 		if fieldSchema.Type == "array" && fieldSchema.Items != nil {
 			itemsBytes, _ := yaml.Marshal(fieldSchema.Items)
 			var itemsSchema Schema
@@ -489,7 +469,6 @@ func formatFieldType(fieldSchema Schema, spec OpenAPISpec, schemaToFile map[stri
 				var itemTypeLink string
 				if itemsSchema.Ref != "" {
 					refType := strings.TrimPrefix(itemsSchema.Ref, "#/components/schemas/")
-					// Check if this is a custom type that should be linked
 					if filename, exists := schemaToFile[refType]; exists {
 						anchor := strings.ToLower(refType)
 						itemTypeLink = fmt.Sprintf("[%s](%s#%s)", refType, filename, anchor)
@@ -512,7 +491,6 @@ func formatFieldType(fieldSchema Schema, spec OpenAPISpec, schemaToFile map[stri
 	return ""
 }
 
-// formatFieldWithNested formats a field inline (nested expansion disabled).
 func formatFieldWithNested(fieldName string, fieldSchema Schema, spec OpenAPISpec, isRequired bool, schemaToFile map[string]string) string {
 	var buf strings.Builder
 	fieldLine, description := formatFieldInline(fieldName, fieldSchema, spec, "", isRequired, schemaToFile)
@@ -538,15 +516,13 @@ func generateRootSection(rootName string, schema Schema, spec OpenAPISpec, schem
 		}
 		sort.Strings(propNames)
 
-		// Output all fields in order (required first, then optional)
-		// Sort by required status, then by name
 		type fieldInfo struct {
-			name      string
-			schema    Schema
-			required  bool
+			name     string
+			schema   Schema
+			required bool
 		}
 		var fields []fieldInfo
-		
+
 		for _, propName := range propNames {
 			isRequired := false
 			for _, req := range schema.Required {
@@ -563,21 +539,19 @@ func generateRootSection(rootName string, schema Schema, spec OpenAPISpec, schem
 				continue
 			}
 			fields = append(fields, fieldInfo{
-				name: propName,
-				schema: prop,
+				name:     propName,
+				schema:   prop,
 				required: isRequired,
 			})
 		}
-		
-		// Sort: required first, then by name
+
 		sort.Slice(fields, func(i, j int) bool {
 			if fields[i].required != fields[j].required {
-				return fields[i].required // required fields come first
+				return fields[i].required
 			}
 			return fields[i].name < fields[j].name
 		})
 
-		// Output all fields
 		for _, field := range fields {
 			buf.WriteString(formatFieldWithNested(field.name, field.schema, spec, field.required, schemaToFile))
 			buf.WriteString("\n")
