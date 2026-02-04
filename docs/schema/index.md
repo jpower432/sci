@@ -152,11 +152,7 @@ The following table illustrates how schemas progress through their lifecycle and
 
 ## Contributing
 
-The Schemas evolve based on community needs:
-
-- **Schema improvements?** Open an issue or submit a PR
-- **Found a bug?** Report it
-- **Significant architectural changes?** Document in an [ADR](../adrs/index.html)
+The Schemas evolve based on community needs. If you find an error or have suggestions for a schema improvement, open a [GitHub Issue](https://github.com/gemaraproj/gemara/issues) or raise your suggestion on a [community](/community) meeting.
 
 See the [Contributing Guide](https://github.com/gemaraproj/gemara/blob/main/CONTRIBUTING.md) for details.
 
