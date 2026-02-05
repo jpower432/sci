@@ -36,8 +36,7 @@ Gemara delivers three core components that work together to support automated GR
       </p>
       <p class="component-content">
         Provides the conceptual framework for understanding how different types of compliance 
-        activities relate to each other. Establishes the seven layers: Guidance, Controls, Policy, 
-        Evaluation, Enforcement, and Audit.
+        activities relate to each other.
       </p>
   </a>
 
@@ -59,8 +58,7 @@ Gemara delivers three core components that work together to support automated GR
         to accelerate automated tool development.
       </p>
       <p class="component-content">
-        Currently provides Go SDK for reading, writing, and manipulating Gemara documents. 
-        Active development area.
+        Currently provides Go SDK for reading, writing, and manipulating Gemara documents.
       </p>
   </a>
 </div>
