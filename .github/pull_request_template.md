@@ -48,3 +48,15 @@
 - Testing approach or edge cases to verify
 - Files or functions that changed significantly
 -->
+
+
+## Self-review checklist
+
+<!-- Maintainer Note: Update the checklist before requesting a review on your PR.-->
+
+- [ ] This PR has content that was created with AI assistance. 
+   - [ ]  I have read and followed the [Generative AI Contribution Policy](https://www.linuxfoundation.org/legal/generative-ai).
+- [ ] I have the experience and knowledge necessary to answer maintainer questions about the content of this PR, without using AI.
+
+
+---
