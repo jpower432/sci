@@ -14,7 +14,7 @@ package gemara
 	"metadata": #Metadata @go(Metadata)
 
 	// families contains a list of control families that can be referenced by controls
-	families?: [...#Family] @go(Families)
+	families?: [...#Group] @go(Families)
 
 	// controls is a list of unique controls defined by this catalog
 	controls?: [...#Control] @go(Controls)

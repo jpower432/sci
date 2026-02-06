@@ -23,7 +23,7 @@ package gemara
 	"mapping-references"?: [...#MappingReference] @go(MappingReferences) @yaml("mapping-references,omitempty")
 
 	// applicability-categories is a list of categories used to classify within this artifact to specify scope
-	"applicability-categories"?: [...#Category] @go(ApplicabilityCategories) @yaml("applicability-categories,omitempty")
+	"applicability-categories"?: [...#Group] @go(ApplicabilityCategories) @yaml("applicability-categories,omitempty")
 
 	// draft indicates whether this artifact is a pre-release version; open to modification
 	draft?: bool

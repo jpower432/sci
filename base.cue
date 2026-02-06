@@ -57,26 +57,14 @@ import "time"
 // Date represents a date string (ISO 8601 date format)
 #Date: time.Format("2006-01-02") @go(Date,format="date")
 
-// Category represents a category used for applicability or classification
-#Category: {
+// Group represents a classification or grouping that can be used in different contexts with semantic meaning derived from its usage
+#Group: {
 	// id allows this entry to be referenced by other elements
 	id: string
 
-	// title describes the purpose of this category at a glance
+	// title describes the purpose of this group at a glance
 	title: string
 
-	// description explains the significance and traits of entries to this category
-	description: string
-}
-
-// Family represents a logical grouping of guidelines or controls which share a common purpose or function
-#Family: {
-	// id allows this entry to be referenced by other elements
-	id: string
-
-	// title describes the purpose of this family at a glance
-	title: string
-
-	// description explains the significance and traits of entries to this entity family
+	// description explains the significance and traits of entries to this group
 	description: string
 }
