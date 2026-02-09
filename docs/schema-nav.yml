@@ -8,8 +8,7 @@ pages:
       - "Email"
       - "Datetime"
       - "Date"
-      - "Category"
-      - "Family"
+      - "Group"
   - title: "Metadata"
     filename: "metadata"
     schemas:

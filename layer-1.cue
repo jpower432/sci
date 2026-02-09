@@ -20,7 +20,7 @@ package gemara
 	"front-matter"?: string @go(FrontMatter) @yaml("front-matter,omitempty")
 
 	// families contains a list of guidance families that can be referenced by guidance
-	families?: [...#Family] @go(Families)
+	families?: [...#Group] @go(Families)
 
 	// guidelines is a list of unique guidelines defined by this catalog
 	guidelines?: [...#Guideline] @go(Guidelines)
