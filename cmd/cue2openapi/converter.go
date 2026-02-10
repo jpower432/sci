@@ -47,6 +47,7 @@ type SchemaInfo struct {
 	Format      string                 `yaml:"format,omitempty" json:"format,omitempty"`
 	Items       interface{}            `yaml:"items,omitempty" json:"items,omitempty"`
 	Ref         string                 `yaml:"$ref,omitempty" json:"$ref,omitempty"`
+	Extensions  map[string]interface{} `yaml:",inline" json:",inline"` // OpenAPI extensions (x-*)
 }
 
 func readVersion(schemaDir string) string {
@@ -159,6 +160,9 @@ func writeManifest(manifest map[string][]string, path string) error {
 // parseFile processes a single CUE file and merges definitions into spec.
 // It returns the root type description (if opts.Root matches) and the list of type names added.
 func parseFile(file *ast.File, spec *OpenAPISpec, seen map[string]bool, rootName string) (rootDescription string, typeNames []string) {
+	// Extract @status from package declaration
+	fileStatus := extractFileStatus(file)
+
 	for _, decl := range file.Decls {
 		field, ok := decl.(*ast.Field)
 		if !ok {
@@ -185,13 +189,13 @@ func parseFile(file *ast.File, spec *OpenAPISpec, seen map[string]bool, rootName
 			continue
 		}
 		seen[typeName] = true
-		parseDefinitionField(field, spec)
+		parseDefinitionField(field, spec, fileStatus)
 		typeNames = append(typeNames, typeName)
 	}
 	return rootDescription, typeNames
 }
 
-func parseDefinitionField(field *ast.Field, spec *OpenAPISpec) {
+func parseDefinitionField(field *ast.Field, spec *OpenAPISpec, fileStatus string) {
 	var typeName string
 
 	// Extract type name from label
@@ -225,7 +229,7 @@ func parseDefinitionField(field *ast.Field, spec *OpenAPISpec) {
 	// Parse struct body
 	if st, ok := field.Value.(*ast.StructLit); ok {
 		schema := convertStructToSchema(st, spec, description)
-		spec.Components.Schemas[typeName] = schema
+		addStatus(schema, fileStatus, spec, typeName)
 	} else {
 		// Handle type aliases (like #URL, #Email with patterns)
 		// Check if it's a UnaryExpr (CUE parses =~"pattern" as UnaryExpr with MAT op)
@@ -235,11 +239,12 @@ func parseDefinitionField(field *ast.Field, spec *OpenAPISpec) {
 				// Extract the pattern from the BasicLit
 				if lit, ok := ue.X.(*ast.BasicLit); ok && lit.Kind == token.STRING {
 					pattern := strings.Trim(lit.Value, "\"")
-					spec.Components.Schemas[typeName] = &SchemaInfo{
+					schema := &SchemaInfo{
 						Type:        "string",
 						Description: description,
 						Pattern:     pattern,
 					}
+					addStatus(schema, fileStatus, spec, typeName)
 					return
 				}
 			}
@@ -254,11 +259,12 @@ func parseDefinitionField(field *ast.Field, spec *OpenAPISpec) {
 					pattern = strings.Trim(lit.Value, "\"")
 				}
 				if pattern != "" {
-					spec.Components.Schemas[typeName] = &SchemaInfo{
+					schema := &SchemaInfo{
 						Type:        "string",
 						Description: description,
 						Pattern:     pattern,
 					}
+					addStatus(schema, fileStatus, spec, typeName)
 					return
 				}
 			}
@@ -267,17 +273,18 @@ func parseDefinitionField(field *ast.Field, spec *OpenAPISpec) {
 		if ce, ok := field.Value.(*ast.CallExpr); ok {
 			schema := convertTypeAlias(ce, spec, description)
 			if schema != nil && (schema.Pattern != "" || schema.Format != "") {
-				spec.Components.Schemas[typeName] = schema
+				addStatus(schema, fileStatus, spec, typeName)
 				return
 			}
 		}
 		// Use convertExprToSchema for other cases
 		schema := convertExprToSchema(field.Value, spec, description)
 		if schemaInfo, ok := schema.(*SchemaInfo); ok {
-			spec.Components.Schemas[typeName] = schemaInfo
+			addStatus(schemaInfo, fileStatus, spec, typeName)
 		} else {
 			// Fallback: create a basic string schema
-			spec.Components.Schemas[typeName] = &SchemaInfo{Type: "string", Description: description}
+			fallbackSchema := &SchemaInfo{Type: "string", Description: description}
+			addStatus(fallbackSchema, fileStatus, spec, typeName)
 		}
 	}
 }
@@ -299,7 +306,12 @@ func convertStructToSchema(st *ast.StructLit, spec *OpenAPISpec, description str
 			if fieldSchema != nil {
 				fieldName := getFieldName(x)
 				if fieldName != "" {
-					schema.Properties[fieldName] = fieldSchema
+					// Convert SchemaInfo to map for properties
+					if fieldSchemaInfo, ok := fieldSchema.(*SchemaInfo); ok {
+						schema.Properties[fieldName] = schemaToMap(fieldSchemaInfo)
+					} else {
+						schema.Properties[fieldName] = fieldSchema
+					}
 					// Check if field is required
 					if x.Optional == token.NoPos {
 						schema.Required = append(schema.Required, fieldName)
@@ -416,10 +428,15 @@ func convertListLitToSchema(list *ast.ListLit, spec *OpenAPISpec, description st
 		if ellipsis, ok := elt.(*ast.Ellipsis); ok {
 			if ellipsis.Type != nil {
 				itemSchema := convertExprToSchema(ellipsis.Type, spec, "")
+				// Convert SchemaInfo to map if needed
+				var items interface{} = itemSchema
+				if itemSchemaInfo, ok := itemSchema.(*SchemaInfo); ok {
+					items = schemaToMap(itemSchemaInfo)
+				}
 				return &SchemaInfo{
 					Type:        "array",
 					Description: description,
-					Items:       itemSchema,
+					Items:       items,
 				}
 			}
 		}
@@ -502,6 +519,90 @@ func extractComment(text string) string {
 	text = strings.TrimPrefix(text, "//")
 	text = strings.TrimSpace(text)
 	return text
+}
+
+// extractFileStatus extracts the @status attribute value from a CUE file.
+func extractFileStatus(file *ast.File) string {
+	checkAttributes := func(decls []ast.Decl) string {
+		for _, decl := range decls {
+			if attr, ok := decl.(*ast.Attribute); ok {
+				key, body := attr.Split()
+				if key == "status" {
+					return strings.Trim(body, "\"")
+				}
+			}
+		}
+		return ""
+	}
+
+	// Check file preamble (declarations before package)
+	if status := checkAttributes(file.Preamble()); status != "" {
+		return status
+	}
+	// Also check all declarations (some CUE versions might store differently)
+	return checkAttributes(file.Decls)
+}
+
+// addStatusExtension adds the status as an OpenAPI extension (x-gemara-status).
+// If status is empty, no extension is added.
+func addStatusExtension(schema *SchemaInfo, status string) {
+	if status == "" {
+		return
+	}
+	if schema.Extensions == nil {
+		schema.Extensions = make(map[string]interface{})
+	}
+	schema.Extensions["x-gemara-status"] = status
+}
+
+// addStatus applies status to a schema and stores it in the spec.
+func addStatus(schema *SchemaInfo, status string, spec *OpenAPISpec, typeName string) {
+	addStatusExtension(schema, status)
+	spec.Components.Schemas[typeName] = schemaToMap(schema)
+}
+
+// schemaToMap converts a SchemaInfo to a map[string]interface{} for OpenAPI serialization.
+// This ensures extensions are properly included in the output.
+func schemaToMap(schema *SchemaInfo) map[string]interface{} {
+	m := make(map[string]interface{})
+
+	if schema.Type != "" {
+		m["type"] = schema.Type
+	}
+	if schema.Description != "" {
+		m["description"] = schema.Description
+	}
+	if len(schema.Properties) > 0 {
+		m["properties"] = schema.Properties
+	}
+	if len(schema.Required) > 0 {
+		m["required"] = schema.Required
+	}
+	if schema.Pattern != "" {
+		m["pattern"] = schema.Pattern
+	}
+	if schema.Format != "" {
+		m["format"] = schema.Format
+	}
+	if schema.Items != nil {
+		if itemsMap, ok := schema.Items.(map[string]interface{}); ok {
+			m["items"] = itemsMap
+		} else if itemsSchema, ok := schema.Items.(*SchemaInfo); ok {
+			m["items"] = schemaToMap(itemsSchema)
+		} else {
+			m["items"] = schema.Items
+		}
+	}
+	if schema.Ref != "" {
+		m["$ref"] = schema.Ref
+	}
+
+	// Add extensions (x-* fields)
+	for k, v := range schema.Extensions {
+		m[k] = v
+	}
+
+	return m
 }
 
 func writeOpenAPISpec(spec *OpenAPISpec, outputPath string) error {

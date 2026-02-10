@@ -38,6 +38,7 @@ type Schema struct {
 	Format      string                 `yaml:"format"`
 	Items       interface{}            `yaml:"items"`
 	Ref         string                 `yaml:"$ref"`
+	Extensions  map[string]interface{} `yaml:",inline"` // OpenAPI extensions (x-*)
 }
 
 type NavPage struct {
@@ -178,10 +179,9 @@ func convertFromNav(inputFile, outputDir, navPath string) error {
 				return fmt.Errorf("schema %q not found in OpenAPI spec (referenced in page %q)", schemaName, page.Title)
 			}
 
-			// Parse schema data into Schema struct
-			schemaBytes, _ := yaml.Marshal(schemaData)
-			var schema Schema
-			if err := yaml.Unmarshal(schemaBytes, &schema); err != nil {
+			// Parse schema data into Schema struct with extensions
+			schema, err := parseSchemaWithExtensions(schemaData)
+			if err != nil {
 				return fmt.Errorf("failed to parse schema %q: %w", schemaName, err)
 			}
 
@@ -251,9 +251,8 @@ func convertPerFile(inputFile, outputDir, manifestPath string) error {
 			if !ok {
 				continue
 			}
-			schemaBytes, _ := yaml.Marshal(schemaData)
-			var schema Schema
-			if err := yaml.Unmarshal(schemaBytes, &schema); err != nil {
+			schema, err := parseSchemaWithExtensions(schemaData)
+			if err != nil {
 				continue
 			}
 			if isAlias(schema) {
@@ -278,7 +277,13 @@ func generateAliasBlock(name string, schema Schema, subheading bool) string {
 	if subheading {
 		level = "###"
 	}
-	buf.WriteString(fmt.Sprintf("%s `%s`\n\n", level, name))
+	buf.WriteString(fmt.Sprintf("%s `%s`", level, name))
+
+	if status := getSchemaStatus(schema); status != "" {
+		buf.WriteString(fmt.Sprintf(" %s", formatStatusBadge(status)))
+	}
+	buf.WriteString("\n\n")
+
 	if schema.Description != "" {
 		buf.WriteString(schema.Description + "\n\n")
 	}
@@ -320,9 +325,8 @@ func convertOpenAPIToMarkdown(inputFile, outputDir string, roots []string) error
 		if !exists {
 			return fmt.Errorf("root schema %q not found in OpenAPI spec", name)
 		}
-		var s Schema
-		bytes, _ := yaml.Marshal(data)
-		if err := yaml.Unmarshal(bytes, &s); err != nil {
+		s, err := parseSchemaWithExtensions(data)
+		if err != nil {
 			return fmt.Errorf("failed to parse root schema %q: %w", name, err)
 		}
 		rootSchemas[name] = s
@@ -334,9 +338,8 @@ func convertOpenAPIToMarkdown(inputFile, outputDir string, roots []string) error
 		if rootSet[schemaName] {
 			continue
 		}
-		schemaBytes, _ := yaml.Marshal(schemaData)
-		var schema Schema
-		if err := yaml.Unmarshal(schemaBytes, &schema); err != nil {
+		schema, err := parseSchemaWithExtensions(schemaData)
+		if err != nil {
 			continue
 		}
 		if isAlias(schema) {
@@ -382,9 +385,9 @@ func convertOpenAPIToMarkdown(inputFile, outputDir string, roots []string) error
 		buf.WriteString("The following aliases are used throughout the schema for consistency.\n\n")
 
 		for _, name := range aliasTypes {
-			schemaBytes, _ := yaml.Marshal(spec.Components.Schemas[name])
-			var schema Schema
-			if err := yaml.Unmarshal(schemaBytes, &schema); err != nil {
+			schemaData := spec.Components.Schemas[name]
+			schema, err := parseSchemaWithExtensions(schemaData)
+			if err != nil {
 				continue
 			}
 			buf.WriteString(generateAliasBlock(name, schema, true))
@@ -397,6 +400,70 @@ func convertOpenAPIToMarkdown(inputFile, outputDir string, roots []string) error
 	}
 
 	return nil
+}
+
+// parseSchemaWithExtensions parses schema data and extracts x-* extensions.
+func parseSchemaWithExtensions(schemaData interface{}) (Schema, error) {
+	schemaMap, ok := schemaData.(map[string]interface{})
+	if !ok {
+		return Schema{}, fmt.Errorf("schema is not a map")
+	}
+
+	schemaBytes, _ := yaml.Marshal(schemaData)
+	var schema Schema
+	if err := yaml.Unmarshal(schemaBytes, &schema); err != nil {
+		return Schema{}, fmt.Errorf("failed to parse schema: %w", err)
+	}
+
+	// Extract x-* extensions
+	if schema.Extensions == nil {
+		schema.Extensions = make(map[string]interface{})
+	}
+	for k, v := range schemaMap {
+		if strings.HasPrefix(k, "x-") {
+			schema.Extensions[k] = v
+		}
+	}
+
+	return schema, nil
+}
+
+// getSchemaStatus extracts the x-gemara-status extension value from a schema.
+func getSchemaStatus(schema Schema) string {
+	if schema.Extensions != nil {
+		if status, ok := schema.Extensions["x-gemara-status"].(string); ok {
+			return status
+		}
+	}
+	return ""
+}
+
+// formatStatusBadge returns a markdown badge for the status.
+func formatStatusBadge(status string) string {
+	switch status {
+	case "experimental":
+		return "<span class=\"badge badge-experimental\">Experimental</span>"
+	case "stable":
+		return "<span class=\"badge badge-stable\">Stable</span>"
+	case "deprecated":
+		return "<span class=\"badge badge-deprecated\">Deprecated</span>"
+	default:
+		return ""
+	}
+}
+
+// formatStatusNotice returns a notice block explaining the status implications.
+func formatStatusNotice(status string) string {
+	switch status {
+	case "experimental":
+		return "> **⚠️ Experimental:** This schema is experimental and may change in future releases. Breaking changes and performance issues may occur during this phase."
+	case "stable":
+		return "> **✅ Stable:** This schema is stable and maintains backward compatibility within major versions. Only additive optional changes are allowed."
+	case "deprecated":
+		return "> **⚠️ Deprecated:** This schema is deprecated and will be removed in the next major version. Please migrate to the replacement schema."
+	default:
+		return ""
+	}
 }
 
 func isAlias(schema Schema) bool {
@@ -416,10 +483,9 @@ func resolveSchemaRef(ref string, spec OpenAPISpec) (*Schema, error) {
 		return nil, fmt.Errorf("schema not found: %s", schemaName)
 	}
 
-	schemaBytes, _ := yaml.Marshal(schemaData)
-	var schema Schema
-	if err := yaml.Unmarshal(schemaBytes, &schema); err != nil {
-		return nil, fmt.Errorf("failed to parse schema %s: %v", schemaName, err)
+	schema, err := parseSchemaWithExtensions(schemaData)
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse schema %s: %w", schemaName, err)
 	}
 
 	return &schema, nil
@@ -526,9 +592,21 @@ func formatFieldWithNested(fieldName string, fieldSchema Schema, spec OpenAPISpe
 func generateRootSection(rootName string, schema Schema, spec OpenAPISpec, schemaToFile map[string]string) string {
 	var buf strings.Builder
 
-	buf.WriteString(fmt.Sprintf("## `%s`\n\n", rootName))
+	buf.WriteString(fmt.Sprintf("## `%s`", rootName))
+
+	// Add status badge if present
+	if status := getSchemaStatus(schema); status != "" {
+		buf.WriteString(fmt.Sprintf(" %s", formatStatusBadge(status)))
+	}
+	buf.WriteString("\n\n")
+
 	if schema.Description != "" {
 		buf.WriteString(schema.Description + "\n\n")
+	}
+
+	// Add status notice if experimental or deprecated
+	if status := getSchemaStatus(schema); status != "" {
+		buf.WriteString(formatStatusNotice(status) + "\n\n")
 	}
 
 	if schema.Properties != nil {
@@ -541,12 +619,12 @@ func generateRootSection(rootName string, schema Schema, spec OpenAPISpec, schem
 		// Output all fields in order (required first, then optional)
 		// Sort by required status, then by name
 		type fieldInfo struct {
-			name      string
-			schema    Schema
-			required  bool
+			name     string
+			schema   Schema
+			required bool
 		}
 		var fields []fieldInfo
-		
+
 		for _, propName := range propNames {
 			isRequired := false
 			for _, req := range schema.Required {
@@ -563,12 +641,12 @@ func generateRootSection(rootName string, schema Schema, spec OpenAPISpec, schem
 				continue
 			}
 			fields = append(fields, fieldInfo{
-				name: propName,
-				schema: prop,
+				name:     propName,
+				schema:   prop,
 				required: isRequired,
 			})
 		}
-		
+
 		// Sort: required first, then by name
 		sort.Slice(fields, func(i, j int) bool {
 			if fields[i].required != fields[j].required {
