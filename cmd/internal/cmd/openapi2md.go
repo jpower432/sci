@@ -22,6 +22,7 @@ type Schema struct {
 	Format      string                 `yaml:"format"`
 	Items       interface{}            `yaml:"items"`
 	Ref         string                 `yaml:"$ref"`
+	XStatus     string                 `yaml:"x-status"`
 }
 
 type NavPage struct {
@@ -427,6 +428,28 @@ func resolveSchemaRef(ref string, spec OpenAPISpec) (*Schema, error) {
 	return &schema, nil
 }
 
+// getSchemaStatus extracts the gemara-status extension value from a schema.
+func getSchemaStatus(schema Schema) string {
+	if schema.XStatus != "" {
+		return schema.XStatus
+	}
+	return ""
+}
+
+// formatStatusBadge returns a markdown badge for the status.
+func formatStatusBadge(status string) string {
+	switch status {
+	case "experimental":
+		return "<span class=\"badge badge-experimental\">Experimental</span>"
+	case "stable":
+		return "<span class=\"badge badge-stable\">Stable</span>"
+	case "deprecated":
+		return "<span class=\"badge badge-deprecated\">Deprecated</span>"
+	default:
+		return ""
+	}
+}
+
 // formatFieldInline formats a field's information and returns (fieldLine, description)
 // fieldLine format: `field` **type** _Required_ or `field` **type**
 // description is returned separately
@@ -539,6 +562,16 @@ func generateRootSection(rootName string, schema Schema, spec OpenAPISpec, schem
 			propNames = append(propNames, propName)
 		}
 		sort.Strings(propNames)
+
+		// Add status badge if present
+		if status := getSchemaStatus(schema); status != "" {
+			buf.WriteString(fmt.Sprintf(" %s", formatStatusBadge(status)))
+		}
+		buf.WriteString("\n\n")
+
+		if schema.Description != "" {
+			buf.WriteString(schema.Description + "\n\n")
+		}
 
 		// Output all fields in order (required first, then optional)
 		// Sort by required status, then by name
