@@ -1,0 +1,23 @@
+metadata:
+  id: TEST-BAD-LIFECYCLE
+  description: Retired guideline with recommendations should fail validation.
+  author:
+    id: test
+    name: Test Author
+    type: Human
+
+title: Bad Lifecycle Test
+type: Standard
+families:
+  - id: fam-1
+    title: Family One
+    description: Test family.
+
+guidelines:
+  - id: GL-001
+    family: fam-1
+    title: Retired Guideline With Recommendations
+    objective: This should fail because retired guidelines cannot have recommendations.
+    state: retired
+    recommendations:
+      - This recommendation should not exist on a retired guideline.
