@@ -90,6 +90,9 @@ package gemara
 	// metadata provides detailed data about this catalog
 	"metadata": #Metadata @go(Metadata)
 
+	// extends references a threat catalog that this catalog builds upon
+	extends?: #EntryMapping @go(Extends,optional=nillable)
+
 	// threats is a list of threats defined by this catalog
 	threats?: [...#Threat] @go(Threats)
 
