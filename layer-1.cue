@@ -84,23 +84,11 @@ package gemara
 	// statements is a list of structural sub-requirements within a guideline
 	statements?: [...#Statement] @go(Statements)
 
-	// guideline-mappings documents the relationship between this guideline and external guidelines
-	"guideline-mappings"?: [...#MultiEntryMapping] @go(GuidelineMappings) @yaml("guideline-mappings,omitempty")
-
-	// principle-mappings documents the relationship between this guideline and one or more principles
-	"principle-mappings"?: [...#MultiEntryMapping] @go(PrincipleMappings) @yaml("principle-mappings,omitempty")
-
-	// vector-mappings documents the relationship between this guideline and one or more vectors
-	"vector-mappings"?: [...#MultiEntryMapping] @go(VectorMappings) @yaml("vector-mappings,omitempty")
-
-	// see-also lists related guideline IDs within the same GuidanceCatalog
-	"see-also"?: [...string] @go(SeeAlso) @yaml("see-also,omitempty")
+	// vectors documents the relationship between this guideline and one or more vectors
+	vectors?: [...#MultiEntryMapping] @go(Vectors)
 
 	// state is the lifecycle state of this guideline
 	state: #Lifecycle @go(State) @yaml("state,omitempty")
-
-	// replaced-by references the guideline that supersedes this one when deprecated or retired
-	"replaced-by"?: #EntryMapping @go(ReplacedBy,optional=nillable) @yaml("replaced-by,omitempty")
 
 	// retired guidelines must not have recommendations
 	if state == "retired" {
