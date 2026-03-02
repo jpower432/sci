@@ -552,6 +552,9 @@ func generateRootSection(rootName string, schema Schema, spec OpenAPISpec, schem
 	var buf strings.Builder
 
 	buf.WriteString(fmt.Sprintf("## `%s`\n\n", rootName))
+	if status := getSchemaStatus(schema); status != "" {
+		buf.WriteString(formatStatusBadge(status) + "\n\n")
+	}
 	if schema.Description != "" {
 		buf.WriteString(schema.Description + "\n\n")
 	}
@@ -562,16 +565,6 @@ func generateRootSection(rootName string, schema Schema, spec OpenAPISpec, schem
 			propNames = append(propNames, propName)
 		}
 		sort.Strings(propNames)
-
-		// Add status badge if present
-		if status := getSchemaStatus(schema); status != "" {
-			buf.WriteString(fmt.Sprintf(" %s", formatStatusBadge(status)))
-		}
-		buf.WriteString("\n\n")
-
-		if schema.Description != "" {
-			buf.WriteString(schema.Description + "\n\n")
-		}
 
 		// Output all fields in order (required first, then optional)
 		// Sort by required status, then by name
