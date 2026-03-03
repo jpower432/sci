@@ -41,8 +41,6 @@ import "time"
 	// uri is a general URI for the entity information
 	uri?: =~"^https?://[^\\s]+$"
 
-	// contact is contact information for the entity
-
 }
 
 // Actor represents an entity (human or tool) that performs actions in evaluations
