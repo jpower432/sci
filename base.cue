@@ -40,17 +40,20 @@ import "time"
 
 	// uri is a general URI for the entity information
 	uri?: =~"^https?://[^\\s]+$"
-
 }
 
 // Actor represents an entity (human or tool) that performs actions in evaluations
-#Actor: #Entity & {
+#Actor: {
+	#Entity
+
 	// contact is contact information for the actor
 	contact?: #Contact @go(Contact)
 }
 
 // Resource represents an entity that exists in the system and can be evaluated
-#Resource: #Entity & {
+#Resource: {
+	#Entity
+
 	// environment describes where the resource exists (e.g., production, staging, development, specific region)
 	environment?: string @go(Environment)
 
