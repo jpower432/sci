@@ -1,6 +1,5 @@
 // Schema lifecycle: experimental | stable | deprecated
 @status("experimental")
-@if(!stable)
 package gemara
 
 @go(gemara)
@@ -11,16 +10,20 @@ package gemara
 	title: string
 
 	// metadata provides detailed data about this catalog
-	"metadata": #Metadata @go(Metadata)
+	metadata: #Metadata @go(Metadata)
 
 	// families contains a list of control families that can be referenced by controls
-	families?: [...#Family] @go(Families)
+	families?: [...#Group] @go(Families)
 
 	// controls is a list of unique controls defined by this catalog
 	controls?: [...#Control] @go(Controls)
 
 	// imported-controls is a list of controls from another source which are included as part of this document
 	"imported-controls"?: [...#MultiEntryMapping] @go(ImportedControls)
+
+	if controls != _|_ {
+		families: [_, ...#Group]
+	}
 }
 
 // Control describes a safeguard or countermeasure with a clear objective and assessment requirements
@@ -45,6 +48,12 @@ package gemara
 
 	// threat-mappings documents relationships betwen this control and Layer 2 threat artifacts
 	"threat-mappings"?: [...#MultiEntryMapping] @go(ThreatMappings)
+
+	// state is the lifecycle state of this control
+	state: #Lifecycle @go(State) @yaml("state,omitempty")
+
+	// replaced-by references the control that supersedes this one when deprecated or retired
+	"replaced-by"?: #EntryMapping @go(ReplacedBy,optional=nillable) @yaml("replaced-by,omitempty")
 }
 
 // AssessmentRequirement describes a tightly scoped, verifiable condition that must be satisfied and confirmed by an evaluator
@@ -60,6 +69,17 @@ package gemara
 
 	// recommendation provides readers with non-binding suggestions to aid in evaluation or enforcement of the requirement
 	recommendation?: string
+
+	// state is the lifecycle state of this assessment requirement
+	state: #Lifecycle @go(State) @yaml("state,omitempty")
+
+	// replaced-by references the assessment requirement that supersedes this one when deprecated or retired
+	"replaced-by"?: #EntryMapping @go(ReplacedBy,optional=nillable) @yaml("replaced-by,omitempty")
+
+	// retired assessment requirements must not have a recommendation
+	if state == "Retired" {
+		recommendation?: _|_
+	}
 }
 
 // ThreatCatalog describes a set of topically-associated threats
@@ -68,7 +88,7 @@ package gemara
 	title: string
 
 	// metadata provides detailed data about this catalog
-	"metadata": #Metadata @go(Metadata)
+	metadata: #Metadata @go(Metadata)
 
 	// threats is a list of threats defined by this catalog
 	threats?: [...#Threat] @go(Threats)

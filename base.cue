@@ -59,7 +59,7 @@ import "time"
 }
 
 // EntityType specifies what entity is interacting in the workflow
-#EntityType: "Human" | "Software" | "Software-Assisted" @go(-)
+#EntityType: "Human" | "Software" | "Software Assisted" @go(-)
 
 // Email represents a validated email address pattern
 #Email: =~"^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$"
@@ -67,29 +67,20 @@ import "time"
 // Datetime represents an ISO 8601 formatted datetime string
 #Datetime: time.Format("2006-01-02T15:04:05Z07:00") @go(Datetime,format="date-time")
 
-// Date represents a date string (ISO 8601 date format)
-#Date: time.Format("2006-01-02") @go(Date,format="date")
-
-// Category represents a category used for applicability or classification
-#Category: {
+// Group represents a classification or grouping that can be used in different contexts with semantic meaning derived from its usage
+#Group: {
 	// id allows this entry to be referenced by other elements
 	id: string
 
-	// title describes the purpose of this category at a glance
+	// title describes the purpose of this group at a glance
 	title: string
 
-	// description explains the significance and traits of entries to this category
+	// description explains the significance and traits of entries to this group
 	description: string
 }
 
-// Family represents a logical grouping of guidelines or controls which share a common purpose or function
-#Family: {
-	// id allows this entry to be referenced by other elements
-	id: string
+// Lifecycle represents the lifecycle state of a guideline, control, or assessment requirement
+#Lifecycle: *"Active" | "Draft" | "Deprecated" | "Retired" @go(-)
 
-	// title describes the purpose of this family at a glance
-	title: string
-
-	// description explains the significance and traits of entries to this entity family
-	description: string
-}
+// ConfidenceLevel indicates the evaluator's confidence level in an assessment result.
+#ConfidenceLevel: "Undetermined" | "Low" | "Medium" | "High" @go(-)

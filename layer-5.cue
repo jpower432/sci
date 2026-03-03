@@ -1,15 +1,14 @@
 // Schema lifecycle: experimental | stable | deprecated
 @status("experimental")
-@if(!stable)
 package gemara
 
 @go(gemara)
 
 // EvaluationLog contains the results of evaluating a set of Layer 2 controls.
 #EvaluationLog: {
-	"evaluations": [#ControlEvaluation, ...#ControlEvaluation] @go(Evaluations,type=[]*ControlEvaluation)
-	"metadata"?: #Metadata @go(Metadata)
-	"target":    #Resource   @go(Target)
+	evaluations: [#ControlEvaluation, ...#ControlEvaluation] @go(Evaluations,type=[]*ControlEvaluation)
+	metadata?: #Metadata @go(Metadata)
+	target:    #Resource   @go(Target)
 }
 
 // ControlEvaluation contains the results of evaluating a single Layer 5 control.
@@ -23,7 +22,7 @@ package gemara
 	// This formulation uses the control's reference if the assessment doesn't include a reference
 	"assessment-logs": [...{
 		requirement: "reference-id": (control."reference-id")
-	}] @go(AssessmentLogs,type=[]*AssessmentLog)
+	}]
 }
 
 // AssessmentLog contains the results of executing a single assessment procedure for a control requirement.
@@ -57,6 +56,3 @@ package gemara
 #AssessmentStep: string @go(-)
 
 #Result: "Not Run" | "Passed" | "Failed" | "Needs Review" | "Not Applicable" | "Unknown" @go(-)
-
-// ConfidenceLevel indicates the evaluator's confidence level in an assessment result.
-#ConfidenceLevel: "Not Set" | "Undetermined" | "Low" | "Medium" | "High" @go(-)

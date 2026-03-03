@@ -2,6 +2,8 @@
 @status("stable")
 package gemara
 
+@go(gemara)
+
 // Metadata represents common metadata fields shared across all layers
 #Metadata: {
 	// id allows this entry to be referenced by other elements
@@ -11,7 +13,7 @@ package gemara
 	version?: string
 
 	// date is the publication or effective date of this artifact
-	date?: #Date @go(Date)
+	date?: #Datetime @go(Date)
 
 	// description provides a high-level summary of the artifact's purpose and scope
 	description: string
@@ -23,7 +25,7 @@ package gemara
 	"mapping-references"?: [...#MappingReference] @go(MappingReferences) @yaml("mapping-references,omitempty")
 
 	// applicability-categories is a list of categories used to classify within this artifact to specify scope
-	"applicability-categories"?: [...#Category] @go(ApplicabilityCategories) @yaml("applicability-categories,omitempty")
+	"applicability-categories"?: [...#Group] @go(ApplicabilityCategories) @yaml("applicability-categories,omitempty")
 
 	// draft indicates whether this artifact is a pre-release version; open to modification
 	draft?: bool
