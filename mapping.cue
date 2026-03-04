@@ -29,6 +29,9 @@ package gemara
 
 // Mapping represents an atomic relationship between a source entry and an optional target entry
 #Mapping: {
+	// id allows this mapping to be referenced by other elements
+	id: string
+
 	// source identifies the entry being mapped from
 	source: #EntryReference @go(Source)
 
@@ -47,9 +50,6 @@ package gemara
 
 	// applicability constrains the contexts in which this mapping holds
 	applicability?: [...string] @go(Applicability)
-
-	// scope describes the technical boundary or extent of the relationship
-	scope?: string
 
 	// rationale explains why this relationship exists
 	rationale?: string

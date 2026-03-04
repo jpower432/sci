@@ -1,173 +1,141 @@
-title: OSPS Baseline to ACME Engineering Standard
+title: OSPS Baseline to EU Cyber Resilience Act (CRA) Annex I
 metadata:
-  id: ACME-MAP-001
+  id: OSPS-CRA-MAP-001
   version: "1.0.0"
   description: >
-    Maps OSPS Baseline controls to ACME internal engineering
-    standard guidelines for compliance traceability.
+    Maps OSPS Baseline controls to essential cybersecurity requirements
+    in Annex I of the EU Cyber Resilience Act (Regulation 2024/2847).
+    OSPS classifies all external guideline mappings as relates-to.
+    Downstream consumers may refine the relationship type based on
+    their applicability context.
   author:
-    id: acme-security
-    name: ACME Security Team
+    id: gemara-example
+    name: Gemara Example Author
     type: Human
+  applicability-categories:
+    - id: manufacturer
+      title: Manufacturer
+      description: >
+        Entity placing a product with digital elements on the EU market.
+        Subject to full CRA Annex I obligations.
+    - id: open-source-steward
+      title: Open Source Software Steward
+      description: >
+        Entity systematically providing support for open source products
+        intended for commercial use. Subject to reduced obligations
+        under CRA Article 24.
+    - id: ML1
+      title: Maturity Level 1
+      description: >
+        OSPS Baseline entry-level maturity. Projects at this level
+        satisfy foundational security requirements.
+    - id: ML2
+      title: Maturity Level 2
+      description: >
+        OSPS Baseline intermediate maturity. Projects at this level
+        satisfy enhanced security requirements including vulnerability
+        disclosure and release practices.
+    - id: ML3
+      title: Maturity Level 3
+      description: >
+        OSPS Baseline advanced maturity. Projects at this level satisfy
+        the most rigorous security requirements including SBOM, VEX,
+        and automated enforcement.
   mapping-references:
     - id: OSPS
       title: Open Source Project Security Baseline
-      version: "2026.02.19"
-      url: "https://baseline.openssf.org/versions/2026-02-19.html"
-    - id: ACME-ES
-      title: ACME Engineering Standard
-      version: "3.0"
+      version: "2025.03.03"
+      url: "https://baseline.openssf.org/"
+    - id: CRA
+      title: EU Cyber Resilience Act - Annex I
+      version: "2024/2847"
+      url: "https://eur-lex.europa.eu/eli/reg/2024/2847/oj"
 
 source-reference:
   reference-id: OSPS
 target-reference:
-  reference-id: ACME-ES
+  reference-id: CRA
 remarks: >
-  One-way gap analysis from OSPS Baseline to ACME Engineering
-  Standard v3.0, authored by the ACME security team.
+  CRA Annex I Part I (1.x) covers security requirements for products
+  with digital elements; Part II (2.x) covers vulnerability handling.
 
 mappings:
-  - source:
-      entry-id: OSPS-AC-01
+  - id: QA02-2.1-mfr
+    source:
+      entry-id: OSPS-QA-02
       entry-type: Control
     target:
-      entry-id: ES-IAM-001
+      entry-id: "2.1"
+      entry-type: Guideline
+    relationship: relates-to
+    confidence-level: Medium
+    applicability:
+      - "manufacturer"
+    rationale: >
+      OSPS-QA-02 requires dependency lists and SBOMs. CRA 2.1 requires
+      identifying and documenting vulnerabilities and components. SBOMs
+      address component identification but not the full manufacturer
+      obligation.
+
+  - id: QA02-2.1-steward
+    source:
+      entry-id: OSPS-QA-02
+      entry-type: Control
+    target:
+      entry-id: "2.1"
       entry-type: Guideline
     relationship: implements
     confidence-level: High
     applicability:
-      - "web-applications"
-      - "internal-services"
-    scope: >
-      Authentication assurance only. Does not extend to
-      hardware token enforcement or session management.
+      - "open-source-steward"
     rationale: >
-      OSPS-AC-01 MFA requirement directly addresses
-      the authentication assurance objective in ES-IAM-001.
-    remarks: >
-      ES-IAM-001 also requires hardware token enforcement,
-      which OSPS-AC-01 does not specify.
+      For open-source stewards, CRA Article 24 narrows 2.1 to a
+      best-effort duty around vulnerability facilitation. OSPS-QA-02
+      dependency tracking and SBOM generation fulfills this
+      scoped-down obligation.
 
-  - source:
-      entry-id: OSPS-AC-02
-      entry-type: Control
-    target:
-      entry-id: ES-IAM-002
-      entry-type: Guideline
-    relationship: equivalent
-    confidence-level: High
-    applicability:
-      - "all-environments"
-    scope: >
-      Default permission minimization for human and
-      service accounts across all project resources.
-    rationale: >
-      Both entries require least-privilege defaults with
-      identical permission boundaries and escalation rules.
-
-  - source:
-      entry-id: OSPS-BR-01
-      entry-type: Control
-    target:
-      entry-id: ES-SDLC-010
-      entry-type: Guideline
-    relationship: supports
-    confidence-level: Medium
-    applicability:
-      - "containerized-workloads"
-      - "compiled-languages"
-    scope: >
-      Build reproducibility only. Does not address signed
-      build attestations, pipeline integrity, or provenance.
-    rationale: >
-      OSPS-BR-01 contributes to ES-SDLC-010 build integrity
-      objective but leaves attestation and provenance unmet.
-
-  - source:
-      entry-id: OSPS-AC-01.01
+  - id: VM01.01-2.5
+    source:
+      entry-id: OSPS-VM-01.01
       entry-type: Assessment Requirement
     target:
-      entry-id: ES-IAM-001.S1
-      entry-type: Statement
-    relationship: implemented-by
+      entry-id: "2.5"
+      entry-type: Guideline
+    relationship: relates-to
     confidence-level: High
     applicability:
-      - "web-applications"
-    scope: >
-      MFA enforcement on sensitive version control operations.
-      Does not cover MFA for CI/CD pipeline credentials.
+      - "ML2"
+      - "ML3"
     rationale: >
-      OSPS-AC-01.01 requires MFA on sensitive resources.
-      ES-IAM-001.S1 fulfills this through mandatory
-      hardware token enrollment for repository access.
+      OSPS-VM-01.01 requires a CVD policy with a clear timeframe for
+      response. This assessment requirement activates at Maturity
+      Level 2. At Level 1, no CVD policy is required, so the CRA 2.5
+      relationship does not hold.
 
-  - source:
-      entry-id: OSPS-QA-02
-      entry-type: Control
+  - id: VM04.02-2.4
+    source:
+      entry-id: OSPS-VM-04.02
+      entry-type: Assessment Requirement
     target:
-      entry-id: ES-SDLC-005
+      entry-id: "2.4"
       entry-type: Guideline
-    relationship: supported-by
-    confidence-level: Medium
-    applicability:
-      - "containerized-workloads"
-      - "interpreted-languages"
-    scope: >
-      Peer review process for application code. Does not
-      cover infrastructure-as-code or configuration review.
-    rationale: >
-      ES-SDLC-005 peer review process contributes to
-      OSPS-QA-02 code review requirements but does not
-      mandate tooling or coverage thresholds.
-
-  - source:
-      entry-id: OSPS-VM-01
-      entry-type: Control
-    target:
-      entry-id: ES-SEC-020
-      entry-type: Guideline
-    relationship: subsumes
+    relationship: relates-to
     confidence-level: High
     applicability:
-      - "all-environments"
-    scope: >
-      Vulnerability disclosure, triage, severity
-      classification, and remediation timelines.
-      ES-SEC-020 only covers disclosure.
+      - "ML3"
     rationale: >
-      OSPS-VM-01 fully contains ES-SEC-020 disclosure
-      requirements and adds triage workflow, severity
-      classification, and remediation SLAs.
+      OSPS-VM-04.02 requires a VEX document for vulnerabilities in
+      components that do not affect the project. This Maturity Level 3
+      requirement strengthens the CRA 2.4 relationship by providing
+      machine-readable exploitability data beyond basic disclosure.
 
-  - source:
-      entry-id: OSPS-SC-01
+  - id: GV01-no-match
+    source:
+      entry-id: OSPS-GV-01
       entry-type: Control
     relationship: no-match
     confidence-level: High
-    applicability:
-      - "all-environments"
-    scope: >
-      Secure coding education and annual training
-      requirements for project contributors.
     rationale: >
-      ACME Engineering Standard has no guideline for
-      developer security education. This is a gap.
-
-  - source:
-      entry-id: OSPS-DP-03
-      entry-type: Control
-    target:
-      entry-id: ES-DATA-007
-      entry-type: Guideline
-    relationship: relates-to
-    confidence-level: Low
-    applicability:
-      - "data-processing-services"
-    scope: >
-      Data retention and disposal procedures for
-      project telemetry and user-submitted data.
-    rationale: >
-      Both entries address data handling but differ
-      in mechanism. OSPS-DP-03 focuses on retention
-      periods; ES-DATA-007 focuses on classification.
-      Relationship requires further analysis.
+      OSPS-GV-01 requires publishing project roles and responsibilities.
+      CRA Annex I has no corresponding requirement for governance
+      documentation.
