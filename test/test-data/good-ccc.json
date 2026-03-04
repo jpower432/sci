@@ -68,9 +68,11 @@
           "reference-id": "CCM",
           "entries": [
             {
-              "reference-id": "IVS-03"            },
+              "reference-id": "IVS-03"
+            },
             {
-              "reference-id": "IVS-07"            }
+              "reference-id": "IVS-07"
+            }
           ]
         },
         {
@@ -86,9 +88,11 @@
           "reference-id": "NIST-800-53",
           "entries": [
             {
-              "reference-id": "SC-8"            },
+              "reference-id": "SC-8"
+            },
             {
-              "reference-id": "SC-13"            }
+              "reference-id": "SC-13"
+            }
           ]
         }
       ],
