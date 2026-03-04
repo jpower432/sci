@@ -21,7 +21,7 @@ import "time"
 	social?: string @go(Social,type=*string)
 }
 
-// Entity represents an entity (human or tool) that can perform actions in evaluations
+// Entity represents a human or tool
 #Entity: {
 	// id uniquely identifies the entity and allows this entry to be referenced by other elements
 	id: string
