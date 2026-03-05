@@ -5,7 +5,7 @@ title: Nest Imported Fields Under imports Struct
 
 - **ADR:** 0014
 - **Proposal Author(s):** @jpower432
-- **Status:** Proposed
+- **Status:** Accepted
 
 ## Context
 
