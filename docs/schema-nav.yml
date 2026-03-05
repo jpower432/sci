@@ -11,6 +11,8 @@ pages:
       - "Datetime"
       - "Group"
       - "Lifecycle"
+      - "ArtifactType"
+      - "EntryType"
       - "ConfidenceLevel"
   - title: "Metadata"
     filename: "metadata"
