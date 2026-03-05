@@ -1,14 +1,15 @@
-catalog:
-  metadata:
-    id: FINOS-CCC
-    description: |
-      FINOS CCC is an open standard project that describes consistent controls for
-      compliant public cloud deployments in the financial services sector.
-    author:
-      id: finos
-      name: FINOS
-      type: Human
-    applicability-categories:
+metadata:
+  id: FINOS-CCC
+  type: ControlCatalog
+  gemara-version: "0.20.0"
+  description: |
+    FINOS CCC is an open standard project that describes consistent controls for
+    compliant public cloud deployments in the financial services sector.
+  author:
+    id: finos
+    name: FINOS
+    type: Human
+  applicability-categories:
     - id: tlp_clear
       title: TLP:Clear
       description: |
@@ -27,15 +28,15 @@ catalog:
       title: TLP:Red
       description: |
         Information is restricted to the organization.
-  title: FINOS Cloud Control Catalog
-  families:
+title: FINOS Cloud Control Catalog
+families:
   - id: data-protection
     title: Data Protection
     description: |
       Data protection controls ensure that data is protected from unauthorized
       access, disclosure, and tampering. This includes encryption of data at
       rest and in transit, access controls, and data retention policies.
-  controls:
+controls:
       - id: CCC.C01
         title: Prevent Unencrypted Requests
         objective: |
@@ -45,31 +46,24 @@ catalog:
         - reference-id: CCC
           entries:
           - reference-id: CCC.TH02
-            strength: 7
             remarks: Data is Intercepted in Transit
         guideline-mappings:
         - reference-id: CSF
           entries:
           - reference-id: PR.DS-02
-            strength: 7
             remarks: Data-in-transit is protected
         - reference-id: CCM
           entries:
           - reference-id: IVS-03
-            strength: 7
           - reference-id: IVS-07
-            strength: 7
         - reference-id: ISO-27001
           entries:
           - reference-id: 2013 A.13.1.1
-            strength: 7
             remarks: This control is closely related to 2013 A.13.1.1.
         - reference-id: NIST-800-53
           entries:
           - reference-id: SC-8
-            strength: 7
           - reference-id: SC-13
-            strength: 7
         assessment-requirements:
         - id: CCC.C01.TR01
           text: |
@@ -102,31 +96,25 @@ catalog:
         - reference-id: CCC
           entries:
           - reference-id: CCC.TH03
-            strength: 7
             remarks: Deployment Region Network is Untrusted
         guideline-mappings:
         - reference-id: CCM
           entries:
           - reference-id: DSI-06
-            strength: 7
             remarks: This control is closely related to DSI-06.
           - reference-id: DSI-08
-            strength: 7
             remarks: This control is closely related to DSI-08.
         - reference-id: ISO-27001
           entries:
           - reference-id: 2013 A.11.1.1
-            strength: 7
             remarks: This control is closely related to 2013 A.11.1.1.
         - reference-id: NIST-800-53
           entries:
           - reference-id: AC-6
-            strength: 7
             remarks: This control is closely related to AC-6.
         - reference-id: CSF
           entries:
           - reference-id: PR.DS-1
-            strength: 7
             remarks: Data-at-rest is protected
         assessment-requirements:
         - id: CCC.C06.TR01
@@ -160,26 +148,21 @@ catalog:
         - reference-id: CCC
           entries:
           - reference-id: CCC.TH06
-            strength: 7
             remarks: Data is Lost or Corrupted
         guideline-mappings:
         - reference-id: CSF
           entries:
           - reference-id: PR.DS-5
-            strength: 7
             remarks: Protections against data leaks are implemented
         - reference-id: CCM
           entries:
           - reference-id: BCR-08
-            strength: 7
             remarks: Backup
         - reference-id: NIST-800-53
           entries:
           - reference-id: CP-2
-            strength: 7
             remarks: Contingency plan
           - reference-id: CP-10
-            strength: 7
             remarks: Information system recovery and reconstitution
         assessment-requirements:
         - id: CCC.C08.TR01
@@ -211,30 +194,23 @@ catalog:
         - reference-id: CCC
           entries:
           - reference-id: CCC.TH07
-            strength: 7
             remarks: Logs are Tampered with or Deleted
           - reference-id: CCC.TH09
-            strength: 7
             remarks: Logs or Monitoring Data are Read by Unauthorized Users
           - reference-id: CCC.TH04
-            strength: 7
             remarks: Data is Replicated to Untrusted or External Locations
         guideline-mappings:
         - reference-id: CCM
           entries:
           - reference-id: LOG-02
-            strength: 7
             remarks: Audit log protection
           - reference-id: LOG-04
-            strength: 7
             remarks: Audit log access and accountability
           - reference-id: LOG-09
-            strength: 7
             remarks: Log protection
         - reference-id: NIST-800-53
           entries:
           - reference-id: AU-9
-            strength: 7
             remarks: Protection of audit information
         assessment-requirements:
         - id: CCC.C09.TR01
@@ -278,26 +254,21 @@ catalog:
         - reference-id: CCC
           entries:
           - reference-id: CCC.TH04
-            strength: 7
             remarks: Data is Replicated to Untrusted or External Locations
         guideline-mappings:
         - reference-id: CSF
           entries:
           - reference-id: PR.DS-5
-            strength: 7
             remarks: Protections against data leaks are implemented
         - reference-id: CCM
           entries:
           - reference-id: DSP-10
-            strength: 7
             remarks: Sensitive data transfer
           - reference-id: DSP-19
-            strength: 7
             remarks: Data location
         - reference-id: NIST-800-53
           entries:
           - reference-id: AC-4
-            strength: 7
             remarks: Information flow enforcement
         assessment-requirements:
         - id: CCC.C10.TR01

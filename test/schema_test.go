@@ -50,24 +50,34 @@ func TestSchemaValidation(t *testing.T) {
 		errContains string
 	}{
 		// ControlCatalog — positive
-		{"valid control catalog YAML", "./test-data/good-ccc.yaml", "#ControlCatalog", false, ""},
-		{"valid control catalog JSON", "./test-data/good-ccc.json", "#ControlCatalog", false, ""},
+		{"valid control catalog", "./test-data/good-ccc.yaml", "#ControlCatalog", false, ""},
 		{"valid OSPS baseline", "./test-data/good-osps.yml", "#ControlCatalog", false, ""},
 		{"valid lifecycle catalog", "./test-data/good-lifecycle.yaml", "#ControlCatalog", false, ""},
+		{"valid nested control catalog", "./test-data/nested-good-ccc.yaml", "#ControlCatalog", false, ""},
 
 		// GuidanceCatalog — positive
 		{"valid AI governance framework", "./test-data/good-aigf.yaml", "#GuidanceCatalog", false, ""},
 
 		// Policy — positive
-		{"valid policy", "./test-data/good-policy.yaml", "#Policy", false, ""},
 		{"valid security policy", "./test-data/good-security-policy.yml", "#Policy", false, ""},
 
 		// ControlCatalog — negative
-		{"invalid YAML against ControlCatalog", "./test-data/bad.yaml", "#ControlCatalog", true, ""},
-		{"invalid JSON against ControlCatalog", "./test-data/bad.json", "#ControlCatalog", true, ""},
+		{"invalid YAML", "./test-data/bad.yaml", "#ControlCatalog", true, ""},
+		{"invalid JSON", "./test-data/bad.json", "#ControlCatalog", true, ""},
+		{"controls without applicability-categories", "./test-data/bad-applicability.yaml", "#ControlCatalog", true, ""},
+		{"extends without mapping-references", "./test-data/bad-no-mapping-refs.yaml", "#ControlCatalog", true, ""},
 
 		// GuidanceCatalog — negative
 		{"retired guideline with recommendations", "./test-data/bad-lifecycle.yaml", "#GuidanceCatalog", true, ""},
+
+		// Policy — negative
+		{"imports without mapping-references", "./test-data/bad-policy-import-ref.yaml", "#Policy", true, ""},
+
+		// ThreatCatalog — negative
+		{"imports without mapping-references", "./test-data/bad-threat-catalog-import-ref.yaml", "#ThreatCatalog", true, ""},
+
+		// ControlCatalog — edge cases
+		{"empty nested catalog", "./test-data/nested-empty.yaml", "#ControlCatalog", false, ""},
 	}
 
 	for _, tt := range tests {

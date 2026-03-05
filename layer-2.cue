@@ -21,12 +21,26 @@ package gemara
 	// controls is a list of unique controls defined by this catalog
 	controls?: [...#Control] @go(Controls)
 
-	// imported-controls is a list of controls from another source which are included as part of this document
-	"imported-controls"?: [...#MultiEntryMapping] @go(ImportedControls)
+	// imports contains controls from other sources which are included as part of this document
+	imports?: #ControlCatalogImports @go(Imports)
 
+	// Constraints
 	if controls != _|_ {
 		families: [_, ...#Group]
+		metadata: "applicability-categories": [_, ...]
 	}
+	if extends != _|_ {
+		metadata: "mapping-references": [_, ...]
+	}
+	if imports != _|_ {
+		metadata: "mapping-references": [_, ...]
+	}
+}
+
+// ControlCatalogImports defines imported entries for a control catalog
+#ControlCatalogImports: {
+	// controls is a list of controls from another source
+	controls?: [...#MultiEntryMapping] @go(Controls)
 }
 
 // Control describes a safeguard or countermeasure with a clear objective and assessment requirements
@@ -102,11 +116,28 @@ package gemara
 	// capabilities is a list of capabilities that make up the system being assessed
 	capabilities?: [...#Capability] @go(Capabilities)
 
-	// imported-threats is a list of threats from another source which are included as part of this document
-	"imported-threats"?: [...#MultiEntryMapping] @go(ImportedThreats)
+	// imports contains threats and capabilities from other sources which are included as part of this document
+	imports?: #ThreatCatalogImports @go(Imports)
 
-	// imported-capabilities is a list of capabilities from another source which are included as part of this document
-	"imported-capabilities"?: [...#MultiEntryMapping] @go(ImportedCapabilities)
+	// Constraints
+	if extends != _|_ {
+		metadata: "mapping-references": [_, ...]
+	}
+	if imports != _|_ {
+		metadata: "mapping-references": [_, ...]
+	}
+	if threats != _|_ {
+		metadata: "mapping-references": [_, ...]
+	}
+}
+
+// ThreatCatalogImports defines imported entries for a threat catalog
+#ThreatCatalogImports: {
+	// threats is a list of threats from another source
+	threats?: [...#MultiEntryMapping] @go(Threats)
+
+	// capabilities is a list of capabilities from another source
+	capabilities?: [...#MultiEntryMapping] @go(Capabilities)
 }
 
 // Threat describes a specifically-scoped opportunity for a negative impact to the organization
