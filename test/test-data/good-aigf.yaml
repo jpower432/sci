@@ -1,5 +1,7 @@
 metadata:
   id: FINOS-AIR
+  type: GuidanceCatalog
+  gemara-version: "0.20.0"
   description: ""
   author:
     id: finos

@@ -1,5 +1,8 @@
 metadata:
   id: TEST-LIFECYCLE
+  type: ControlCatalog
+  gemara-version: "0.20.0"
+  version: "1.0.0"
   description: Validates lifecycle states on controls and assessment requirements.
   author:
     id: test
