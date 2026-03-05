@@ -3,12 +3,15 @@ pages:
     filename: "base"
     schemas:
       - "Contact"
+      - "Entity"
       - "Actor"
       - "Resource"
       - "EntityType"
       - "Email"
       - "Datetime"
       - "Group"
+      - "Lifecycle"
+      - "ConfidenceLevel"
   - title: "Metadata"
     filename: "metadata"
     schemas:
@@ -17,9 +20,9 @@ pages:
     filename: "mapping"
     schemas:
       - "MappingReference"
+      - "ArtifactMapping"
       - "MultiEntryMapping"
       - "EntryMapping"
-      - "ArtifactMapping"
       - "MappingEntry"
   - title: "Layer 1"
     filename: "layer-1"
@@ -69,4 +72,3 @@ pages:
       - "AssessmentLog"
       - "AssessmentStep"
       - "Result"
-      - "ConfidenceLevel"
