@@ -50,7 +50,8 @@ func TestSchemaValidation(t *testing.T) {
 		errContains string
 	}{
 		// ControlCatalog — positive
-		{"valid control catalog", "./test-data/good-ccc.yaml", "#ControlCatalog", false, ""},
+		{"valid control catalog YAML", "./test-data/good-ccc.yaml", "#ControlCatalog", false, ""},
+		{"valid control catalog JSON", "./test-data/good-ccc.json", "#ControlCatalog", false, ""},
 		{"valid OSPS baseline", "./test-data/good-osps.yml", "#ControlCatalog", false, ""},
 		{"valid lifecycle catalog", "./test-data/good-lifecycle.yaml", "#ControlCatalog", false, ""},
 		{"valid nested control catalog", "./test-data/nested-good-ccc.yaml", "#ControlCatalog", false, ""},
@@ -59,6 +60,7 @@ func TestSchemaValidation(t *testing.T) {
 		{"valid AI governance framework", "./test-data/good-aigf.yaml", "#GuidanceCatalog", false, ""},
 
 		// Policy — positive
+		{"valid policy", "./test-data/good-policy.yaml", "#Policy", false, ""},
 		{"valid security policy", "./test-data/good-security-policy.yml", "#Policy", false, ""},
 
 		// ControlCatalog — negative
