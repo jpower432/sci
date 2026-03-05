@@ -10,9 +10,7 @@ package gemara
 	title: string
 
 	// metadata provides detailed data about this document
-	"metadata": #Metadata & {
-		"mapping-references": [#MappingReference, ...#MappingReference]
-	} @go(Metadata)
+	metadata: #Metadata @go(Metadata)
 
 	// source-reference identifies the artifact being mapped from; must match a mapping-reference id
 	"source-reference": #ArtifactMapping @go(SourceReference)
@@ -25,6 +23,9 @@ package gemara
 
 	// remarks is prose regarding this mapping document
 	remarks?: string
+
+	// mapping-references is required for MappingDocument
+	_validateMappingReferences: metadata."mapping-references" != _|_
 }
 
 // Mapping represents an atomic relationship between a source entry and an optional target entry
@@ -36,14 +37,16 @@ package gemara
 	source: #EntryReference @go(Source)
 
 	// target identifies the entry being mapped to; absent when relationship is no-match
-	target?: #EntryReference @go(Target)
+	target?: #EntryReference @go(Target,optional=nillable)
 
 	// relationship describes the nature or purpose of the mapping
-	relationship: #RelationshipType | string @go(Relationship)
+	relationship: #RelationshipType @go(Relationship)
 
 	// target is required for all relationships except no-match
-	if relationship != "no-match" {
-		target: #EntryReference
+	_validateTarget: {
+		if relationship != "no-match" {
+			target: #EntryReference
+		}
 	}
 
 	"confidence-level"?: #ConfidenceLevel @go(ConfidenceLevel)
@@ -59,8 +62,6 @@ package gemara
 }
 
 // RelationshipType enumerates the nature of the mapping between entries.
-// Values use kebab-lower instead of Title Case (see ADR-0013) because they act as
-// predicates in a source-relationship-target triple.
 #RelationshipType:
 	// source fulfills the target's objective
 	"implements" |
@@ -77,8 +78,7 @@ package gemara
 	// source has no counterpart in the target artifact
 	"no-match" |
 	// source and target are related but the nature is unspecified
-	"relates-to"
-@go(-)
+	"relates-to" @go(-)
 
 // EntryReference identifies a specific entry within a referenced artifact
 #EntryReference: {
