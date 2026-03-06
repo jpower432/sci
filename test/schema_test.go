@@ -69,6 +69,12 @@ func TestSchemaValidation(t *testing.T) {
 		{"controls without applicability-categories", "./test-data/bad-applicability.yaml", "#ControlCatalog", true, ""},
 		{"extends without mapping-references", "./test-data/bad-no-mapping-refs.yaml", "#ControlCatalog", true, ""},
 
+		// MappingDocument — positive
+		{"valid mapping document", "./test-data/good-mapping-document.yaml", "#MappingDocument", false, ""},
+
+		// MappingDocument — negative
+		{"invalid mapping document without mapping-references", "./test-data/bad-mapping-document.yaml", "#MappingDocument", true, ""},
+
 		// GuidanceCatalog — negative
 		{"retired guideline with recommendations", "./test-data/bad-lifecycle.yaml", "#GuidanceCatalog", true, ""},
 

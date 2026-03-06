@@ -21,6 +21,11 @@ pages:
   - title: "Mapping"
     filename: "mapping"
     schemas:
+      - "MappingDocument"
+      - "Mapping"
+      - "EntryReference"
+      - "RelationshipType"
+      - "EntryType"
       - "MappingReference"
       - "ArtifactMapping"
       - "MultiEntryMapping"
