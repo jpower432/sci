@@ -1,2 +1,11 @@
-catalog:
-  # unknown fields are tolerated, but completely empty data would not be expected
+metadata:
+  id: "empty-test-catalog"
+  type: ControlCatalog
+  gemara-version: "0.20.0"
+  description: "Minimal test catalog for edge case testing"
+  author:
+    id: test-author
+    name: Test Author
+    type: Human
+title: "Empty Test Catalog"
+# unknown fields are tolerated, but completely empty data would not be expected

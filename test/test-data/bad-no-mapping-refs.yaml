@@ -1,0 +1,24 @@
+metadata:
+  id: TEST-NO-MAPPING-REFS
+  type: ControlCatalog
+  gemara-version: "0.20.0"
+  version: "1.0.0"
+  description: Control catalog with extends but no mapping-references declared.
+  author:
+    id: test
+    name: Test Author
+    type: Human
+
+title: No Mapping References Test
+families:
+  - id: fam
+    title: Test Family
+    description: Test family.
+
+applicability-categories:
+  - id: all
+    title: All
+    description: All environments.
+
+extends:
+  - reference-id: UNDECLARED

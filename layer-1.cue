@@ -27,6 +27,7 @@ package gemara
 	// exemptions provides information about situations where this guidance is not applicable
 	exemptions?: [...#Exemption] @go(Exemptions)
 
+	// Constraints
 	if guidelines != _|_ {
 		families: [_, ...#Group]
 	}
