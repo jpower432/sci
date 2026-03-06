@@ -99,7 +99,7 @@ mappings:
   - id: VM01.01-2.5
     source:
       entry-id: OSPS-VM-01.01
-      entry-type: Assessment Requirement
+      entry-type: AssessmentRequirement
     target:
       entry-id: "2.5"
       entry-type: Guideline
@@ -117,7 +117,7 @@ mappings:
   - id: VM04.02-2.4
     source:
       entry-id: OSPS-VM-04.02
-      entry-type: Assessment Requirement
+      entry-type: AssessmentRequirement
     target:
       entry-id: "2.4"
       entry-type: Guideline
