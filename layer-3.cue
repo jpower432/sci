@@ -40,13 +40,11 @@ package gemara
 	impact?: string
 
 	// threat-mappings link this risk to Layer 2 threats
-	"threat-mappings"?: [...#MultiEntryMapping]@go(ThreatMappings)
+	"threat-mappings"?: [...#MultiEntryMapping] @go(ThreatMappings)
 
 	// residual-risk describes risk remaining after controls are applied
 	"residual-risk"?: string
 }
-
-
 
 // Policy represents a policy document with metadata, contacts, scope, imports, implementation plan, risks, and adherence requirements.
 #Policy: {
