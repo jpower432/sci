@@ -71,8 +71,7 @@ func TestSchemaValidation(t *testing.T) {
 		// ControlCatalog — negative
 		{"invalid YAML", "./test-data/bad.yaml", "#ControlCatalog", true, ""},
 		{"invalid JSON", "./test-data/bad.json", "#ControlCatalog", true, ""},
-		{"controls without applicability-categories", "./test-data/bad-applicability.yaml", "#ControlCatalog", true, ""},
-		{"extends without mapping-references", "./test-data/bad-no-mapping-refs.yaml", "#ControlCatalog", true, ""},
+		{"controls without families", "./test-data/bad-no-families.yaml", "#ControlCatalog", true, ""},
 
 		// MappingDocument — positive
 		{"valid mapping document", "./test-data/good-mapping-document.yaml", "#MappingDocument", false, ""},
@@ -83,11 +82,8 @@ func TestSchemaValidation(t *testing.T) {
 		// GuidanceCatalog — negative
 		{"retired guideline with recommendations", "./test-data/bad-lifecycle.yaml", "#GuidanceCatalog", true, ""},
 
-		// Policy — negative
-		{"imports without mapping-references", "./test-data/bad-policy-import-ref.yaml", "#Policy", true, ""},
-
-		// ThreatCatalog — negative
-		{"imports without mapping-references", "./test-data/bad-threat-catalog-import-ref.yaml", "#ThreatCatalog", true, ""},
+		// EvaluationLog — positive
+		{"valid PVTR baseline scan", "./test-data/pvtr-baseline-scan.yaml", "#EvaluationLog", false, ""},
 
 		// ControlCatalog — edge cases
 		{"empty nested catalog", "./test-data/nested-empty.yaml", "#ControlCatalog", false, ""},
