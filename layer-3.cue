@@ -14,17 +14,6 @@ package gemara
 	"implementation-plan"?: #ImplementationPlan @go(ImplementationPlan)
 	risks?:                 #Risks
 	adherence:              #Adherence
-
-	// Constraints
-	if imports.catalogs != _|_ {
-		metadata: "mapping-references": [_, ...]
-	}
-	if imports.guidance != _|_ {
-		metadata: "mapping-references": [_, ...]
-	}
-	if imports.policies != _|_ {
-		metadata: "mapping-references": [_, ...]
-	}
 }
 
 // Contacts defines RACI roles for policy compliance and notification.

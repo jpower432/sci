@@ -1,27 +1,26 @@
 metadata:
-  id: TEST-NO-APPLICABILITY-CATS
+  id: TEST-NO-FAMILIES
   type: ControlCatalog
   gemara-version: "0.20.0"
   version: "1.0.0"
-  description: Control catalog with controls but no applicability-categories declared.
+  description: Control catalog with controls but no families declared.
   author:
     id: test
     name: Test Author
     type: Human
+  applicability-categories:
+    - id: production
+      title: Production
+      description: Production environments.
 
-title: Missing Applicability Categories Test
-families:
-  - id: fam
-    title: Test Family
-    description: Test family.
-
+title: No Families Test
 controls:
   - id: TC-001
-    family: fam
+    family: missing-family
     title: Test Control
     objective: Test objective.
     assessment-requirements:
       - id: TC-001.AR01
         text: Test requirement.
         applicability:
-          - all
+          - production

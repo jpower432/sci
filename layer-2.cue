@@ -27,13 +27,6 @@ package gemara
 	// Constraints
 	if controls != _|_ {
 		families: [_, ...#Group]
-		metadata: "applicability-categories": [_, ...]
-	}
-	if extends != _|_ {
-		metadata: "mapping-references": [_, ...]
-	}
-	if imports != _|_ {
-		metadata: "mapping-references": [_, ...]
 	}
 }
 
@@ -118,17 +111,6 @@ package gemara
 
 	// imports contains threats and capabilities from other sources which are included as part of this document
 	imports?: #ThreatCatalogImports @go(Imports)
-
-	// Constraints
-	if extends != _|_ {
-		metadata: "mapping-references": [_, ...]
-	}
-	if imports != _|_ {
-		metadata: "mapping-references": [_, ...]
-	}
-	if threats != _|_ {
-		metadata: "mapping-references": [_, ...]
-	}
 }
 
 // ThreatCatalogImports defines imported entries for a threat catalog
