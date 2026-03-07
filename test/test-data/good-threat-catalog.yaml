@@ -1,0 +1,61 @@
+metadata:
+  id: EXAMPLE-THREAT-CATALOG
+  type: ThreatCatalog
+  gemara-version: "0.20.0"
+  version: "1.0.0"
+  description: Example Threat Catalog
+  author:
+    id: security-team
+    name: Security Team
+    type: Human
+  mapping-references:
+    - id: EXAMPLE-VECTOR-CATALOG
+      title: Example Attack Vector Catalog
+      version: "1.0.0"
+
+title: Example Threat Catalog
+
+capabilities:
+  - id: CAP-001
+    title: Container Runtime
+    description: System's ability to run containerized applications, including image management and container lifecycle.
+
+  - id: CAP-002
+    title: Container Registry
+    description: System's ability to store and retrieve container images from registries.
+
+threats:
+  - id: THREAT-001
+    title: Exploitation of Vulnerable Container Images
+    description: Attackers exploit known vulnerabilities in container images to gain unauthorized access or execute malicious code.
+    capabilities:
+      - reference-id: EXAMPLE-THREAT-CATALOG
+        entries:
+          - reference-id: CAP-002
+    vectors:
+      - reference-id: EXAMPLE-VECTOR-CATALOG
+        entries:
+          - reference-id: VEC-001
+    actors:
+      - id: external-attacker
+        name: External Attacker
+        type: Human
+
+  - id: THREAT-002
+    title: Host System Compromise via Container Escape
+    description: Attackers escape container isolation to gain access to the underlying host system and compromise other containers or host resources.
+    capabilities:
+      - reference-id: EXAMPLE-THREAT-CATALOG
+        entries:
+          - reference-id: CAP-001
+    vectors:
+      - reference-id: EXAMPLE-VECTOR-CATALOG
+        entries:
+          - reference-id: VEC-002
+    actors:
+      - id: external-attacker
+        name: External Attacker
+        type: Human
+      - id: malicious-insider
+        name: Malicious Insider
+        type: Human

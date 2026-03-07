@@ -86,8 +86,5 @@ package gemara
 	"entry-id": string @go(EntryId)
 
 	// entry-type identifies what kind of atomic unit this entry is
-	"entry-type": #EntryType | string @go(EntryType)
+	"entry-type": #EntryType @go(EntryType)
 }
-
-// EntryType enumerates the atomic units within Gemara artifacts that can participate in mappings
-#EntryType: "Guideline" | "Statement" | "Control" | "Assessment Requirement" @go(-)

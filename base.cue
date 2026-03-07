@@ -89,7 +89,7 @@ import "time"
 #ArtifactType: "ControlCatalog" | "GuidanceCatalog" | "ThreatCatalog" | "Policy" | "MappingDocument" | "EvaluationLog" | "VectorCatalog" @go(-)
 
 // EntryType enumerates the atomic units within Gemara artifacts that can participate in mappings
-#EntryType: "Guideline" | "Statement" | "Control" | "AssessmentRequirement" @go(-)
+#EntryType: "Guideline" | "Statement" | "Control" | "AssessmentRequirement" | "Vector" @go(-)
 
 // ConfidenceLevel indicates the evaluator's confidence level in an assessment result.
 #ConfidenceLevel: "Undetermined" | "Low" | "Medium" | "High" @go(-)
