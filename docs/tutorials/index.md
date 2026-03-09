@@ -32,9 +32,14 @@ Before writing policy → [Threat Assessment Guide](controls/threat-assessment-g
 → **COMING SOON:** Understand the control catalog structure and assessment requirements (Layer 2).
 
 ### Understanding the security posture of consumed software
+
 → [Threat Assessment Guide](controls/threat-assessment-guide) — review threat catalogs for your dependencies (Layer 2).
 
-→ **COMING SOON:** Use control catalogs (e.g. OSPS, CCC) to act as hardening guides (Layer 2).
+→ **COMING SOON:** Use control catalogs (e.g. OSPS, CCC) as hardening guides (Layer 2).
+
+### Creating a guidance catalog from best practices
+
+From a spreadsheet or checklist — create a guidance catalog (guidelines, families, mapping-references) that threat-informed controls can reference; express relationships to other frameworks in a [Mapping Document](https://gemara.openssf.org/schema/mapping.html). → [Guidance Catalog Guide](guidance/guidance-guide).
 
 ---
 
@@ -42,17 +47,17 @@ Before writing policy → [Threat Assessment Guide](controls/threat-assessment-g
 
 | Layer | Artifact | Guide |
 |-------|----------|-------|
-| **Layer 1** — Guidance | Guidance Catalog (guidelines, families, mapping-references) | *(tutorial coming later)* |
+| **Layer 1** — Guidance | Guidance Catalog (guidelines, families, mapping-references) | [Guidance Catalog Guide](guidance/guidance-guide) |
 | **Layer 2** — Controls | Threat Catalog + Control Catalog (assessment requirements, threats) | [Threat Assessment](controls/threat-assessment-guide), [Control Catalog](controls/control-catalog-guide) |
 | **Layer 3** — Policy | Policy Document (scope, imports, adherence, risks) | *(tutorial coming later)* |
 
 ## What You'll Need
 
-* `go` installed
-* `cue` installed for validation
+- `go` installed
+- `cue` installed for validation
 
-## Have Ideas? 
+## Have Ideas?
 
-* Reach out via Slack in `#gemara`
-* Discuss in one of our bi-weekly meetings on the [OpenSSF calendar](https://calendar.google.com/calendar/u/0?cid=czYzdm9lZmhwNWk5cGZsdGI1cTY3bmdwZXNAZ3JvdXAuY2FsZW5kYXIuZ29vZ2xlLmNvbQ)
-* Open a [GitHub Issue](https://github.com/gemaraproj/gemara/issues)
+- Reach out via Slack in `#gemara`
+- Discuss in one of our bi-weekly meetings on the [OpenSSF calendar](https://calendar.google.com/calendar/u/0?cid=czYzdm9lZmhwNWk5cGZsdGI1cTY3bmdwZXNAZ3JvdXAuY2FsZW5kYXIuZ29vZ2xlLmNvbQ)
+- Open a [GitHub Issue](https://github.com/gemaraproj/gemara/issues)
