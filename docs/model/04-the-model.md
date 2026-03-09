@@ -20,7 +20,7 @@ Activities in the definition layers, Layer 1 through Layer 3, should each produc
 
 As noted in [Foundational Concepts](./03-foundational-concepts), Layer 4 defines Sensitive Activities connecting the two halves. The first three layers point toward the Sensitive Activities to define what is acceptable and what is unacceptable. Meanwhile, the last three layers look back at the Sensitive Activities or their outcomes to determine whether they comply with defined expectations. In Layer 7, Audit activities determine the quality of results from the lower layers.
 
-The model's architectural components and their elements are detailed in the following sections, starting with [The Definition Layers](./05-definition-layers.html), followed by [The Pivot Point](./06-sensitive-activities.html) examining sensitive activities, and finally [The Measurement Layers](./07-measurement-layers.html).
+The model's architectural components and their elements are detailed in the following sections, starting with [The Definition Layers](./05-definition-layers), followed by [The Pivot Point](./06-sensitive-activities) examining sensitive activities, and finally [The Measurement Layers](./07.1-measurement-layers).
 
 {% include themed-image.html
   light="/assets/model-images/figure-4.1-light.png"
