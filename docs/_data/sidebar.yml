@@ -17,5 +17,9 @@
       children:
         - title: Guidance Catalog Guide
           url: /tutorials/guidance/guidance-guide
+    - title: Policy
+      children:
+        - title: Policy Guide
+          url: /tutorials/policy/policy-guide
 - title: ADRs
   url: /adrs/
