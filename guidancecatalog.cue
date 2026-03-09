@@ -26,22 +26,6 @@ package gemara
 
 	// exemptions provides information about situations where this guidance is not applicable
 	exemptions?: [...#Exemption] @go(Exemptions)
-
-	// Constraints
-	if guidelines != _|_ {
-		families: [_, ...#Group]
-	}
-
-	// guidelines that extend other guidelines must be in the same family as the extended guideline
-	_validateExtensions: {
-		for guideline in guidelines if guideline.extends != _|_ {
-			if (guideline.extends."reference-id" == "" || guideline.extends."reference-id" == _|_) {
-				for extended in guidelines if extended.id == guideline.extends."entry-id" {
-					guideline.family == extended.family
-				}
-			}
-		}
-	}
 }
 
 // GuidanceType restricts the possible types that a catalog may be listed as
@@ -90,11 +74,6 @@ package gemara
 
 	// replaced-by references the guideline that supersedes this one when deprecated or retired
 	"replaced-by"?: #EntryMapping @go(ReplacedBy,optional=nillable) @yaml("replaced-by,omitempty")
-
-	// retired guidelines must not have recommendations
-	if state == "Retired" {
-		recommendations?: _|_
-	}
 }
 
 // Statement represents a structural sub-requirement within a guideline;

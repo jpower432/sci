@@ -23,11 +23,6 @@ package gemara
 
 	// imports contains controls from other sources which are included as part of this document
 	imports?: #ControlCatalogImports @go(Imports)
-
-	// Constraints
-	if controls != _|_ {
-		families: [_, ...#Group]
-	}
 }
 
 // ControlCatalogImports defines imported entries for a control catalog
@@ -85,9 +80,4 @@ package gemara
 
 	// replaced-by references the assessment requirement that supersedes this one when deprecated or retired
 	"replaced-by"?: #EntryMapping @go(ReplacedBy,optional=nillable) @yaml("replaced-by,omitempty")
-
-	// retired assessment requirements must not have a recommendation
-	if state == "Retired" {
-		recommendation?: _|_
-	}
 }
