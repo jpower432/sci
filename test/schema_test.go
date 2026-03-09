@@ -15,7 +15,7 @@ import (
 	cueyaml "cuelang.org/go/encoding/yaml"
 )
 
-var schemaValue cue.Value
+var baseValue, validationValue cue.Value
 
 func TestMain(m *testing.M) {
 	ctx := cuecontext.New()
@@ -28,14 +28,21 @@ func TestMain(m *testing.M) {
 	cfg := &load.Config{
 		Dir: schemaDir,
 	}
-	instances := load.Instances([]string{"."}, cfg)
-	if len(instances) != 1 {
-		panic("expected exactly one CUE instance")
+
+	// Load the base package and the validation subpackage.
+	instances := load.Instances([]string{".", "./validation"}, cfg)
+	if len(instances) != 2 {
+		panic("expected two CUE instances (base + validation)")
 	}
 
-	schemaValue = ctx.BuildInstance(instances[0])
-	if schemaValue.Err() != nil {
-		panic("failed to build CUE schema: " + schemaValue.Err().Error())
+	baseValue = ctx.BuildInstance(instances[0])
+	if baseValue.Err() != nil {
+		panic("failed to build base CUE schema: " + baseValue.Err().Error())
+	}
+
+	validationValue = ctx.BuildInstance(instances[1])
+	if validationValue.Err() != nil {
+		panic("failed to build validation CUE schema: " + validationValue.Err().Error())
 	}
 
 	os.Exit(m.Run())
@@ -72,18 +79,33 @@ func TestSchemaValidation(t *testing.T) {
 		{"invalid YAML", "./test-data/bad.yaml", "#ControlCatalog", true, ""},
 		{"invalid JSON", "./test-data/bad.json", "#ControlCatalog", true, ""},
 		{"controls without families", "./test-data/bad-no-families.yaml", "#ControlCatalog", true, ""},
+		{"duplicate control IDs", "./test-data/bad-ctl-duplicate-ids.yaml", "#ControlCatalog", true, ""},
+		{"control references invalid family", "./test-data/bad-ctl-invalid-family.yaml", "#ControlCatalog", true, ""},
+		{"control references invalid mapping-reference", "./test-data/bad-ctl-invalid-mapping-ref.yaml", "#ControlCatalog", true, ""},
+		{"metadata type does not match artifact definition", "./test-data/bad-ctl-wrong-type.yaml", "#ControlCatalog", true, ""},
+
+		// GuidanceCatalog — negative
+		{"retired guideline with recommendations", "./test-data/bad-lifecycle.yaml", "#GuidanceCatalog", true, ""},
+
+		// VectorCatalog — negative
+		{"duplicate vector IDs", "./test-data/bad-vc-duplicate-ids.yaml", "#VectorCatalog", true, ""},
+
+		// ThreatCatalog — negative
+		{"threat references invalid mapping-reference", "./test-data/bad-tc-invalid-ref.yaml", "#ThreatCatalog", true, ""},
 
 		// MappingDocument — positive
 		{"valid mapping document", "./test-data/good-mapping-document.yaml", "#MappingDocument", false, ""},
 
 		// MappingDocument — negative
 		{"invalid mapping document without mapping-references", "./test-data/bad-mapping-document.yaml", "#MappingDocument", true, ""},
-
-		// GuidanceCatalog — negative
-		{"retired guideline with recommendations", "./test-data/bad-lifecycle.yaml", "#GuidanceCatalog", true, ""},
+		{"mapping source references invalid mapping-reference", "./test-data/bad-md-source-ref.yaml", "#MappingDocument", true, ""},
+		{"duplicate mapping IDs", "./test-data/bad-md-duplicate-ids.yaml", "#MappingDocument", true, ""},
 
 		// EvaluationLog — positive
 		{"valid PVTR baseline scan", "./test-data/pvtr-baseline-scan.yaml", "#EvaluationLog", false, ""},
+
+		// EvaluationLog — negative
+		{"evaluation log reference-id mismatch", "./test-data/bad-eval-ref-mismatch.yaml", "#EvaluationLog", true, ""},
 
 		// ControlCatalog — edge cases
 		{"empty nested catalog", "./test-data/nested-empty.yaml", "#ControlCatalog", false, ""},
@@ -96,9 +118,14 @@ func TestSchemaValidation(t *testing.T) {
 				t.Fatalf("read %s: %v", tt.file, err)
 			}
 
-			def := schemaValue.LookupPath(cue.ParsePath(tt.definition))
+			// Prefer the validation definition (base + cross-field constraints).
+			// Fall back to the base definition for types without validation.
+			def := validationValue.LookupPath(cue.ParsePath(tt.definition))
 			if def.Err() != nil {
-				t.Fatalf("lookup %s: %v", tt.definition, def.Err())
+				def = baseValue.LookupPath(cue.ParsePath(tt.definition))
+				if def.Err() != nil {
+					t.Fatalf("lookup %s: %v", tt.definition, def.Err())
+				}
 			}
 
 			var validationErr error
@@ -106,7 +133,17 @@ func TestSchemaValidation(t *testing.T) {
 			case strings.HasSuffix(tt.file, ".json"):
 				validationErr = cuejson.Validate(data, def)
 			case strings.HasSuffix(tt.file, ".yaml"), strings.HasSuffix(tt.file, ".yml"):
-				validationErr = cueyaml.Validate(data, def)
+				yamlAST, extractErr := cueyaml.Extract(tt.file, data)
+				if extractErr != nil {
+					validationErr = extractErr
+				} else {
+					yamlValue := baseValue.Context().BuildFile(yamlAST)
+					result := def.Unify(yamlValue)
+					validationErr = result.Err()
+					if validationErr == nil {
+						validationErr = result.Validate(cue.All())
+					}
+				}
 			default:
 				t.Fatalf("unsupported file extension: %s", tt.file)
 			}
