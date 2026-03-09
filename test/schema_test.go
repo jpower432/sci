@@ -76,36 +76,36 @@ func TestSchemaValidation(t *testing.T) {
 		{"valid security policy", "./test-data/good-security-policy.yml", "#Policy", false, ""},
 
 		// ControlCatalog — negative
-		{"invalid YAML", "./test-data/bad.yaml", "#ControlCatalog", true, ""},
-		{"invalid JSON", "./test-data/bad.json", "#ControlCatalog", true, ""},
-		{"controls without families", "./test-data/bad-no-families.yaml", "#ControlCatalog", true, ""},
-		{"duplicate control IDs", "./test-data/bad-ctl-duplicate-ids.yaml", "#ControlCatalog", true, ""},
-		{"control references invalid family", "./test-data/bad-ctl-invalid-family.yaml", "#ControlCatalog", true, ""},
-		{"control references invalid mapping-reference", "./test-data/bad-ctl-invalid-mapping-ref.yaml", "#ControlCatalog", true, ""},
-		{"metadata type does not match artifact definition", "./test-data/bad-ctl-wrong-type.yaml", "#ControlCatalog", true, ""},
+		{"invalid YAML", "./test-data/bad.yaml", "#ControlCatalog", true, "mismatched types string and struct"},
+		{"invalid JSON", "./test-data/bad.json", "#ControlCatalog", true, "field not allowed"},
+		{"controls without families", "./test-data/bad-no-families.yaml", "#ControlCatalog", true, "families changed after evaluation"},
+		{"duplicate control IDs", "./test-data/bad-ctl-duplicate-ids.yaml", "#ControlCatalog", true, "_uniqueControlIds"},
+		{"control references invalid family", "./test-data/bad-ctl-invalid-family.yaml", "#ControlCatalog", true, "family: conflicting values"},
+		{"control references invalid mapping-reference", "./test-data/bad-ctl-invalid-mapping-ref.yaml", "#ControlCatalog", true, `guidelines.0."reference-id"`},
+		{"metadata type does not match artifact definition", "./test-data/bad-ctl-wrong-type.yaml", "#ControlCatalog", true, "metadata.type: conflicting values"},
 
 		// GuidanceCatalog — negative
-		{"retired guideline with recommendations", "./test-data/bad-lifecycle.yaml", "#GuidanceCatalog", true, ""},
+		{"retired guideline with recommendations", "./test-data/bad-lifecycle.yaml", "#GuidanceCatalog", true, "explicit error (_|_ literal) in source"},
 
 		// VectorCatalog — negative
-		{"duplicate vector IDs", "./test-data/bad-vc-duplicate-ids.yaml", "#VectorCatalog", true, ""},
+		{"duplicate vector IDs", "./test-data/bad-vc-duplicate-ids.yaml", "#VectorCatalog", true, "_uniqueVectorIds"},
 
 		// ThreatCatalog — negative
-		{"threat references invalid mapping-reference", "./test-data/bad-tc-invalid-ref.yaml", "#ThreatCatalog", true, ""},
+		{"threat references invalid mapping-reference", "./test-data/bad-tc-invalid-ref.yaml", "#ThreatCatalog", true, `capabilities.0."reference-id"`},
 
 		// MappingDocument — positive
 		{"valid mapping document", "./test-data/good-mapping-document.yaml", "#MappingDocument", false, ""},
 
 		// MappingDocument — negative
-		{"invalid mapping document without mapping-references", "./test-data/bad-mapping-document.yaml", "#MappingDocument", true, ""},
-		{"mapping source references invalid mapping-reference", "./test-data/bad-md-source-ref.yaml", "#MappingDocument", true, ""},
-		{"duplicate mapping IDs", "./test-data/bad-md-duplicate-ids.yaml", "#MappingDocument", true, ""},
+		{"invalid mapping document without mapping-references", "./test-data/bad-mapping-document.yaml", "#MappingDocument", true, "incompatible list lengths"},
+		{"mapping source references invalid mapping-reference", "./test-data/bad-md-source-ref.yaml", "#MappingDocument", true, `"source-reference"."reference-id"`},
+		{"duplicate mapping IDs", "./test-data/bad-md-duplicate-ids.yaml", "#MappingDocument", true, "_uniqueMappingIds"},
 
 		// EvaluationLog — positive
 		{"valid PVTR baseline scan", "./test-data/pvtr-baseline-scan.yaml", "#EvaluationLog", false, ""},
 
 		// EvaluationLog — negative
-		{"evaluation log reference-id mismatch", "./test-data/bad-eval-ref-mismatch.yaml", "#EvaluationLog", true, ""},
+		{"evaluation log reference-id mismatch", "./test-data/bad-eval-ref-mismatch.yaml", "#EvaluationLog", true, `conflicting values "CATALOG-A" and "CATALOG-B"`},
 
 		// ControlCatalog — edge cases
 		{"empty nested catalog", "./test-data/nested-empty.yaml", "#ControlCatalog", false, ""},
@@ -118,10 +118,9 @@ func TestSchemaValidation(t *testing.T) {
 				t.Fatalf("read %s: %v", tt.file, err)
 			}
 
-			// Prefer the validation definition (base + cross-field constraints).
-			// Fall back to the base definition for types without validation.
 			def := validationValue.LookupPath(cue.ParsePath(tt.definition))
 			if def.Err() != nil {
+				t.Logf("validation package missing %s, falling back to base package", tt.definition)
 				def = baseValue.LookupPath(cue.ParsePath(tt.definition))
 				if def.Err() != nil {
 					t.Fatalf("lookup %s: %v", tt.definition, def.Err())
