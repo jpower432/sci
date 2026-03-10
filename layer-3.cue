@@ -51,7 +51,7 @@ package gemara
 	description: string
 
 	// severity describes the impact level
-	severity: "Low" | "Medium" | "High" | "Critical"
+	severity: #Severity @go(Severity)
 
 	// owner defines the RACI roles responsible for managing this risk
 	owner?: #Owner @go(Owner)
