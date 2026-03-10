@@ -55,6 +55,7 @@ pages:
     filename: "layer-3"
     schemas:
       - "RiskCatalog"
+      - "RiskCategory"
       - "Risk"
       - "Policy"
       - "Contacts"

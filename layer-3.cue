@@ -15,9 +15,29 @@ package gemara
 	// metadata provides detailed data about this catalog
 	metadata: #Metadata @go(Metadata)
 
+	// categories is a list of risk categories used to classify risks
+	categories?: [...#RiskCategory] @go(Categories)
+
 	// risks is a list of risks defined by this catalog
 	risks?: [...#Risk] @go(Risks)
 }
+
+// RiskCategory describes a grouping of risks and defines appetite boundaries
+#RiskCategory: {
+	#Group
+
+	// appetite defines the acceptable level of risk for this category
+	appetite: #RiskAppetite @go(Appetite)
+
+	// max-severity defines the highest allowed severity within this category
+	"max-severity"?: #Severity @go(MaxSeverity) @yaml("max-severity,omitempty")
+}
+
+// Severity defines the allowed impact levels for a risk
+#Severity: "Low" | "Medium" | "High" | "Critical"
+
+// RiskAppetite defines the acceptable level of exposure for a risk category
+#RiskAppetite: "Zero" | "Low" | "Moderate" | "High"
 
 // A Risk represents the potential for negative impact resulting from one or more threats.
 #Risk: {
@@ -33,17 +53,14 @@ package gemara
 	// severity describes the impact level
 	severity: "Low" | "Medium" | "High" | "Critical"
 
-	// owner identifies the responsible party for managing the risk
-	owner?: string
+	// owner defines the RACI roles responsible for managing this risk
+	owner?: #Owner @go(Owner)
 
 	// impact describes the business or operational impact
 	impact?: string
 
-	// threat-mappings link this risk to Layer 2 threats
-	"threat-mappings"?: [...#MultiEntryMapping] @go(ThreatMappings)
-
-	// residual-risk describes risk remaining after controls are applied
-	"residual-risk"?: string
+	// threats link this risk to Layer 2 threats
+	"threats"?: [...#MultiEntryMapping] @go(Threats)
 }
 
 // Policy represents a policy document with metadata, contacts, scope, imports, implementation plan, risks, and adherence requirements.
@@ -124,16 +141,37 @@ package gemara
 // Risks defines mitigated and accepted risks addressed by this policy.
 #Risks: {
 	// Mitigated risks only need reference-id and risk-id (no justification required)
-	mitigated?: [...#MultiEntryMapping]
+	mitigated?: [...#MitigatedRisk]
 	// Accepted risks require rationale (justification) and may include scope. Controls addressing these risks are implicitly identified through threat mappings.
 	accepted?: [...#AcceptedRisk]
 }
 
-// RiskMapping maps a risk to a reference and optionally includes scope and justification.
-#AcceptedRisk: {
+// MitigatedRisk represents a risk addressed by the policy
+#MitigatedRisk: {
+	// id allows this mitigated risk entry to be referenced by accepted risks
+	id: string
+
+	// risk references the risk being mitigated
 	risk: #EntryMapping
-	// Scope and justification are only required for accepted risks (e.g., risk is accepted for TLP:Green and TLP:Clear because they contain non-sensitive data)
-	scope?:         #Scope
+}
+
+// AcceptedRisk documents a risk the organization has chosen to accept,
+// optionally linking it to a mitigated risk when the acceptance covers
+// residual risk after partial mitigation.
+#AcceptedRisk: {
+	// id allows this accepted risk entry to be referenced
+	id: string
+
+	// target-id optionally links this acceptance to a mitigated risk entry
+	"target-id"?: string
+
+	// risk references the risk being accepted
+	risk: #EntryMapping
+
+	// scope defines where the risk acceptance applies
+	scope?: #Scope
+
+	// justification explains why the risk is accepted
 	justification?: string
 }
 
