@@ -26,6 +26,26 @@ jobs:
       - name: Run Schema Test
         run: make test
 
+  backward-compatibility:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v6.0.2
+        with:
+          persist-credentials: false
+
+      - name: Setup Go
+        uses: actions/setup-go@4b73464bb391d4059bd26b0524d20df3927bd417
+        with:
+          go-version: stable
+
+      - name: Backward compatibility check (advisory)
+        continue-on-error: true
+        run: make breaking-check
+
   check-generated-content:
     runs-on: ubuntu-latest
 
