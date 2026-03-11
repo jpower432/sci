@@ -10,18 +10,21 @@ title: Schema Organization by Artifact Type
 
 ## Context
 
-This layer-based organization is not working as well anymore because the layers have multiple main types and the artifacts are becoming the primary inot of work for users.
+Until this point, we have organized the schemas based on layer. For example, `layer-3.cue` contains the schemas for Capabilities, Threats, and Controls.
+
+This layer-based organization is not working as well anymore because (1) the layers have multiple main types and (2) the artifacts are becoming the primary unit of work for users.
 
 ## Decision
 
 Reorganize CUE schema files by artifact type instead of by layer.
-Each top-level artifact type gets its own file containing the artifact type definition and its main component types.
+
+Each top-level artifact type will be organized into its own file which contains the artifact type definition and its main component types.
 
 These artifacts are represented in `#ArtifactType`
 
 ### Website Organization
 
-The website continues to use layer-based navigation and cards (Layer 1, Layer 2, etc.) for conceptual organization, while the underlying schema files are organized by artifact type.
+The website is set to render schemas based on the file they live in, so there will now be one page per artifact type.
 
 ## Consequences
 
