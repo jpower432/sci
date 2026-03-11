@@ -2,9 +2,7 @@ package validation
 
 import "github.com/gemaraproj/gemara"
 
-#GuidanceCatalog: {
-	gemara.#GuidanceCatalog
-
+#GuidanceCatalog: gemara.#GuidanceCatalog & {
 	// Re-declare embedded fields in local scope for if-guards (_=top, no extra constraint)
 	families?:   _
 	guidelines?: _
@@ -72,9 +70,7 @@ import "github.com/gemaraproj/gemara"
 	guidelines?: [...#Guideline]
 }
 
-#Guideline: {
-	gemara.#Guideline
-
+#Guideline: gemara.#Guideline & {
 	// Re-declare embedded fields in local scope for if-guards (_=top, no extra constraint)
 	state:       _
 	statements?: _

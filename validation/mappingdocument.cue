@@ -2,9 +2,7 @@ package validation
 
 import "github.com/gemaraproj/gemara"
 
-#MappingDocument: {
-	gemara.#MappingDocument
-
+#MappingDocument: gemara.#MappingDocument & {
 	// Re-declare embedded fields in local scope for if-guards (_=top, no extra constraint)
 	mappings: _
 
@@ -34,9 +32,7 @@ import "github.com/gemaraproj/gemara"
 	mappings: [...#Mapping]
 }
 
-#Mapping: {
-	gemara.#Mapping
-
+#Mapping: gemara.#Mapping & {
 	// Re-declare embedded fields in local scope for if-guards (_=top, no extra constraint)
 	relationship: _
 

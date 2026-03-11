@@ -2,9 +2,7 @@ package validation
 
 import "github.com/gemaraproj/gemara"
 
-#VectorCatalog: {
-	gemara.#VectorCatalog
-
+#VectorCatalog: gemara.#VectorCatalog & {
 	// Re-declare embedded fields in local scope for if-guards (_=top, no extra constraint)
 	vectors?: _
 

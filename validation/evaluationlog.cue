@@ -2,8 +2,7 @@ package validation
 
 import "github.com/gemaraproj/gemara"
 
-#EvaluationLog: {
-	gemara.#EvaluationLog
+#EvaluationLog: gemara.#EvaluationLog & {
 
 	metadata: #Metadata
 

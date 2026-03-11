@@ -2,9 +2,7 @@ package validation
 
 import "github.com/gemaraproj/gemara"
 
-#Metadata: {
-	gemara.#Metadata
-
+#Metadata: gemara.#Metadata & {
 	// Alias re-declares the hyphenated field for use in the comprehension below
 	MR="mapping-references"?: _
 	if MR != _|_ {

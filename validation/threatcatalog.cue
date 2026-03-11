@@ -2,9 +2,7 @@ package validation
 
 import "github.com/gemaraproj/gemara"
 
-#ThreatCatalog: {
-	gemara.#ThreatCatalog
-
+#ThreatCatalog: gemara.#ThreatCatalog & {
 	// Re-declare embedded fields in local scope for if-guards (_=top, no extra constraint)
 	threats?:      _
 	capabilities?: _

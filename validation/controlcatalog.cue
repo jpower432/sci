@@ -2,9 +2,7 @@ package validation
 
 import "github.com/gemaraproj/gemara"
 
-#ControlCatalog: {
-	gemara.#ControlCatalog
-
+#ControlCatalog: gemara.#ControlCatalog & {
 	// Re-declare embedded fields in local scope for if-guards (_=top, no extra constraint)
 	families?: _
 	controls?: _
@@ -64,9 +62,7 @@ import "github.com/gemaraproj/gemara"
 	controls?: [...#Control]
 }
 
-#Control: {
-	gemara.#Control
-
+#Control: gemara.#Control & {
 	// Re-declare embedded fields in local scope for if-guards (_=top, no extra constraint)
 	state: _
 
@@ -80,9 +76,7 @@ import "github.com/gemaraproj/gemara"
 	"assessment-requirements": [...#AssessmentRequirement]
 }
 
-#AssessmentRequirement: {
-	gemara.#AssessmentRequirement
-
+#AssessmentRequirement: gemara.#AssessmentRequirement & {
 	// Re-declare embedded fields in local scope for if-guards (_=top, no extra constraint)
 	state: _
 

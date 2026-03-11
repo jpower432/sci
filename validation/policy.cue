@@ -2,9 +2,7 @@ package validation
 
 import "github.com/gemaraproj/gemara"
 
-#Policy: {
-	gemara.#Policy
-
+#Policy: gemara.#Policy & {
 	// Re-declare embedded fields in local scope for if-guards (_=top, no extra constraint)
 	imports:   _
 	risks?:    _
