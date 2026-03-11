@@ -82,6 +82,21 @@ import "time"
 	description: string
 }
 
+// Owner defines the RACI roles responsible for managing an artifact such as a risk
+#RACI: {
+	// responsible identifies the entities responsible for executing work to manage or mitigate the artifact
+	responsible: [...#Contact]
+
+	// accountable identifies the entity ultimately accountable for the outcome
+	accountable: [...#Contact]
+
+	// consulted identifies entities whose input is required when assessing or responding to the artifact
+	consulted?: [...#Contact]
+
+	// informed identifies entities that should be notified about changes to the artifact status
+	informed?: [...#Contact]
+}
+
 // Lifecycle represents the lifecycle state of a guideline, control, or assessment requirement
 #Lifecycle: *"Active" | "Draft" | "Deprecated" | "Retired" @go(-)
 

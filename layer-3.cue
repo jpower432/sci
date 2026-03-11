@@ -4,28 +4,75 @@ package gemara
 
 @go(gemara)
 
+// A RiskCatalog is a structured collection of documented risks that may affect an organization,
+// system, or service. It provides a centralized reference for risks that can be mapped to threats
+// and referenced by policies when documenting how those risks are mitigated or accepted.
+#RiskCatalog: {
+
+	// title describes the contents of this catalog at a glance
+	title: string
+
+	// metadata provides detailed data about this catalog
+	metadata: #Metadata @go(Metadata)
+
+	// categories is a list of risk categories used to classify risks
+	categories?: [...#RiskCategory] @go(Categories)
+
+	// risks is a list of risks defined by this catalog
+	risks?: [...#Risk] @go(Risks)
+}
+
+// RiskCategory describes a grouping of risks and defines appetite boundaries
+#RiskCategory: {
+	#Group
+
+	// appetite defines the acceptable level of risk for this category
+	appetite: #RiskAppetite @go(Appetite)
+
+	// max-severity defines the highest allowed severity within this category
+	"max-severity"?: #Severity @go(MaxSeverity) @yaml("max-severity,omitempty")
+}
+
+// Severity defines the allowed impact levels for a risk
+#Severity: "Low" | "Medium" | "High" | "Critical" @go(-)
+
+// RiskAppetite defines the acceptable level of exposure for a risk category
+#RiskAppetite: "Zero" | "Low" | "Moderate" | "High" @go(-)
+
+// A Risk represents the potential for negative impact resulting from one or more threats.
+#Risk: {
+	// id allows this risk to be referenced by other elements
+	id: string
+
+	// title describes the risk
+	title: string
+
+	// description explains the risk scenario
+	description: string
+
+	// severity describes the impact level
+	severity: #Severity @go(Severity)
+
+	// owner defines the RACI roles responsible for managing this risk
+	owner?: #RACI @go(Owner)
+
+	// impact describes the business or operational impact
+	impact?: string
+
+	// threats link this risk to Layer 2 threats
+	"threats"?: [...#MultiEntryMapping] @go(Threats)
+}
+
 // Policy represents a policy document with metadata, contacts, scope, imports, implementation plan, risks, and adherence requirements.
 #Policy: {
 	title:                  string
 	metadata:               #Metadata
-	contacts:               #Contacts
+	contacts:               #RACI
 	scope:                  #Scope
 	imports:                #Imports
 	"implementation-plan"?: #ImplementationPlan @go(ImplementationPlan)
 	risks?:                 #Risks
 	adherence:              #Adherence
-}
-
-// Contacts defines RACI roles for policy compliance and notification.
-#Contacts: {
-	// responsible is the person or group responsible for implementing controls for technical requirements
-	responsible: [...#Contact]
-	// accountable is the person or group accountable for evaluating and enforcing the efficacy of technical controls
-	accountable: [...#Contact]
-	// consulted is an optional person or group who may be consulted for more information about the technical requirements 
-	consulted?: [...#Contact]
-	// informed is an optional person or group who must receive updates about compliance with this policy 
-	informed?: [...#Contact]
 }
 
 // Scope defines what is included and excluded from policy applicability.
@@ -71,16 +118,37 @@ package gemara
 // Risks defines mitigated and accepted risks addressed by this policy.
 #Risks: {
 	// Mitigated risks only need reference-id and risk-id (no justification required)
-	mitigated?: [...#MultiEntryMapping]
+	mitigated?: [...#MitigatedRisk]
 	// Accepted risks require rationale (justification) and may include scope. Controls addressing these risks are implicitly identified through threat mappings.
 	accepted?: [...#AcceptedRisk]
 }
 
-// RiskMapping maps a risk to a reference and optionally includes scope and justification.
-#AcceptedRisk: {
+// MitigatedRisk represents a risk addressed by the policy
+#MitigatedRisk: {
+	// id allows this mitigated risk entry to be referenced by accepted risks
+	id: string
+
+	// risk references the risk being mitigated
 	risk: #EntryMapping
-	// Scope and justification are only required for accepted risks (e.g., risk is accepted for TLP:Green and TLP:Clear because they contain non-sensitive data)
-	scope?:         #Scope
+}
+
+// AcceptedRisk documents a risk the organization has chosen to accept,
+// optionally linking it to a mitigated risk when the acceptance covers
+// residual risk after partial mitigation.
+#AcceptedRisk: {
+	// id allows this accepted risk entry to be referenced
+	id: string
+
+	// target-id optionally links this acceptance to a mitigated risk entry
+	"target-id"?: string
+
+	// risk references the risk being accepted
+	risk: #EntryMapping
+
+	// scope defines where the risk acceptance applies
+	scope?: #Scope
+
+	// justification explains why the risk is accepted
 	justification?: string
 }
 

@@ -54,8 +54,11 @@ pages:
   - title: "Layer 3"
     filename: "layer-3"
     schemas:
+      - "RiskCatalog"
+      - "RiskCategory"
+      - "Risk"
       - "Policy"
-      - "Contacts"
+      - "RACI"
       - "Scope"
       - "Dimensions"
       - "Imports"
