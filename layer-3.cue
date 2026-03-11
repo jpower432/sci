@@ -34,10 +34,10 @@ package gemara
 }
 
 // Severity defines the allowed impact levels for a risk
-#Severity: "Low" | "Medium" | "High" | "Critical"
+#Severity: "Low" | "Medium" | "High" | "Critical" @go(-)
 
 // RiskAppetite defines the acceptable level of exposure for a risk category
-#RiskAppetite: "Zero" | "Low" | "Moderate" | "High"
+#RiskAppetite: "Zero" | "Low" | "Moderate" | "High" @go(-)
 
 // A Risk represents the potential for negative impact resulting from one or more threats.
 #Risk: {
@@ -54,7 +54,7 @@ package gemara
 	severity: #Severity @go(Severity)
 
 	// owner defines the RACI roles responsible for managing this risk
-	owner?: #Owner @go(Owner)
+	owner?: #RACI @go(Owner)
 
 	// impact describes the business or operational impact
 	impact?: string
@@ -87,16 +87,7 @@ package gemara
 }
 
 // Contacts defines RACI roles for policy compliance and notification.
-#Contacts: {
-	// responsible is the person or group responsible for implementing controls for technical requirements
-	responsible: [...#Contact]
-	// accountable is the person or group accountable for evaluating and enforcing the efficacy of technical controls
-	accountable: [...#Contact]
-	// consulted is an optional person or group who may be consulted for more information about the technical requirements 
-	consulted?: [...#Contact]
-	// informed is an optional person or group who must receive updates about compliance with this policy 
-	informed?: [...#Contact]
-}
+#contacts?: #RACI @go(Contacts)
 
 // Scope defines what is included and excluded from policy applicability.
 #Scope: {

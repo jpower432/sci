@@ -83,7 +83,7 @@ import "time"
 }
 
 // Owner defines the RACI roles responsible for managing an artifact such as a risk
-#Owner: {
+#RACI: {
 	// responsible identifies the entities responsible for executing work to manage or mitigate the artifact
 	responsible: [...#Contact]
 
