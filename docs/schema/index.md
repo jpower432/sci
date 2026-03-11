@@ -66,7 +66,7 @@ The base package contains field-level type definitions and validation subpackage
 # Install CUE
 go install cuelang.org/go/cmd/cue@latest
 
-# Validate with base types only
+# Validate with base types only; no cross-field constraints
 cue vet -c -d '#ControlCatalog' github.com/gemaraproj/gemara@latest your-controls.yaml
 
 # Validate with base types + cross-field constraints
