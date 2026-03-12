@@ -41,4 +41,4 @@ package gemara
 }
 
 // ArtifactType identifies the kind of Gemara artifact for unambiguous parsing
-#ArtifactType: "ControlCatalog" | "GuidanceCatalog" | "ThreatCatalog" | "Policy" | "MappingDocument" | "EvaluationLog" | "VectorCatalog" @go(-)
+#ArtifactType: "ControlCatalog" | "GuidanceCatalog" | "ThreatCatalog" | "Policy" | "MappingDocument" | "EvaluationLog" | "VectorCatalog" | "RiskCatalog" @go(-)

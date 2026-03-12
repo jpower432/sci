@@ -101,6 +101,9 @@ func TestSchemaValidation(t *testing.T) {
 		{"mapping source references invalid mapping-reference", "./test-data/bad-md-source-ref.yaml", "#MappingDocument", true, `"source-reference"."reference-id"`},
 		{"duplicate mapping IDs", "./test-data/bad-md-duplicate-ids.yaml", "#MappingDocument", true, "_uniqueMappingIds"},
 
+		// RiskCatalog — positive
+		{"valid risk catalog", "./test-data/good-risk-catalog.yaml", "#RiskCatalog", false, ""},
+
 		// EvaluationLog — positive
 		{"valid PVTR baseline scan", "./test-data/pvtr-baseline-scan.yaml", "#EvaluationLog", false, ""},
 
