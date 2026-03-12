@@ -10,7 +10,7 @@ package gemara
 	id: string
 
 	// type identifies the kind of Gemara artifact for unambiguous parsing
-	type: #ArtifactType @go(Type)
+	type: #ArtifactType
 
 	// gemara-version declares which version of the Gemara specification this artifact conforms to
 	"gemara-version": string @go(GemaraVersion) @yaml("gemara-version")

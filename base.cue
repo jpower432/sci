@@ -30,7 +30,7 @@ import "time"
 	name: string
 
 	// type specifies the type of entity interacting in the workflow
-	type: #EntityType @go(Type)
+	type: #EntityType
 
 	// version is the version of the entity (for tools; if applicable)
 	version?: string

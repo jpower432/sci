@@ -45,7 +45,7 @@ package gemara
 }
 
 // GuidanceType restricts the possible types that a catalog may be listed as
-#GuidanceType: "Standard" | "Regulation" | "Best Practice" | "Framework"
+#GuidanceType: "Standard" | "Regulation" | "Best Practice" | "Framework" @go(-)
 
 // Exemption describes a single scenario where the catalog is not applicable
 #Exemption: {

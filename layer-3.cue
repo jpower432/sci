@@ -177,7 +177,7 @@ package gemara
 	executor?:    #Actor
 }
 
-#MethodType: "Manual" | "Behavioral" | "Automated" | "Autoremediation" | "Gate"
+#MethodType: "Manual" | "Behavioral" | "Automated" | "Autoremediation" | "Gate" @go(-)
 
 // Parameter defines a configurable parameter for assessment or enforcement activities.
 #Parameter: {
@@ -228,4 +228,4 @@ package gemara
 }
 
 // ModType defines the type of modification to the assessment requirement.
-#ModType: "Add" | "Modify" | "Remove" | "Replace" | "Override"
+#ModType: "Add" | "Modify" | "Remove" | "Replace" | "Override" @go(-)
