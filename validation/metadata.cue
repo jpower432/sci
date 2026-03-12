@@ -1,3 +1,6 @@
+// Package validation is a policy overlay for authoring Gemara artifacts.
+// It layers referential integrity, uniqueness, and cross-field consistency
+// checks on top of the base schema definitions in the gemara package.
 package validation
 
 import "github.com/gemaraproj/gemara"

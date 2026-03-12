@@ -10,7 +10,6 @@ import "github.com/gemaraproj/gemara"
 	imports?:  _
 
 	metadata: #Metadata
-
 	metadata: type: "ControlCatalog"
 
 	if controls != _|_ {

@@ -8,7 +8,6 @@ import "github.com/gemaraproj/gemara"
 	guidelines?: _
 
 	metadata: #Metadata
-
 	metadata: type: "GuidanceCatalog"
 
 	if guidelines != _|_ {

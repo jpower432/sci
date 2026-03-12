@@ -9,7 +9,6 @@ import "github.com/gemaraproj/gemara"
 	adherence: _
 
 	metadata: #Metadata
-
 	metadata: type: "Policy"
 
 	// metadata.id allows self-referencing in addition to mapping-reference IDs

@@ -7,7 +7,6 @@ import "github.com/gemaraproj/gemara"
 	vectors?: _
 
 	metadata: #Metadata
-
 	metadata: type: "VectorCatalog"
 
 	if vectors != _|_ {

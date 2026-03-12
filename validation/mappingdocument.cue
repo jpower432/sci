@@ -7,7 +7,6 @@ import "github.com/gemaraproj/gemara"
 	mappings: _
 
 	metadata: #Metadata
-
 	metadata: type: "MappingDocument"
 
 	// Base type allows empty mapping-references; MappingDocument requires at least one
