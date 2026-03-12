@@ -22,7 +22,7 @@ package gemara
 	controls?: [...#Control] @go(Controls)
 
 	// imports contains controls from other sources which are included as part of this document
-	imports?: #ControlCatalogImports @go(Imports)
+	imports?: #ControlCatalogImports @go(Imports,optional=nillable)
 
 	// Constraints
 	if controls != _|_ {
@@ -110,7 +110,7 @@ package gemara
 	capabilities?: [...#Capability] @go(Capabilities)
 
 	// imports contains threats and capabilities from other sources which are included as part of this document
-	imports?: #ThreatCatalogImports @go(Imports)
+	imports?: #ThreatCatalogImports @go(Imports,optional=nillable)
 }
 
 // ThreatCatalogImports defines imported entries for a threat catalog
