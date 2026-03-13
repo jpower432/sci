@@ -93,9 +93,8 @@ pages:
     filename: "layer-6"
     schemas:
       - "EnforcementLog"
-      - "Action"
+      - "ActionLog"
       - "Procedure"
       - "Justification"
       - "AssessmentFinding"
-      - "ActionType"
-      - "Status"
+      - "Disposition"
