@@ -34,6 +34,21 @@ You have added a new schema 'newschema' in layerN.cue( where N is a number from 
 
 Use `cue fmt .` and `make cuefmtcheck` to ensure proper formatting and `make lintcue` to validate the syntax of your changes. If you forget to do this before opening a PR and your changes are invalid, the [CI workflow](.github/workflows/ci.yml) will fail and alert you.
 
+### Adding a new artifact type
+
+Adding a new artifact type requires schema changes, test data, and documentation updates. Follow the checklist below.
+
+| **Step** | **Action**                                                                                    |
+|:---------|:----------------------------------------------------------------------------------------------|
+| 1        | Define the new `#YourArtifact` definition in the appropriate `layer-N.cue` file               |
+| 2        | Add `"YourArtifact"` to the `#ArtifactType` enum in `base.cue`                                |
+| 3        | Add new enum or alias types to `docs/schema-nav.yml` under the correct layer                  |
+| 4        | Create a valid test data file in `test/test-data/` (prefix with `good-`)                      |
+| 5        | Add positive and/or negative test cases to `test/schema_test.go`                              |
+| 6        | Run `cue vet -d '#YourArtifact' . test/test-data/good-your-artifact.yaml` to validate locally |
+| 7        | Run `cue fmt .` and `make cuefmtcheck` to verify formatting                                   |
+| 8        | Run `make lintcue` and `make test` to confirm all checks pass                                 |
+
 ## Releases
 
 Releases are automatically created when a PR is merged into `main` with the `release` label. To trigger a release:
