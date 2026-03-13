@@ -25,6 +25,12 @@ metadata:
       title: "Approved Exception Register"
       version: "2025-Q3"
 
+disposition: Enforced
+
+method:
+  reference-id: security-policy
+  entry-id: EM-GATE-01
+
 target:
   id: gemara-repo
   name: "gemaraproj/gemara"
@@ -35,15 +41,11 @@ target:
     name: "Gemara Maintainers"
     affiliation: "OpenSSF"
 
-policy:
-  reference-id: security-policy
-
 actions:
-  - type: Block
-    method: Gate
-    status: Success
+  - disposition: Enforced
     message: "Blocked merge: missing user documentation"
-    executed-at: "2025-08-22T16:05:00Z"
+    start: "2025-08-22T16:05:00Z"
+    end: "2025-08-22T16:05:01Z"
     procedures:
       - github.com/gemaraproj/gemara/enforcement/gate.BlockMerge
     justification:
@@ -58,11 +60,10 @@ actions:
             reference-id: eval-log
             entry-id: OSPS-DO-01
 
-  - type: Remediate
-    method: Autoremediation
-    status: Success
+  - disposition: Enforced
     message: "Auto-remediation: enabled private vulnerability reporting"
-    executed-at: "2025-08-22T16:06:00Z"
+    start: "2025-08-22T16:06:00Z"
+    end: "2025-08-22T16:06:03Z"
     procedures:
       - github.com/gemaraproj/gemara/enforcement/remediate.EnablePrivateVulnReporting
       - github.com/gemaraproj/gemara/enforcement/remediate.VerifyVulnReportingActive
@@ -78,11 +79,9 @@ actions:
             reference-id: eval-log
             entry-id: OSPS-DO-02
 
-  - type: Allow
-    method: Gate
-    status: Success
+  - disposition: Clear
     message: "All access control assessments passed; no enforcement action required"
-    executed-at: "2025-08-22T16:07:00Z"
+    start: "2025-08-22T16:07:00Z"
     procedures:
       - github.com/gemaraproj/gemara/enforcement/allow.PassThrough
     justification:
@@ -94,11 +93,10 @@ actions:
             reference-id: eval-log
             entry-id: OSPS-AC-01
 
-  - type: Waive
-    method: Automated
-    status: Success
+  - disposition: Tolerated
     message: "Waived: subproject listing requirement deferred per approved exception EXC-2025-042"
-    executed-at: "2025-08-22T16:08:00Z"
+    start: "2025-08-22T16:08:00Z"
+    end: "2025-08-22T16:08:00Z"
     procedures:
       - github.com/gemaraproj/gemara/enforcement/waive.RecordException
     justification:
@@ -116,11 +114,9 @@ actions:
         - reference-id: exception-register
           remarks: "EXC-2025-042: Single-repository projects are exempt from the subproject listing requirement"
 
-  - type: Remediate
-    method: Autoremediation
-    status: Not Run
+  - disposition: Clear
     message: "Autoremediation enforcement active; no noncompliance findings to act on"
-    executed-at: "2025-08-22T16:09:00Z"
+    start: "2025-08-22T16:09:00Z"
     procedures:
       - github.com/gemaraproj/gemara/enforcement/remediate.EnablePrivateVulnReporting
     justification:

@@ -15,21 +15,22 @@ metadata:
       title: "Information Security Policy"
       version: "2.1.0"
 
+disposition: Enforced
+
+method:
+  reference-id: security-policy
+  entry-id: EM-GATE-01
+
 target:
   id: gemara-repo
   name: "gemaraproj/gemara"
   type: Software
   uri: "https://github.com/gemaraproj/gemara"
 
-policy:
-  reference-id: security-policy
-
 actions:
-  - type: Block
-    method: Gate
-    status: Success
+  - disposition: Enforcedd
     message: "Blocked merge: missing user documentation"
-    executed-at: "2025-08-22T16:05:00Z"
+    start: "2025-08-22T16:05:00Z"
     procedures:
       - github.com/gemaraproj/gemara/enforcement/gate.BlockMerge
     justification:
