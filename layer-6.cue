@@ -8,29 +8,29 @@ package gemara
 #EnforcementLog: {
 	// metadata provides detailed data about this log
 	metadata: #Metadata @go(Metadata)
-	// policy references the Policy being enforced
-	policy: #ArtifactMapping @go(Policy)
+	// disposition is the aggregate enforcement disposition across all actions in this log
+	disposition: #Disposition
+	// method references the specific AcceptedMethod entry within the Policy being enforced
+	method: #EntryMapping @go(Method)
 	// target references the resource enforcement was performed on
 	target: #Resource @go(Target)
-	actions: [...#Action] @go(Actions,type=[]*Action)
+	//
+	actions: [...#ActionLog] @go(Actions,type=[]*ActionLog)
 }
 
-// Action captures performed enforcement actions.
-#Action: {
-	// type is the enforcement action taken
-	type: #ActionType @go(Type)
-
-	// method identifies the Policy enforcement method
-	method: #MethodType @go(Method)
-
-	// status is the outcome of the enforcement action
-	status: #Status @go(Status)
+// ActionLog captures a performed enforcement action.
+#ActionLog: {
+	// disposition is the enforcement action taken
+	disposition: #Disposition @go(Disposition)
 
 	// message provides additional context about the action
 	message?: string @go(Message,type=*string)
 
-	// executed-at is the timestamp when the action was taken
-	"executed-at": #Datetime @go(ExecutedAt)
+	// start is the timestamp when the enforcement action began
+	start: #Datetime
+
+	// end is the timestamp when the enforcement action concluded
+	end?: #Datetime
 
 	// procedures references the code paths or addresses that carried out this enforcement action
 	procedures: [...#Procedure]
@@ -63,8 +63,11 @@ package gemara
 	log: #EntryMapping @go(Log)
 }
 
-// ActionType enumerates the possible enforcement actions.
-#ActionType: "Block" | "Allow" | "Remediate" | "Waive" @go(-)
-
-// Status enumerates the possible outcomes of an enforcement action.
-#Status: "Success" | "Failure" | "Not Run" @go(-)
+// Disposition enumerates the possible enforcement outcomes.
+#Disposition:
+	// Findings existed and actions were taken.
+	"Enforced" |
+	// Findings existed but were accepted without action.
+	"Tolerated" |
+	// No findings, nothing to act on.
+	"Clear" @go(-)
