@@ -64,6 +64,9 @@ func TestSchemaValidation(t *testing.T) {
 		{"threats with vectors", "./test-data/good-threat-catalog.yaml", "#ThreatCatalog", false, ""},
 		{"vector mapping", "./test-data/good-vector-mitre-mapping.yaml", "#MappingDocument", false, ""},
 
+		// RiskCatalog — positive
+		{"valid risk catalog", "./test-data/good-risk-catalog.yaml", "#RiskCatalog", false, ""},
+
 		// Policy — positive
 		{"valid policy", "./test-data/good-policy.yaml", "#Policy", false, ""},
 		{"valid security policy", "./test-data/good-security-policy.yml", "#Policy", false, ""},

@@ -56,6 +56,8 @@ pages:
     schemas:
       - "RiskCatalog"
       - "RiskCategory"
+      - "Severity"
+      - "RiskAppetite"
       - "Risk"
       - "Policy"
       - "RACI"

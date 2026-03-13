@@ -20,6 +20,11 @@ package gemara
 
 	// risks is a list of risks defined by this catalog
 	risks?: [...#Risk] @go(Risks)
+
+	// Constraints
+	if risks != _|_ {
+		categories: [_, ...#RiskCategory]
+	}
 }
 
 // RiskCategory describes a grouping of risks and defines appetite boundaries
@@ -49,6 +54,9 @@ package gemara
 
 	// description explains the risk scenario
 	description: string
+
+	// category references by id a catalog risk category that this risk belongs to
+	category: string @go(Category)
 
 	// severity describes the impact level
 	severity: #Severity @go(Severity)
