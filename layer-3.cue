@@ -205,7 +205,7 @@ package gemara
 	executor?:    #Actor
 }
 
-#ModeType: "Manual" | "Automated" @go(-)
+#ModeType:   "Manual" | "Automated"                           @go(-)
 #MethodType: "Behavioral" | "Intent" | "Remediation" | "Gate" @go(-)
 
 // Parameter defines a configurable parameter for assessment or enforcement activities.
