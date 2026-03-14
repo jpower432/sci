@@ -24,8 +24,6 @@ package gemara
 	// remarks is prose regarding this mapping document
 	remarks?: string
 
-	// mapping-references is required for MappingDocument
-	_validateMappingReferences: metadata."mapping-references" != _|_
 }
 
 // Mapping represents an atomic relationship between a source entry and an optional target entry
@@ -41,13 +39,6 @@ package gemara
 
 	// relationship describes the nature or purpose of the mapping
 	relationship: #RelationshipType @go(Relationship)
-
-	// target is required for all relationships except no-match
-	_validateTarget: {
-		if relationship != "no-match" {
-			target: #EntryReference
-		}
-	}
 
 	// strength is the author's estimate of how completely the source entry satisfies the target entry; range 1-10
 	strength?: int & >=1 & <=10 @go(Strength)
