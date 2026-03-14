@@ -94,7 +94,7 @@ pages:
     schemas:
       - "EnforcementLog"
       - "ActionLog"
-      - "Procedure"
+      - "EnforcementStep"
       - "Justification"
       - "AssessmentFinding"
       - "Disposition"

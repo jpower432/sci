@@ -93,6 +93,7 @@ func TestSchemaValidation(t *testing.T) {
 
 		// EnforcementLog — negative
 		{"enforcement action missing log reference", "./test-data/bad-enforcement-log.yaml", "#EnforcementLog", true, ""},
+		{"clear disposition with failed assessment", "./test-data/bad-enforcement-clear-failed.yaml", "#EnforcementLog", true, ""},
 
 		// ControlCatalog — edge cases
 		{"empty nested catalog", "./test-data/nested-empty.yaml", "#ControlCatalog", false, ""},
