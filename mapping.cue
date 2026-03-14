@@ -23,7 +23,6 @@ package gemara
 
 	// remarks is prose regarding this mapping document
 	remarks?: string
-
 }
 
 // Mapping represents an atomic relationship between a source entry and an optional target entry
