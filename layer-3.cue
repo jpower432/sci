@@ -34,15 +34,32 @@ package gemara
 	// appetite defines the acceptable level of risk for this category
 	appetite: #RiskAppetite @go(Appetite)
 
-	// max-severity defines the highest allowed severity within this category
+	// max-severity defines the risk tolerance boundary: the highest severity
+	// the organization will accept within this category
 	"max-severity"?: #Severity @go(MaxSeverity) @yaml("max-severity,omitempty")
 }
 
-// Severity defines the allowed impact levels for a risk
-#Severity: "Low" | "Medium" | "High" | "Critical" @go(-)
+// Severity defines the assessed level of a risk based on its potential impact and likelihood
+#Severity:
+	// minor consequence if realized; manageable within normal operations
+	"Low" |
+	// moderate consequence if realized; may impair specific functions or objectives
+	"Medium" |
+	// severe consequence if realized; likely to disrupt core operations or objectives
+	"High" |
+	// extreme consequence if realized; threatens organizational viability or mission
+	"Critical" @go(-)
 
 // RiskAppetite defines the acceptable level of exposure for a risk category
-#RiskAppetite: "Zero" | "Low" | "Moderate" | "High" @go(-)
+#RiskAppetite:
+	// organization is willing to accept higher cost to minimize risk
+	"Minimal" |
+	// organization favors caution but permits limited risk
+	"Low" |
+	// organization tolerates residual risk when justified by value
+	"Moderate" |
+	// organization is willing to operate with less restrictive controls
+	"High" @go(-)
 
 // A Risk represents the potential for negative impact resulting from one or more threats.
 #Risk: {
@@ -58,7 +75,7 @@ package gemara
 	// category references by id a catalog risk category that this risk belongs to
 	category: string @go(Category)
 
-	// severity describes the impact level
+	// severity describes the assessed level of this risk
 	severity: #Severity @go(Severity)
 
 	// owner defines the RACI roles responsible for managing this risk
