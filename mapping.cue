@@ -49,6 +49,9 @@ package gemara
 		}
 	}
 
+	// strength is the author's estimate of how completely the source entry satisfies the target entry; range 1-10
+	strength?: int & >=1 & <=10 @go(Strength)
+
 	"confidence-level"?: #ConfidenceLevel @go(ConfidenceLevel)
 
 	// applicability constrains the contexts in which this mapping holds
