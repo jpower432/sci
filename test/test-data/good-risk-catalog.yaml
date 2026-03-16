@@ -29,7 +29,7 @@ categories:
   - id: CAT-COMPLIANCE
     title: Compliance Risk
     description: Risks arising from failure to comply with applicable laws, regulations, or industry standards
-    appetite: Zero
+    appetite: Minimal
 
 risks:
   - id: RISK-001
