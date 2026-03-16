@@ -55,7 +55,7 @@ package gemara
 	"confidence-level"?: #ConfidenceLevel @go(ConfidenceLevel)
 
 	// applicability constrains the contexts in which this mapping holds
-	applicability?: [...string] @go(Applicability)
+	applicability?: [string, ...string] @go(Applicability)
 
 	// rationale explains why this relationship exists
 	rationale?: string
