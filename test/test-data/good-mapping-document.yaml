@@ -70,6 +70,7 @@ mappings:
       entry-id: "2.1"
       entry-type: Guideline
     relationship: relates-to
+    strength: 6
     confidence-level: Medium
     applicability:
       - "manufacturer"
@@ -87,6 +88,7 @@ mappings:
       entry-id: "2.1"
       entry-type: Guideline
     relationship: implements
+    strength: 9
     confidence-level: High
     applicability:
       - "open-source-steward"
