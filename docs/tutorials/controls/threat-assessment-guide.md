@@ -113,7 +113,7 @@ It applies because mutable image tags let the tool resolve to a stale or comprom
 **Example (YAML)**
 
 ```yaml
-imports
+imports:
   threats:
   - reference-id: CCC
     entries:
