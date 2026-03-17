@@ -7,6 +7,9 @@ package gemara
 // EvaluationLog contains the results of evaluating a set of Layer 2 controls.
 #EvaluationLog: {
 	#Log
+
+	// result is the aggregate outcome across all evaluations in this log
+	result: #Result
 	evaluations: [#ControlEvaluation, ...#ControlEvaluation] @go(Evaluations,type=[]*ControlEvaluation)
 }
 
