@@ -6,12 +6,10 @@ package gemara
 
 // EnforcementLog records actions taken in response to noncompliance findings from Layer 5 evaluations.
 #EnforcementLog: {
-	// metadata provides detailed data about this log
-	metadata: #Metadata @go(Metadata)
+	#Log
+
 	// disposition is the aggregate enforcement disposition across all actions in this log
 	disposition: #Disposition
-	// target references the resource enforcement was performed on
-	target: #Resource @go(Target)
 	// actions is the list of enforcement actions performed
 	actions: [#ActionLog, ...#ActionLog] @go(Actions,type=[]*ActionLog)
 	// Enforce that Clear dispositions only contain Passed assessment results
