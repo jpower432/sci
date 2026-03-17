@@ -6,9 +6,8 @@ package gemara
 
 // EvaluationLog contains the results of evaluating a set of Layer 2 controls.
 #EvaluationLog: {
-	metadata: #Metadata @go(Metadata)
+	#Log
 	evaluations: [#ControlEvaluation, ...#ControlEvaluation] @go(Evaluations,type=[]*ControlEvaluation)
-	target: #Resource @go(Target)
 }
 
 // ControlEvaluation contains the results of evaluating a single Layer 5 control.
