@@ -62,6 +62,7 @@ func TestSchemaValidation(t *testing.T) {
 		// VectorCatalog — positive
 		{"valid vector catalog", "./test-data/good-vector-catalog.yaml", "#VectorCatalog", false, ""},
 		{"threats with vectors", "./test-data/good-threat-catalog.yaml", "#ThreatCatalog", false, ""},
+		{"valid capability catalog", "./test-data/good-capability-catalog.yaml", "#CapabilityCatalog", false, ""},
 		{"vector mapping", "./test-data/good-vector-mitre-mapping.yaml", "#MappingDocument", false, ""},
 
 		// RiskCatalog — positive

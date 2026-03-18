@@ -88,9 +88,6 @@ package gemara
 
 	// threats is a list of threats defined by this catalog
 	threats?: [#Threat, ...#Threat] @go(Threats)
-
-	// capabilities is a list of capabilities that make up the system being assessed
-	capabilities?: [#Capability, ...#Capability] @go(Capabilities)
 }
 
 // ThreatCatalogImports defines imported entries for a threat catalog
@@ -100,6 +97,14 @@ package gemara
 
 	// capabilities is a list of capabilities from another source
 	capabilities?: [#MultiEntryMapping, ...#MultiEntryMapping] @go(Capabilities)
+}
+
+// CapabilityCatalog describes a collection of capability entries
+#CapabilityCatalog: {
+	#Catalog
+
+	// capabilities is a list of capabilities defined by this catalog
+	capabilities?: [#Capability, ...#Capability] @go(Capabilities)
 }
 
 // Threat describes a specifically-scoped opportunity for a negative impact to the organization
