@@ -11,6 +11,8 @@ package gemara
 
 	// metadata provides detailed data about this document
 	metadata: #Metadata @go(Metadata)
+	metadata: type: "MappingDocument"
+	metadata: "mapping-references": [#MappingReference, ...#MappingReference]
 
 	// source-reference identifies the artifact being mapped from; must match a mapping-reference id
 	"source-reference": #ArtifactMapping @go(SourceReference)
@@ -19,10 +21,22 @@ package gemara
 	"target-reference": #ArtifactMapping @go(TargetReference)
 
 	// mappings is one or more atomic relationships between entries in the referenced artifacts
-	mappings: [#Mapping, ...#Mapping] @go(Mappings)
+	mappings: [#_MappingStrict, ...#_MappingStrict] @go(Mappings,type=[]Mapping)
+
+	_uniqueMappingIds: {for i, m in mappings {(m.id): i}}
 
 	// remarks is prose regarding this mapping document
 	remarks?: string
+}
+
+// _MappingStrict layers the "target required when not no-match" rule on top of #Mapping
+#_MappingStrict: {
+	@go(-)
+} & #Mapping & {
+	relationship: #RelationshipType
+	if relationship != "no-match" {
+		target: #TypedEntry
+	}
 }
 
 // Mapping represents an atomic relationship between a source entry and an optional target entry
@@ -31,10 +45,10 @@ package gemara
 	id: string
 
 	// source identifies the entry being mapped from
-	source: #EntryReference @go(Source)
+	source: #TypedEntry @go(Source)
 
 	// target identifies the entry being mapped to; absent when relationship is no-match
-	target?: #EntryReference @go(Target,optional=nillable)
+	target?: #TypedEntry @go(Target,optional=nillable)
 
 	// relationship describes the nature or purpose of the mapping
 	relationship: #RelationshipType @go(Relationship)
@@ -74,10 +88,16 @@ package gemara
 	"relates-to" @go(-)
 
 // EntryReference identifies a specific entry within a referenced artifact
-#EntryReference: {
+#TypedEntry: {
 	// entry-id identifies the specific entry in the referenced artifact
 	"entry-id": string @go(EntryId)
 
 	// entry-type identifies what kind of atomic unit this entry is
 	"entry-type": #EntryType @go(EntryType)
 }
+
+// EntryType enumerates the atomic units within Gemara artifacts that can participate in mappings
+#EntryType: "Guideline" | "Statement" | "Control" | "AssessmentRequirement" | "Vector" @go(-)
+
+// ConfidenceLevel indicates the evaluator's confidence level in an assessment result.
+#ConfidenceLevel: "Undetermined" | "Low" | "Medium" | "High" @go(-)

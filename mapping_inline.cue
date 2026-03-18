@@ -31,14 +31,10 @@ package gemara
 
 // MultiEntryMapping represents a mapping to an external reference with one or more entries.
 #MultiEntryMapping: {
-	// ReferenceId should reference the corresponding MappingReference id from metadata
-	"reference-id": string @go(ReferenceId)
+	#ArtifactMapping
 
 	// entries is a list of mapping entries
-	entries: [#MappingEntry, ...#MappingEntry] @go(Entries)
-
-	// remarks is prose regarding the mapped artifact or the mapping relationship
-	remarks?: string
+	entries: [#ArtifactMapping, ...#ArtifactMapping] @go(Entries)
 }
 
 // EntryMapping represents how a specific entry (control/requirement/procedure) maps to a MappingReference.
@@ -48,15 +44,6 @@ package gemara
 
 	// entry-id is the identifier being mapped to in the referenced artifact
 	"entry-id": string @go(EntryId)
-
-	// remarks is prose describing the mapping relationship
-	remarks?: string
-}
-
-// MappingEntry represents a single entry within a mapping
-#MappingEntry: {
-	// reference-id is the id for a MappingReference entry in the artifact's metadata
-	"reference-id": string @go(ReferenceId)
 
 	// remarks is prose describing the mapping relationship
 	remarks?: string

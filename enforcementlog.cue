@@ -7,7 +7,7 @@ package gemara
 // EnforcementLog records actions taken in response to noncompliance findings from Layer 5 evaluations.
 #EnforcementLog: {
 	#Log
-
+	metadata: type: "EnforcementLog"
 	// disposition is the aggregate enforcement disposition across all actions in this log
 	disposition: #Disposition
 	// actions is the list of enforcement actions performed
@@ -73,6 +73,8 @@ package gemara
 
 // Disposition enumerates the possible enforcement outcomes.
 #Disposition:
+	// Enforcement outcome could not be determined.
+	"Undetermined" |
 	// Findings existed and actions were taken.
 	"Enforced" |
 	// Findings existed but were accepted without action.

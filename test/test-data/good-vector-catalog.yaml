@@ -14,15 +14,25 @@ metadata:
       description: Systems running containerized applications
 title: Example Attack Vector Catalog
 
+groups:
+  - id: software-supply-chain
+    title: Software Supply Chain
+    description: Vectors related to the software supply chain, including dependencies and base images
+  - id: runtime-exploitation
+    title: Runtime Exploitation
+    description: Vectors related to exploiting runtime environments and configurations
+
 vectors:
   - id: VEC-001
     title: Container Image Vulnerabilities
     description: Container images containing known vulnerabilities in base images or dependencies can be exploited by attackers.
+    group: software-supply-chain
     applicability:
       - containerized-systems
 
   - id: VEC-002
     title: Container Escape
     description: Attackers exploit vulnerabilities in container runtime or misconfigurations to escape container isolation and access the host system.
+    group: runtime-exploitation
     applicability:
       - containerized-systems

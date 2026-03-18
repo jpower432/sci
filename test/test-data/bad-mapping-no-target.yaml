@@ -1,0 +1,29 @@
+title: Test Missing Target
+metadata:
+  id: TEST-MAP-001
+  version: "1.0.0"
+  type: MappingDocument
+  gemara-version: "0.20.0"
+  description: Test
+  author:
+    id: test
+    name: Test
+    type: Human
+  mapping-references:
+    - id: SRC
+      title: Source
+      version: "1.0"
+    - id: TGT
+      title: Target
+      version: "1.0"
+source-reference:
+  reference-id: SRC
+target-reference:
+  reference-id: TGT
+mappings:
+  - id: m1
+    source:
+      entry-id: S1
+      entry-type: Control
+    relationship: implements
+    rationale: This should fail because target is missing

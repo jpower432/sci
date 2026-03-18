@@ -18,10 +18,22 @@ metadata:
 
 title: Example Threat Catalog
 
+groups:
+  - id: stride-s
+    title: Spoofing
+    description: Impersonating something or someone to gain unauthorized access
+  - id: stride-t
+    title: Tampering
+    description: Modifying data or code without authorization
+  - id: stride-e
+    title: Elevation of Privilege
+    description: Gaining capabilities without proper authorization
+
 threats:
   - id: THREAT-001
     title: Exploitation of Vulnerable Container Images
     description: Attackers exploit known vulnerabilities in container images to gain unauthorized access or execute malicious code.
+    group: stride-t
     capabilities:
       - reference-id: EXAMPLE-CAPABILITY-CATALOG
         entries:
@@ -38,6 +50,7 @@ threats:
   - id: THREAT-002
     title: Host System Compromise via Container Escape
     description: Attackers escape container isolation to gain access to the underlying host system and compromise other containers or host resources.
+    group: stride-e
     capabilities:
       - reference-id: EXAMPLE-CAPABILITY-CATALOG
         entries:
