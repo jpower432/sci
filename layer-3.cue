@@ -10,15 +10,15 @@ package gemara
 #RiskCatalog: {
 	#Catalog
 
-	// categories is a list of risk categories used to classify risks
-	categories?: [#RiskCategory, ...#RiskCategory] @go(Categories)
+	// groups is a list of risk groups used to classify risks
+	groups?: [#RiskCategory, ...#RiskCategory] @go(Groups)
 
 	// risks is a list of risks defined by this catalog
 	risks?: [#Risk, ...#Risk] @go(Risks)
 
 	// Constraints
 	if risks != _|_ {
-		categories: [_, ...#RiskCategory]
+		groups: [_, ...#RiskCategory]
 	}
 }
 
@@ -67,8 +67,8 @@ package gemara
 	// description explains the risk scenario
 	description: string
 
-	// category references by id a catalog risk category that this risk belongs to
-	category: string @go(Category)
+	// group references by id a catalog risk group that this risk belongs to
+	group: string @go(Group)
 
 	// severity describes the assessed level of this risk
 	severity: #Severity @go(Severity)

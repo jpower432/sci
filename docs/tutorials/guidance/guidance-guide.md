@@ -8,10 +8,10 @@ description: Step-by-step guide to creating Gemara-compatible guidance catalogs
 
 This guide walks through creating a **Guidance Catalog** using the [Gemara](https://gemara.openssf.org/) project.
 
-**The basic idea:** A Guidance Catalog is a structured set of **guidelines**—recommendations, requirements, or best practices—that help readers achieve desired outcomes. Guidelines are grouped into **families**.
+**The basic idea:** A Guidance Catalog is a structured set of **guidelines**—recommendations, requirements, or best practices—that help readers achieve desired outcomes. Guidelines are grouped into **groups**.
 
 In technical terms:
-* **Guidance catalogs** have a **type** (Standard, Regulation, Best Practice, or Framework), **families** that group guidelines by theme, and **guidelines** with an objective, optional recommendations, and optional references to other guidelines within the *same* guidance catalog.
+* **Guidance catalogs** have a **type** (Standard, Regulation, Best Practice, or Framework), **groups** that group guidelines by theme, and **guidelines** with an objective, optional recommendations, and optional references to other guidelines within the *same* guidance catalog.
 * **Guidelines:** state the intent and context; they have statements which act as sub-requirements of the guideline (e.g., `ORG.SSD.001` and statements.id `ORG.SSD.001.1`). The guidance includes a see-also for linking other guidelines within the same guidance catalog (e.g., `ORG.SSD.001` see-also `ORG.SSD.002`, `ORG.SSD.003`).
 * **Guidelines** have the ability to be mapped to external guidance (e.g., OWASP, NIST, HIPAA, GDPR, CRA, PCI, ISO) and to controls in a *separate* **Mapping Document**. Downstream Gemara Layers can reference `guidelines`, defining support for specific controls.
 
@@ -46,7 +46,7 @@ Declare your catalog and, if you will reference external standards, add mapping 
 | `metadata.type`               | Artifact kind (e.g. `GuidanceCatalog`)                                    | Required by schema; identifies the Gemara artifact type              |
 | `metadata.gemara-version`     | Gemara specification version (e.g. `"0.20.0"`)                            | Required by schema; declares which spec the artifact conforms to     |
 | `metadata.mapping-references` | Pointers to external standards (e.g., OWASP, NIST)                        | Resolve IDs used in external Mapping Document on guidelines. |
-| `metadata.applicability-categories` | List of categories (id, title, description) for when guidelines apply | Define scope so guidelines reference these ids in `applicability`; keeps applicability consistent and documented |
+| `metadata.applicability-groups` | List of groups (id, title, description) for when guidelines apply | Define scope so guidelines reference these ids in `applicability`; keeps applicability consistent and documented |
 
 **Example (YAML):**
 
@@ -68,7 +68,7 @@ metadata:
       version: "2021"
       url: https://owasp.org/Top10
       description: OWASP Top 10 Web Application Security Risks
-  applicability-categories:
+  applicability-groups:
     - id: containerized_workloads
       title: Containerized Workloads
       description: Guidelines that apply to container-based deployments and images.
@@ -83,14 +83,14 @@ type: Best Practice
 
 > **Minimal Mapping Document example:** A Mapping Document that maps this guidance catalog’s guidelines to OWASP Top 10 (source `ORG-SSD`, target `OWASP`) is in [mapping-document.yaml](mapping-document.yaml).
 
-### Step 2: Define Families
+### Step 2: Define Groups
 
-**Families** group guidelines by theme. The Guidance Catalog schema requires at least one family when the catalog defines `guidelines`. Each guideline’s `family` field must match the `id` of one of these groups (id, title, description).
+**Groups** group guidelines by theme. The Guidance Catalog schema requires at least one group when the catalog defines `guidelines`. Each guideline’s `group` field must match the `id` of one of these groups (id, title, description).
 
 **Example (YAML):**
 
 ```yaml
-families:
+groups:
   - id: ORG.SSD.FAM01
     title: Secure Dependencies and Supply Chain
     description: Guidelines for selecting, updating, and verifying dependencies and images.
@@ -105,12 +105,12 @@ families:
 | `id`        | Yes      | Unique identifier (e.g., `ORG.SSD.GL01`)                 |
 | `title`     | Yes      | Short name for the guideline                             |
 | `objective` | Yes      | Unified statement of intent                              |
-| `family`    | Yes      | `id` of a family in this catalog                         |
+| `group`     | Yes      | `id` of a group in this catalog                          |
 | `state`     | Yes      | Lifecycle: `Active`, `Draft`, `Deprecated`, or `Retired` |
 
 Optional: `recommendations`, `applicability`, `rationale`, `statements`, `guidelines`, `vectors`, and others (see `layer-1.cue`).
 
-**Applicability:** When you define `metadata.applicability-categories` in Step 1, use those category **ids** in each guideline’s `applicability` list (e.g. `["containerized_workloads", "ci_cd"]`). That keeps applicability consistent and documented.
+**Applicability:** When you define `metadata.applicability-groups` in Step 1, use those group **ids** in each guideline’s `applicability` list (e.g. `["containerized_workloads", "ci_cd"]`). That keeps applicability consistent and documented.
 
 **Example (YAML):** The following guidelines illustrate supply chain security for dependencies and images (artifact integrity, source/code integrity, and secure transit):
 
@@ -121,7 +121,7 @@ guidelines:
     objective: |
       Use digest-based or immutable references for container images to prevent
       tampering and ensure repeatable deployments.
-    family: ORG.SSD.FAM01
+    group: ORG.SSD.FAM01
     state: active
     recommendations:
       - Prefer pull-by-digest over tags for production.
@@ -135,7 +135,7 @@ guidelines:
     objective: |
       Use branch protection so only approved changes reach the main branch and
       malicious code cannot be merged without review.
-    family: ORG.SSD.FAM01
+    group: ORG.SSD.FAM01
     state: Active
     recommendations:
       - Prefer pull requests submitted from fork branch.
@@ -149,7 +149,7 @@ guidelines:
     objective: |
       Use a VPN on untrusted networks to protect traffic from interception and
       DNS spoofing.
-    family: ORG.SSD.FAM01
+    group: ORG.SSD.FAM01
     state: Active
     recommendations:
       - Use a VPN for registry and build traffic on untrusted networks.
@@ -192,7 +192,7 @@ metadata:
       version: "2021"
       url: https://owasp.org/Top10
       description: OWASP Top 10 Web Application Security Risks
-  applicability-categories:
+  applicability-groups:
     - id: containerized_workloads
       title: Containerized Workloads
       description: Guidelines that apply to container-based deployments and images.
@@ -204,7 +204,7 @@ metadata:
       description: Guidelines that apply to projects using GitHub for source and collaboration.
 type: Best Practice
 front-matter: Example best-practices text for tutorials developed by Gemara maintainers.
-families:
+groups:
   - id: ORG.SSD.FAM01
     title: Secure Dependencies and Supply Chain
     description: Guidelines for selecting, updating, and verifying dependencies and images.
@@ -215,7 +215,7 @@ guidelines:
     objective: |
       Use digest-based or immutable references for container images to prevent
       tampering and ensure repeatable deployments.
-    family: ORG.SSD.FAM01
+    group: ORG.SSD.FAM01
     state: Active
     recommendations:
       - Prefer pull-by-digest over tags for production.
@@ -229,7 +229,7 @@ guidelines:
     objective: |
       Use branch protection so only approved changes reach the main branch and
       malicious code cannot be merged without review.
-    family: ORG.SSD.FAM01
+    group: ORG.SSD.FAM01
     state: Active
     recommendations:
       - Prefer pull requests submitted from fork branch.
@@ -243,7 +243,7 @@ guidelines:
     objective: |
       Use a VPN on untrusted networks to protect traffic from interception and
       DNS spoofing.
-    family: ORG.SSD.FAM01
+    group: ORG.SSD.FAM01
     state: Active
     recommendations:
       - Use a VPN for registry and build traffic on untrusted networks.

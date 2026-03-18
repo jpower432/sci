@@ -19,7 +19,7 @@ metadata:
 title: AI Governance Framework
 type: Framework
 front-matter: The following framework has been developed by FINOS (Fintech Open Source Foundation).
-families:
+groups:
   - id: DET
     title: Detective
     description: Detection and Continuous Improvement
@@ -28,7 +28,7 @@ families:
     description: Prevention and Risk Mitigation
 guidelines:
   - id: AIR-DET-011
-    family: DET
+    group: DET
     title: Human Feedback Loop for AI Systems
     objective: A Human Feedback Loop is a critical detective and continuous improvement mechanism that involves systematically collecting, analyzing, and acting upon feedback provided by human users, subject matter experts (SMEs), or reviewers regarding an AI system's performance, outputs, or behavior.
     rationale:
@@ -51,7 +51,7 @@ guidelines:
       - AIR-DET-004
       - AIR-PREV-005
   - id: AIR-DET-004
-    family: DET
+    group: DET
     title: Example Detective Control 004
     objective: Placeholder control for testing references.
     rationale:
@@ -59,7 +59,7 @@ guidelines:
       goals:
         - "Placeholder goal for testing"
   - id: AIR-DET-015
-    family: DET
+    group: DET
     title: Example Detective Control 015
     objective: Placeholder control for testing references.
     rationale:
@@ -67,7 +67,7 @@ guidelines:
       goals:
         - "Placeholder goal for testing"
   - id: AIR-PREV-005
-    family: PREV
+    group: PREV
     title: Example Preventive Control 005
     objective: Placeholder control for testing references.
     rationale:

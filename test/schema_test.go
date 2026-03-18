@@ -75,7 +75,7 @@ func TestSchemaValidation(t *testing.T) {
 		// ControlCatalog — negative
 		{"invalid YAML", "./test-data/bad.yaml", "#ControlCatalog", true, ""},
 		{"invalid JSON", "./test-data/bad.json", "#ControlCatalog", true, ""},
-		{"controls without families", "./test-data/bad-no-families.yaml", "#ControlCatalog", true, ""},
+		{"controls without groups", "./test-data/bad-no-groups.yaml", "#ControlCatalog", true, ""},
 
 		// MappingDocument — positive
 		{"valid mapping document", "./test-data/good-mapping-document.yaml", "#MappingDocument", false, ""},

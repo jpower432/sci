@@ -26,7 +26,7 @@ metadata:
     - id: NIST-800-53
       title: NIST Special Publication 800-53
       version: "Rev. 5"
-  applicability-categories:
+  applicability-groups:
     - id: tlp_clear
       title: TLP:Clear
       description: |
@@ -46,7 +46,7 @@ metadata:
       description: |
         Information is restricted to the organization.
 title: FINOS Cloud Control Catalog
-families:
+groups:
   - id: data-protection
     title: Data Protection
     description: |
@@ -55,7 +55,7 @@ families:
       rest and in transit, access controls, and data retention policies.
 controls:
   - id: CCC.C01
-    family: data-protection
+    group: data-protection
     title: Prevent Unencrypted Requests
     objective: |
       Ensure that all communications are encrypted in transit to protect data
@@ -103,7 +103,7 @@ controls:
           - tlp_red
 
   - id: CCC.C06
-    family: data-protection
+    group: data-protection
     title: Prevent Deployment in Restricted Regions
     objective: |
       Ensure that resources are not provisioned or deployed in
@@ -158,7 +158,7 @@ controls:
           - tlp_red
 
   - id: CCC.C08
-    family: data-protection
+    group: data-protection
     title: Enable Multi-zone or Multi-region Data Replication
     objective: |
       Ensure that data is replicated across multiple
@@ -205,7 +205,7 @@ controls:
           - tlp_red
 
   - id: CCC.C09
-    family: data-protection
+    group: data-protection
     title: Prevent Tampering, Deletion, or Unauthorized Access to Access Logs
     objective: |
       Access logs should always be considered sensitive.
@@ -263,7 +263,7 @@ controls:
           - tlp_clear
 
   - id: CCC.C10
-    family: data-protection
+    group: data-protection
     title: |
       Prevent Data Replication to Destinations Outside of Defined
       Trust Perimeter

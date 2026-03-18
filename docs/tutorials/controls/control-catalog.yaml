@@ -28,7 +28,7 @@ metadata:
       description: |
         Foundational repository of reusable security controls, capabilities,
         and threat models maintained by FINOS.
-  applicability-categories:
+  applicability-groups:
     - id: production
       title: Production
       description: |
@@ -48,7 +48,7 @@ metadata:
       description: |
         Applies in continuous integration and deployment pipelines.
 
-families:
+groups:
   - id: SEC.SLAM.CM.FAM01
     title: Image Integrity and Supply Chain
     description: |
@@ -70,7 +70,7 @@ controls:
       accepted; then pin each image to an immutable digest (e.g., sha256)
       after the check so that what is used matches what was verified and
       TOCTOU (time-of-check to time-of-use) attacks are prevented.
-    family: SEC.SLAM.CM.FAM01
+    group: SEC.SLAM.CM.FAM01
     assessment-requirements:
       - id: SEC.SLAM.CM.CTL01.AR01
         text: |
@@ -101,7 +101,7 @@ controls:
       to reduce interception risk, and verify artifact signatures or hashes so
       that tampered or redirected content is detected even if the channel is
       compromised.
-    family: SEC.SLAM.CM.FAM01
+    group: SEC.SLAM.CM.FAM01
     state: Active
     assessment-requirements:
       - id: SEC.SLAM.CM.CTL02.AR01

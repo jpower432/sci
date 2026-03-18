@@ -14,8 +14,8 @@ package gemara
 	// front-matter provides introductory text for the document to be used during rendering
 	"front-matter"?: string @go(FrontMatter) @yaml("front-matter,omitempty")
 
-	// families contains a list of guidance families that can be referenced by guidance
-	families?: [#Group, ...#Group] @go(Families)
+	// groups contains a list of guidance groups that can be referenced by guidance
+	groups?: [#Group, ...#Group] @go(Groups)
 
 	// guidelines is a list of unique guidelines defined by this catalog
 	guidelines?: [#Guideline, ...#Guideline] @go(Guidelines)
@@ -25,7 +25,7 @@ package gemara
 
 	// Constraints
 	if guidelines != _|_ {
-		families: [_, ...#Group]
+		groups: [_, ...#Group]
 	}
 }
 
@@ -55,8 +55,8 @@ package gemara
 	// objective is a unified statement of intent, which may encompass multiple situationally applicable statements
 	objective: string
 
-	// family provides an id to the family that this guideline belongs to
-	family: string @go(Family)
+	// group provides an id to the group that this guideline belongs to
+	group: string @go(Group)
 
 	// recommendations is a list of non-binding suggestions to aid in evaluation or enforcement of the guideline
 	recommendations?: [string, ...string]

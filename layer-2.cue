@@ -8,15 +8,15 @@ package gemara
 #ControlCatalog: {
 	#Catalog
 
-	// families contains a list of control families that can be referenced by controls
-	families?: [#Group, ...#Group] @go(Families)
+	// groups contains a list of control groups that can be referenced by controls
+	groups?: [#Group, ...#Group] @go(Groups)
 
 	// controls is a list of unique controls defined by this catalog
 	controls?: [#Control, ...#Control] @go(Controls)
 
 	// Constraints
 	if controls != _|_ {
-		families: [_, ...#Group]
+		groups: [_, ...#Group]
 	}
 }
 
@@ -37,8 +37,8 @@ package gemara
 	// objective is a unified statement of intent, which may encompass multiple situationally applicable requirements
 	objective: string
 
-	// family references by id a catalog control family that this control belongs to
-	family: string @go(Family)
+	// group references by id a catalog group that this control belongs to
+	group: string @go(Group)
 
 	// assessment-requirements is a list of requirements that must be verified to confirm the control objective has been met
 	"assessment-requirements": [#AssessmentRequirement, ...#AssessmentRequirement] @go(AssessmentRequirements)

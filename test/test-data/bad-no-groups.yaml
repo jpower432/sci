@@ -3,20 +3,20 @@ metadata:
   type: ControlCatalog
   gemara-version: "0.20.0"
   version: "1.0.0"
-  description: Control catalog with controls but no families declared.
+  description: Control catalog with controls but no groups declared.
   author:
     id: test
     name: Test Author
     type: Human
-  applicability-categories:
+  applicability-groups:
     - id: production
       title: Production
       description: Production environments.
 
-title: No Families Test
+title: No Groups Test
 controls:
   - id: TC-001
-    family: missing-family
+    group: missing-group
     title: Test Control
     objective: Test objective.
     assessment-requirements:

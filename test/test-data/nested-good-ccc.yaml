@@ -9,7 +9,7 @@ metadata:
     id: finos
     name: FINOS
     type: Human
-  applicability-categories:
+  applicability-groups:
     - id: tlp_clear
       title: TLP:Clear
       description: |
@@ -29,7 +29,7 @@ metadata:
       description: |
         Information is restricted to the organization.
 title: FINOS Cloud Control Catalog
-families:
+groups:
   - id: data-protection
     title: Data Protection
     description: |
@@ -83,7 +83,7 @@ controls:
           - tlp_green
           - tlp_amber
           - tlp_red
-        family: data-protection
+        group: data-protection
       - id: CCC.C06
         title: Prevent Deployment in Restricted Regions
         objective: |
@@ -137,7 +137,7 @@ controls:
           - tlp_green
           - tlp_amber
           - tlp_red
-        family: data-protection
+        group: data-protection
       - id: CCC.C08
         title: Enable Multi-zone or Multi-region Data Replication
         objective: |
@@ -183,7 +183,7 @@ controls:
           - tlp_green
           - tlp_amber
           - tlp_red
-        family: data-protection
+        group: data-protection
       - id: CCC.C09
         title: Prevent Tampering, Deletion, or Unauthorized Access to Access Logs
         objective: |
@@ -240,7 +240,7 @@ controls:
           - tlp_red
           - tlp_green
           - tlp_clear
-        family: data-protection
+        group: data-protection
       - id: CCC.C10
         title: |
           Prevent Data Replication to Destinations Outside of Defined
@@ -279,5 +279,5 @@ controls:
           - tlp_green
           - tlp_amber
           - tlp_red
-        family: data-protection
+        group: data-protection
 

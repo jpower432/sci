@@ -8,7 +8,7 @@
       "name": "FINOS",
       "type": "Human"
     },
-    "applicability-categories": [
+    "applicability-groups": [
       {
         "id": "tlp_clear",
         "title": "TLP:Clear",
@@ -31,7 +31,7 @@
       }
     ]
   },
-  "families": [
+  "groups": [
     {
       "id": "data-protection",
       "title": "Data Protection",
@@ -118,7 +118,7 @@
           ]
         }
       ],
-      "family": "data-protection"
+      "group": "data-protection"
     },
     {
       "id": "CCC.C06",
@@ -199,7 +199,7 @@
           ]
         }
       ],
-      "family": "data-protection"
+      "group": "data-protection"
     },
     {
       "id": "CCC.C08",
@@ -269,7 +269,7 @@
           ]
         }
       ],
-      "family": "data-protection"
+      "group": "data-protection"
     },
     {
       "id": "CCC.C09",
@@ -354,7 +354,7 @@
           ]
         }
       ],
-      "family": "data-protection"
+      "group": "data-protection"
     },
     {
       "id": "CCC.C10",
@@ -415,7 +415,7 @@
           ]
         }
       ],
-      "family": "data-protection"
+      "group": "data-protection"
     }
   ]
 }

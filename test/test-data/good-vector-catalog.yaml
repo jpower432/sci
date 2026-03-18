@@ -8,7 +8,7 @@ metadata:
     id: security-team
     name: Security Team
     type: Human
-  applicability-categories:
+  applicability-groups:
     - id: containerized-systems
       title: Containerized Systems
       description: Systems running containerized applications

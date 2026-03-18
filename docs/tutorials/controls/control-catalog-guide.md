@@ -10,7 +10,7 @@ This guide walks through creating a **control catalog** using the [Gemara](https
 
 In technical terms:
 * **Controls** are safeguards with a stated objective and a list of assessment requirements.
-* **Families** group related controls by domain (e.g., supply chain, access control).
+* **Groups** group related controls by domain (e.g., supply chain, access control).
 * **Threats** link each control to the threat(s) it mitigates, connecting your control catalog to your layer 2 threat catalog.
 
 This exercise produces a structured way to develop control objectives and corresponding testable conditions to determine if the objective is met.
@@ -38,9 +38,9 @@ Declare your control catalog and mapping references. Key fields:
 |-------------------------------------|--------------------------------------------------------------|-------------------------------------------------------------------------------------------|
 | `title`                             | Display name for the control catalog (top-level field)       | Human-readable label used in reports and tooling output                                   |
 | `mapping-references` with `id: CCC` | Optional pointer to CCC or another control/threat catalog   | Resolve imported capability and control IDs from the referenced catalog                  |
-| `applicability-categories`          | List of categories (id, title, description) for when controls apply | Scope assessment requirements by context (e.g., production, CI/CD) so evaluators know when each requirement applies |
+| `applicability-groups`          | List of groups (id, title, description) for when controls apply | Scope assessment requirements by context (e.g., production, CI/CD) so evaluators know when each requirement applies |
 
-> **Note:** Applicability categories must be defined to assign applicability to controls.
+> **Note:** Applicability groups must be defined to assign applicability to controls.
 
 **Example (YAML):**
 
@@ -68,7 +68,7 @@ metadata:
       description: |
         Foundational repository of reusable security controls, capabilities,
         and threat models maintained by FINOS.
-  applicability-categories:
+  applicability-groups:
     - id: production
       title: Production
       description: |
@@ -89,22 +89,22 @@ metadata:
         Applies in continuous integration and deployment pipelines.
 ```
 
-### Step 2: Define Control Families
+### Step 2: Define Control Groups
 
-**Families** group controls by theme. The Layer 2 schema requires at least one family when the catalog defines its own `controls`. Each control's `family` field must match the `id` of one of these groups.
+**Groups** group controls by theme. The Layer 2 schema requires at least one group when the catalog defines its own `controls`. Each control's `group` field must match the `id` of one of these groups.
 
-Required fields for each family (see `base.cue`):
+Required fields for each group (see `base.cue`):
 
 | Field         | Required | Description                                  |
 |---------------|----------|----------------------------------------------|
 | `id`          | Yes      | Unique identifier referenced by controls     |
-| `title`       | Yes      | Short name for the family                    |
-| `description` | Yes      | Explanation of what controls in this family address |
+| `title`       | Yes      | Short name for the group                    |
+| `description` | Yes      | Explanation of what controls in this group address |
 
 **Example (YAML):**
 
 ```yaml
-families:
+groups:
   - id: SEC.SLAM.CM.FAM01
     title: Image Integrity and Supply Chain
     description: |
@@ -137,7 +137,7 @@ imports:
 | `id`                     | Yes      | Unique identifier (e.g., `ORG.PROJ.COMPONENT.CTL##`)                        |
 | `title`                  | Yes      | Short name describing the control                                           |
 | `objective`              | Yes      | Unified statement of intent for the control                                 |
-| `family`                 | Yes      | `id` of a family in this catalog (or in a referenced catalog for imports)  |
+| `group`                  | Yes      | `id` of a group in this catalog (or in a referenced catalog for imports)  |
 | `assessment-requirements`| Yes      | List of verifiable conditions; each has `id`, `text`, `applicability`      |
 | `threats`        | No       | Links to threat catalog(s) and threat IDs this control mitigates            |
 | `state`                  | Yes       | Lifecycle: `Active` (default), `Draft`, `Deprecated`, `Retired`             |
@@ -182,7 +182,7 @@ controls:
       - reference-id: CCC
         entries:
           - reference-id: CCC.Core.TH02
-    family: SEC.SLAM.CM.FAM01
+    group: SEC.SLAM.CM.FAM01
     state: Active
     assessment-requirements:
       - id: SEC.SLAM.CM.CTL02.AR01
@@ -214,11 +214,11 @@ go install cuelang.org/go/cmd/cue@latest
 cue vet -c -d '#ControlCatalog' github.com/gemaraproj/gemara@latest your-control-catalog.yaml
 ```
 
-Fix any reported errors (e.g., missing required fields, invalid `family` reference, or malformed `threats`) so the catalog is schema-consistent.
+Fix any reported errors (e.g., missing required fields, invalid `group` reference, or malformed `threats`) so the catalog is schema-consistent.
 
 ### Step 5: Assemble the Full Catalog and Validate
 
-Combine metadata, mapping-references, families, imported-controls (if any), and controls into a single YAML document. A complete, schema-valid catalog for the SEC.SLAM.CM scenario is in [control-catalog.yaml](control-catalog.yaml) in this directory.
+Combine metadata, mapping-references, groups, imported-controls (if any), and controls into a single YAML document. A complete, schema-valid catalog for the SEC.SLAM.CM scenario is in [control-catalog.yaml](control-catalog.yaml) in this directory.
 
 **Complete example (SEC.SLAM.CM):**
 
@@ -249,7 +249,7 @@ metadata:
       description: |
         Foundational repository of reusable security controls, capabilities,
         and threat models maintained by FINOS.
-  applicability-categories:
+  applicability-groups:
     - id: production
       title: Production
       description: |
@@ -269,7 +269,7 @@ metadata:
       description: |
         Applies in continuous integration and deployment pipelines.
 
-families:
+groups:
   - id: SEC.SLAM.CM.FAM01
     title: Image Integrity and Supply Chain
     description: |
@@ -308,7 +308,7 @@ controls:
       - reference-id: CCC
         entries:
           - reference-id: CCC.Core.TH02
-    family: SEC.SLAM.CM.FAM01
+    group: SEC.SLAM.CM.FAM01
     state: Active
     assessment-requirements:
       - id: SEC.SLAM.CM.CTL02.AR01
@@ -334,7 +334,7 @@ controls:
 cue vet -c -d '#ControlCatalog' ./layer-2.cue ./metadata.cue ./mapping.cue ./base.cue docs/tutorials/controls/control-catalog.yaml
 ```
 
-Fix any reported errors (e.g., missing required fields, invalid `family` reference, or malformed `threats`) so the catalog is schema-consistent.
+Fix any reported errors (e.g., missing required fields, invalid `group` reference, or malformed `threats`) so the catalog is schema-consistent.
 
 ## Summary: From Threat Assessment to Control Catalog
 

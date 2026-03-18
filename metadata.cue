@@ -30,8 +30,8 @@ package gemara
 	// mapping-references is a list of external documents referenced within this artifact
 	"mapping-references"?: [#MappingReference, ...#MappingReference] @go(MappingReferences) @yaml("mapping-references,omitempty")
 
-	// applicability-categories is a list of categories used to classify within this artifact to specify scope
-	"applicability-categories"?: [#Group, ...#Group] @go(ApplicabilityCategories) @yaml("applicability-categories,omitempty")
+	// applicability-groups is a list of groups used to classify within this artifact to specify scope
+	"applicability-groups"?: [#Group, ...#Group] @go(ApplicabilityGroups) @yaml("applicability-groups,omitempty")
 
 	// draft indicates whether this artifact is a pre-release version; open to modification
 	draft?: bool

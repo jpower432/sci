@@ -16,7 +16,7 @@ metadata:
 
 title: Cloud-Native Container Risk Catalog
 
-categories:
+groups:
   - id: CAT-OPERATIONAL
     title: Operational Risk
     description: Risks arising from failures in internal processes, systems, or external events that affect service availability and reliability
@@ -35,7 +35,7 @@ risks:
   - id: RISK-001
     title: Container Image Supply Chain Compromise
     description: Third-party or base container images may contain known vulnerabilities or malicious code, leading to exploitation at runtime.
-    category: CAT-SECURITY
+    group: CAT-SECURITY
     severity: High
     owner:
       responsible:
@@ -55,7 +55,7 @@ risks:
   - id: RISK-002
     title: Container Escape Leading to Host Compromise
     description: Misconfigured or unpatched container runtimes may allow an attacker to escape container isolation and access the host.
-    category: CAT-SECURITY
+    group: CAT-SECURITY
     severity: Critical
     owner:
       responsible:
@@ -78,6 +78,6 @@ risks:
   - id: RISK-003
     title: Regulatory Non-Compliance from Unaudited Deployments
     description: Deploying workloads without automated compliance gates may result in violations of regulatory requirements.
-    category: CAT-COMPLIANCE
+    group: CAT-COMPLIANCE
     severity: Medium
     impact: Regulatory fines, audit findings, and reputational damage.

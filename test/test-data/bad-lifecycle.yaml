@@ -11,14 +11,14 @@ metadata:
 
 title: Bad Lifecycle Test
 type: Standard
-families:
+groups:
   - id: fam-1
     title: Family One
     description: Test family.
 
 guidelines:
   - id: GL-001
-    family: fam-1
+    group: fam-1
     title: Retired Guideline With Recommendations
     objective: This should fail because retired guidelines cannot have recommendations.
     state: Retired
