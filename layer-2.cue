@@ -6,23 +6,13 @@ package gemara
 
 // ControlCatalog describes a set of related controls and relevant metadata
 #ControlCatalog: {
-	// title describes the contents of this catalog at a glance
-	title: string
-
-	// metadata provides detailed data about this catalog
-	metadata: #Metadata @go(Metadata)
-
-	// extends references control catalogs that this catalog builds upon
-	extends?: [#ArtifactMapping, ...#ArtifactMapping] @go(Extends)
+	#Catalog
 
 	// families contains a list of control families that can be referenced by controls
 	families?: [#Group, ...#Group] @go(Families)
 
 	// controls is a list of unique controls defined by this catalog
 	controls?: [#Control, ...#Control] @go(Controls)
-
-	// imports contains controls from other sources which are included as part of this document
-	imports?: #ControlCatalogImports @go(Imports,optional=nillable)
 
 	// Constraints
 	if controls != _|_ {
@@ -94,23 +84,13 @@ package gemara
 
 // ThreatCatalog describes a set of topically-associated threats
 #ThreatCatalog: {
-	// title describes the purpose of this catalog at a glance
-	title: string
-
-	// metadata provides detailed data about this catalog
-	metadata: #Metadata @go(Metadata)
-
-	// extends references threat catalogs that this catalog builds upon
-	extends?: [#ArtifactMapping, ...#ArtifactMapping] @go(Extends)
+	#Catalog
 
 	// threats is a list of threats defined by this catalog
 	threats?: [#Threat, ...#Threat] @go(Threats)
 
 	// capabilities is a list of capabilities that make up the system being assessed
 	capabilities?: [#Capability, ...#Capability] @go(Capabilities)
-
-	// imports contains threats and capabilities from other sources which are included as part of this document
-	imports?: #ThreatCatalogImports @go(Imports,optional=nillable)
 }
 
 // ThreatCatalogImports defines imported entries for a threat catalog

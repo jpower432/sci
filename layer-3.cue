@@ -8,12 +8,7 @@ package gemara
 // system, or service. It provides a centralized reference for risks that can be mapped to threats
 // and referenced by policies when documenting how those risks are mitigated or accepted.
 #RiskCatalog: {
-
-	// title describes the contents of this catalog at a glance
-	title: string
-
-	// metadata provides detailed data about this catalog
-	metadata: #Metadata @go(Metadata)
+	#Catalog
 
 	// categories is a list of risk categories used to classify risks
 	categories?: [#RiskCategory, ...#RiskCategory] @go(Categories)

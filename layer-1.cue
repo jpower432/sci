@@ -6,11 +6,7 @@ package gemara
 
 // GuidanceCatalog represents a concerted documentation effort to help bring about an optimal future without foreknowledge of the implementation details
 #GuidanceCatalog: {
-	// title describes the contents of this catalog at a glance
-	title: string
-
-	// metadata provides detailed data about this catalog
-	metadata: #Metadata @go(Metadata)
+	#Catalog
 
 	// type categorizes this document based on the intent of its contents
 	type: #GuidanceType @go(GuidanceType)
@@ -127,11 +123,7 @@ package gemara
 // serving as a centralized reference for known attack methods and exploitation pathways that may be relevant to a particular domain, framework, or security model.
 
 #VectorCatalog: {
-	// title describes the contents of this catalog
-	title: string
-
-	// metadata provides detailed data about this catalog
-	metadata: #Metadata @go(Metadata)
+	#Catalog
 
 	// vectors is a list of attack vectors documented in this catalog
 	vectors?: [#Vector, ...#Vector] @go(Vectors)
