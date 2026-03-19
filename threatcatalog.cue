@@ -12,7 +12,7 @@ package gemara
 	// threats is a list of threats defined by this catalog
 	threats?: [#Threat, ...#Threat] @go(Threats)
 
-		if threats != _|_ {
+	if threats != _|_ {
 		_uniqueThreatIds: {for i, t in threats {(t.id): i}}
 		groups: [#Group, ...#Group]
 	}
@@ -41,4 +41,3 @@ package gemara
 	// actors describes the relevant internal or external threat actors
 	actors?: [#Actor, ...#Actor]
 }
-

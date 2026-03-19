@@ -6,8 +6,8 @@ package gemara
 
 // Policy represents a policy document with metadata, contacts, scope, imports, implementation plan, risks, and adherence requirements.
 #Policy: {
-	title:                  string
-	metadata:               #Metadata
+	title:    string
+	metadata: #Metadata
 	metadata: type: "Policy"
 	contacts:               #RACI
 	scope:                  #Scope
