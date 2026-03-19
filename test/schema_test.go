@@ -82,6 +82,7 @@ func TestSchemaValidation(t *testing.T) {
 
 		// MappingDocument — negative
 		{"invalid mapping document without mapping-references", "./test-data/bad-mapping-document.yaml", "#MappingDocument", true, ""},
+		{"mapping missing target for non-no-match relationship", "./test-data/bad-mapping-no-target.yaml", "#MappingDocument", true, ""},
 
 		// GuidanceCatalog — negative
 		{"retired guideline with recommendations", "./test-data/bad-lifecycle.yaml", "#GuidanceCatalog", true, ""},
@@ -93,7 +94,8 @@ func TestSchemaValidation(t *testing.T) {
 		{"valid enforcement log", "./test-data/good-enforcement-log.yaml", "#EnforcementLog", false, ""},
 
 		// EnforcementLog — negative
-		{"enforcement action missing log reference", "./test-data/bad-enforcement-log.yaml", "#EnforcementLog", true, ""},
+		{"enforcement action with invalid disposition", "./test-data/bad-enforcement-log.yaml", "#EnforcementLog", true, ""},
+		{"enforcement action missing log reference", "./test-data/bad-enforcement-missing-log.yaml", "#EnforcementLog", true, ""},
 		{"clear disposition with failed assessment", "./test-data/bad-enforcement-clear-failed.yaml", "#EnforcementLog", true, ""},
 
 		// ControlCatalog — edge cases
