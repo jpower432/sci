@@ -9,10 +9,17 @@
 ### Schema Changes Made
 
 - [ ] No schema changes
-- [ ] Layer 1 schema (`layer-1.cue`) changes
-- [ ] Layer 2 schema (`layer-2.cue`) changes
-- [ ] Layer 3 schema (`layer-3.cue`) changes
-- [ ] Layer 5 schema (`layer-5.cue`) changes
+- [ ] Control Catalog schema (`controlcatalog.cue`) changes
+- [ ] Capability Catalog schema (`capabilitycatalog.cue`) changes
+- [ ] Enforcement Log schema (`enforcementlog.cue`) changes
+- [ ] Evaluation Log schema (`evaluationlog.cue`) changes
+- [ ] Guidance Catalog schema (`guidancecatalog.cue`) changes
+- [ ] Mapping Document schema (`mapping.cue`) changes
+- [ ] Policy Document schema (`policy.cue`) changes
+- [ ] Risk Catalog schema (`riskcatalog.cue`) changes
+- [ ] Threat Catalog schema (`threatcatalog.cue`) changes
+- [ ] Vector Catalog schema (`vectorcatalog.cue`) changes
+- [ ] Other
 
 ### Schema Change Details
 
@@ -50,6 +57,9 @@
 -->
 
 
+
+ ---
+
 ## Self-review checklist
 
 <!-- Maintainer Note: Update the checklist before requesting a review on your PR.-->
@@ -57,6 +67,3 @@
 - [ ] This PR has content that was created with AI assistance. 
    - [ ]  I have read and followed the [Generative AI Contribution Policy](https://www.linuxfoundation.org/legal/generative-ai).
 - [ ] I have the experience and knowledge necessary to answer maintainer questions about the content of this PR, without using AI.
-
-
----
