@@ -44,6 +44,12 @@ pages:
     schemas:
       - "VectorCatalog"
       - "Vector"
+  - title: "Principle Catalog"
+    filename: "principlecatalog"
+    layer: 1
+    schemas:
+      - "PrinciplesCatalog"
+      - "Principle"
   - title: "Control Catalog"
     filename: "controlcatalog"
     layer: 2
