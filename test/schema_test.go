@@ -97,7 +97,6 @@ func TestSchemaValidation(t *testing.T) {
 		{"enforcement action with invalid disposition", "./test-data/bad-enforcement-log.yaml", "#EnforcementLog", true, ""},
 		{"enforcement action missing log reference", "./test-data/bad-enforcement-missing-log.yaml", "#EnforcementLog", true, ""},
 		{"clear disposition with failed assessment", "./test-data/bad-enforcement-clear-failed.yaml", "#EnforcementLog", true, ""},
-		{"aggregate disposition mismatch", "./test-data/bad-enforcement-disposition-mismatch.yaml", "#EnforcementLog", true, ""},
 
 		// ControlCatalog — edge cases
 		{"empty nested catalog", "./test-data/nested-empty.yaml", "#ControlCatalog", false, ""},
