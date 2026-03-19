@@ -6,38 +6,62 @@ nav-title: Schema
 
 Schemas (CUE format) standardize the expression of elements in the model and enable automated interoperability between [GRC](../model/02-definitions.html#grc) tools. These schemas provide validation across all layers.
 
-Click on a layer to view its schema: 
+Click on an artifact to view its schema:
 
 <div class="layer-grid">
-  <a href="layer-1.html" class="layer-card">
-    <h3>Layer 1: Guidance</h3>
+  <a href="guidancecatalog.html" class="layer-card">
+    <span class="layer-badge">Layer 1</span>
+    <h3>Guidance Catalog</h3>
     <p>High-level guidance on cybersecurity measures from industry groups and standards bodies.</p>
   </a>
 
-  <a href="layer-2.html" class="layer-card">
-    <h3>Layer 2: Controls</h3>
+  <a href="vectorcatalog.html" class="layer-card">
+    <span class="layer-badge">Layer 1</span>
+    <h3>Vector Catalog</h3>
+    <p>Attack vectors and techniques used to compromise information systems.</p>
+  </a>
+
+  <a href="controlcatalog.html" class="layer-card">
+    <span class="layer-badge">Layer 2</span>
+    <h3>Control Catalog</h3>
     <p>Technology-specific, threat-informed security controls for protecting information systems.</p>
   </a>
 
-  <a href="layer-3.html" class="layer-card">
-    <h3>Layer 3: Policy</h3>
+  <a href="capabilitycatalog.html" class="layer-card">
+    <span class="layer-badge">Layer 2</span>
+    <h3>Capability Catalog</h3>
+    <p>Technology capabilities that can be leveraged to implement security controls.</p>
+  </a>
+
+  <a href="threatcatalog.html" class="layer-card">
+    <span class="layer-badge">Layer 2</span>
+    <h3>Threat Catalog</h3>
+    <p>Threats mapped to technology capabilities and security controls.</p>
+  </a>
+
+  <a href="riskcatalog.html" class="layer-card">
+    <span class="layer-badge">Layer 3</span>
+    <h3>Risk Catalog</h3>
+    <p>Organizational risk categories, severity levels, and risk appetite definitions.</p>
+  </a>
+
+  <a href="policy.html" class="layer-card">
+    <span class="layer-badge">Layer 3</span>
+    <h3>Policy</h3>
     <p>Risk-informed guidance tailored to your organization's specific needs and risk appetite.</p>
   </a>
 
-  <a href="layer-5.html" class="layer-card">
-    <h3>Layer 5: Evaluation</h3>
+  <a href="evaluationlog.html" class="layer-card">
+    <span class="layer-badge">Layer 5</span>
+    <h3>Evaluation Log</h3>
     <p>Inspection of code, configurations, and deployments against policies and controls.</p>
   </a>
 
-  <a href="layer-6.html" class="layer-card">
-    <h3>Layer 6: Enforcement</h3>
+  <a href="enforcementlog.html" class="layer-card">
+    <span class="layer-badge">Layer 6</span>
+    <h3>Enforcement Log</h3>
     <p>Prevention or remediation based on assessment findings.</p>
   </a>
-
-  <div class="layer-card">
-    <h3>Layer 7: Audit</h3>
-    <p>Review of organizational policy and conformance. (Coming Soon)</p>
-  </div>
 </div>
 
 **[Browse all schemas in the CUE Central Registry →](https://registry.cue.works/docs/github.com/gemaraproj/gemara@latest)**
@@ -50,12 +74,17 @@ Schema documentation generated from CUE. One page per schema file:
 
 - [Aliases & Base Types](base.html)
 - [Metadata](metadata.html)
-- [Mapping](mapping.html)
-- [Layer 1](layer-1.html)
-- [Layer 2](layer-2.html)
-- [Layer 3](layer-3.html)
-- [Layer 5](layer-5.html)
-- [Layer 6](layer-6.html)
+- [Mapping Primitives](mapping-inline.html)
+- [Guidance Catalog](guidancecatalog.html)
+- [Vector Catalog](vectorcatalog.html)
+- [Control Catalog](controlcatalog.html)
+- [Capability Catalog](capabilitycatalog.html)
+- [Threat Catalog](threatcatalog.html)
+- [Risk Catalog](riskcatalog.html)
+- [Policy](policy.html)
+- [Mapping Document](mappingdocument.html)
+- [Evaluation Log](evaluationlog.html)
+- [Enforcement Log](enforcementlog.html)
 
 <!-- SCHEMA_LIST_END -->
 
