@@ -97,7 +97,7 @@ package gemara
 }
 
 // EntryType enumerates the atomic units within Gemara artifacts that can participate in mappings
-#EntryType: "Guideline" | "Statement" | "Control" | "AssessmentRequirement" | "Vector" @go(-)
+#EntryType: "Guideline" | "Statement" | "Control" | "AssessmentRequirement" | "Capability" | "Threat" | "Risk" | "Vector" @go(-)
 
 // ConfidenceLevel indicates the evaluator's confidence level in an assessment result.
 #ConfidenceLevel: "Undetermined" | "Low" | "Medium" | "High" @go(-)
