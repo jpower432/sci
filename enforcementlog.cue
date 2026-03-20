@@ -11,7 +11,7 @@ package gemara
 	// disposition is the aggregate enforcement disposition across all actions in this log
 	disposition: #Disposition
 	// actions is the list of enforcement actions performed
-	actions: [#ActionLog, ...#ActionLog] @go(Actions,type=[]*ActionLog)
+	actions: [#ActionResult, ...#ActionResult] @go(Actions,type=[]*ActionResult)
 	// Enforce that Clear dispositions only contain Passed assessment results
 	actions: [...{
 		if disposition == "Clear" {
@@ -20,8 +20,8 @@ package gemara
 	}]
 }
 
-// ActionLog captures a performed enforcement action.
-#ActionLog: {
+// ActionResult captures a performed enforcement action.
+#ActionResult: {
 	// disposition is the enforcement action taken
 	disposition: #Disposition @go(Disposition)
 
