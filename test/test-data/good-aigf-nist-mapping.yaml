@@ -1,0 +1,205 @@
+# AIGF to NIST SP 800-53r5 Mapping Document
+title: AI Governance Framework to NIST SP 800-53r5
+metadata:
+  id: AIR-NIST-MAP-001
+  version: "0.1.0"
+  type: MappingDocument
+  gemara-version: "0.20.0"
+  description: >
+    Maps FINOS AI Governance Framework mitigations (guidelines) to
+    NIST SP 800-53 Revision 5 security and privacy controls.
+    References derived from AIGF mitigation frontmatter.
+  author:
+    id: finos
+    name: FINOS
+    type: Human
+  mapping-references:
+    - id: FINOS-AIR
+      title: AI Governance Framework
+      version: "0.1.0"
+      url: "https://aigf.finos.org"
+      description: FINOS AI Governance Framework mitigations and risks
+    - id: NIST-800-53
+      title: NIST SP 800-53 Revision 5
+      version: "rev5"
+      url: "https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-53r5.pdf"
+      description: Security and privacy guidelines for information systems and organizations
+
+source-reference:
+  reference-id: FINOS-AIR
+target-reference:
+  reference-id: NIST-800-53
+remarks: >
+  AIGF guidelines mapped to NIST 800-53r5 guidelines based on mitigation
+  frontmatter references from the original AIGF content.
+
+mappings:
+  # AIR-PREV-002: Data Filtering From External Knowledge Bases
+  - id: MAP-PREV002-AC4
+    source:
+      entry-id: AIR-PREV-002
+      entry-type: Guideline
+    target:
+      entry-id: AC-4
+      entry-type: Guideline
+    relationship: supports
+    rationale: >
+      Data filtering enforces information flow policies between AI
+      processing pipelines and external knowledge sources.
+
+  - id: MAP-PREV002-AC22
+    source:
+      entry-id: AIR-PREV-002
+      entry-type: Guideline
+    target:
+      entry-id: AC-22
+      entry-type: Guideline
+    relationship: supports
+    rationale: >
+      Filtering prevents sensitive internal data from being
+      inadvertently exposed through AI-accessible content.
+
+  - id: MAP-PREV002-MP6
+    source:
+      entry-id: AIR-PREV-002
+      entry-type: Guideline
+    target:
+      entry-id: MP-6
+      entry-type: Guideline
+    relationship: supports
+    rationale: >
+      Data cleansing and anonymization at ingestion aligns with
+      media sanitization requirements for AI data pipelines.
+
+  - id: MAP-PREV002-PT2
+    source:
+      entry-id: AIR-PREV-002
+      entry-type: Guideline
+    target:
+      entry-id: PT-2
+      entry-type: Guideline
+    relationship: supports
+    rationale: >
+      PII filtering ensures AI systems only process personally
+      identifiable information with proper authority.
+
+  - id: MAP-PREV002-SI4
+    source:
+      entry-id: AIR-PREV-002
+      entry-type: Guideline
+    target:
+      entry-id: SI-4
+      entry-type: Guideline
+    relationship: supports
+    rationale: >
+      Monitoring and continuous improvement of filtering effectiveness
+      supports system monitoring objectives.
+
+  - id: MAP-PREV002-SI12
+    source:
+      entry-id: AIR-PREV-002
+      entry-type: Guideline
+    target:
+      entry-id: SI-12
+      entry-type: Guideline
+    relationship: supports
+    rationale: >
+      Data retention and lifecycle management within AI systems
+      aligns with information management requirements.
+
+  - id: MAP-PREV002-SI15
+    source:
+      entry-id: AIR-PREV-002
+      entry-type: Guideline
+    target:
+      entry-id: SI-15
+      entry-type: Guideline
+    relationship: supports
+    rationale: >
+      Output filtering of AI responses acts as a secondary defense
+      against sensitive data leakage.
+
+  - id: MAP-PREV002-SI19
+    source:
+      entry-id: AIR-PREV-002
+      entry-type: Guideline
+    target:
+      entry-id: SI-19
+      entry-type: Guideline
+    relationship: supports
+    rationale: >
+      Data masking, redaction, and anonymization methods directly
+      implement de-identification requirements.
+
+  # AIR-PREV-003: User/App/Model Firewalling
+  - id: MAP-PREV003-AC4
+    source:
+      entry-id: AIR-PREV-003
+      entry-type: Guideline
+    target:
+      entry-id: AC-4
+      entry-type: Guideline
+    relationship: supports
+    rationale: >
+      Firewalling at user, application, and model boundaries enforces
+      information flow policies for AI interactions.
+
+  - id: MAP-PREV003-SC5
+    source:
+      entry-id: AIR-PREV-003
+      entry-type: Guideline
+    target:
+      entry-id: SC-5
+      entry-type: Guideline
+    relationship: supports
+    rationale: >
+      Detection of excessively long responses and resource abuse
+      protects against denial-of-service conditions.
+
+  - id: MAP-PREV003-SC7
+    source:
+      entry-id: AIR-PREV-003
+      entry-type: Guideline
+    target:
+      entry-id: SC-7
+      entry-type: Guideline
+    relationship: supports
+    rationale: >
+      Layered filtering at user, application, and model boundaries
+      implements boundary protection for AI systems.
+
+  - id: MAP-PREV003-SI4
+    source:
+      entry-id: AIR-PREV-003
+      entry-type: Guideline
+    target:
+      entry-id: SI-4
+      entry-type: Guideline
+    relationship: supports
+    rationale: >
+      API monitoring, logging, and analysis of AI interactions
+      supports system monitoring requirements.
+
+  - id: MAP-PREV003-SI10
+    source:
+      entry-id: AIR-PREV-003
+      entry-type: Guideline
+    target:
+      entry-id: SI-10
+      entry-type: Guideline
+    relationship: supports
+    rationale: >
+      Detection and blocking of prompt injection and malicious user
+      inputs validates information before AI model processing.
+
+  - id: MAP-PREV003-SI15
+    source:
+      entry-id: AIR-PREV-003
+      entry-type: Guideline
+    target:
+      entry-id: SI-15
+      entry-type: Guideline
+    relationship: supports
+    rationale: >
+      Response filtering for data leakage, format conformance, and
+      inappropriate content implements output filtering.

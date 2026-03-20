@@ -21,6 +21,12 @@ Click on an artifact to view its schema:
     <p>Attack vectors and techniques used to compromise information systems.</p>
   </a>
 
+  <a href="principlecatalog.html" class="layer-card">
+    <span class="layer-badge">Layer 1</span>
+    <h3>Principle Catalog</h3>
+    <p>Foundational values that guide governance, design, and operational decisions.</p>
+  </a>
+
   <a href="controlcatalog.html" class="layer-card">
     <span class="layer-badge">Layer 2</span>
     <h3>Control Catalog</h3>
@@ -83,6 +89,7 @@ Schema documentation generated from CUE. One page per schema file:
 - [Mapping Primitives](mapping-inline.html)
 - [Guidance Catalog](guidancecatalog.html)
 - [Vector Catalog](vectorcatalog.html)
+- [Principle Catalog](principlecatalog.html)
 - [Control Catalog](controlcatalog.html)
 - [Capability Catalog](capabilitycatalog.html)
 - [Threat Catalog](threatcatalog.html)
