@@ -33,9 +33,6 @@ package gemara
 	}
 }
 
-// Lifecycle represents the lifecycle state of a guideline, control, or assessment requirement
-#Lifecycle: *"Active" | "Draft" | "Deprecated" | "Retired" @go(-)
-
 // Log describes a set of recorded entries from a measurement activity
 #Log: {
 	// metadata provides detailed data about this log
@@ -44,3 +41,9 @@ package gemara
 	// target identifies the resource being evaluated
 	target: #Resource @go(Target)
 }
+
+// Lifecycle represents the lifecycle state of a guideline, control, or assessment requirement
+#Lifecycle: *"Active" | "Draft" | "Deprecated" | "Retired" @go(-)
+
+// ConfidenceLevel indicates the evaluator's confidence level in an assessment result.
+#ConfidenceLevel: "Undetermined" | "Low" | "Medium" | "High" @go(-)
