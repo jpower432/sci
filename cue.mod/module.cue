@@ -1,6 +1,6 @@
 module: "github.com/gemaraproj/gemara"
 language: {
-	version: "v0.16.0"
+	version: "v0.15.4"
 }
 source: {
 	kind: "git"
