@@ -59,7 +59,7 @@ func TestSchemaValidation(t *testing.T) {
 		// GuidanceCatalog — positive
 		{"valid AI governance framework", "./test-data/good-aigf.yaml", "#GuidanceCatalog", false, ""},
 		// PrinciplesCatalog — positive
-		{"valid AIGF principles catalog", "./test-data/good-aigf-principles.yaml", "#PrinciplesCatalog", false, ""},
+		{"valid AIGF principles catalog", "./test-data/good-aigf-principles.yaml", "#PrincipleCatalog", false, ""},
 
 		// VectorCatalog — positive
 		{"valid AIGF vector catalog", "./test-data/good-aigf-vectors.yaml", "#VectorCatalog", false, ""},
