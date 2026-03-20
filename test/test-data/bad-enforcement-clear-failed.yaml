@@ -6,7 +6,7 @@ metadata:
   description: "Invalid enforcement log: Clear disposition with Failed assessment result"
   author:
     id: enforcement-engine
-    name: "ComplyTime Enforcement Engine"
+    name: "Example Enforcement Engine"
     type: Software
     version: "1.2.0"
     uri: "https://github.com/gemaraproj/gemara"

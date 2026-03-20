@@ -6,7 +6,7 @@ metadata:
   description: "Enforcement actions taken against pvtr evaluation findings for the Gemara repository"
   author:
     id: enforcement-engine
-    name: "ComplyTime Enforcement Engine"
+    name: "Example Enforcement Engine"
     type: Software
     version: "1.2.0"
     uri: "https://github.com/gemaraproj/gemara"
@@ -14,7 +14,7 @@ metadata:
     - id: OSPS
       title: "Open Source Project Security Baseline"
       version: "2025.1"
-      url: "https://github.com/ossf/S2C2F/blob/main/specification/Open_Source_Project_Security_Baseline.md"
+      url: "https://baseline.openssf.org"
     - id: security-policy
       title: "Information Security Policy"
       version: "2.1.0"

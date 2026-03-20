@@ -6,7 +6,7 @@ metadata:
   description: "Invalid enforcement log: action justification missing required log reference"
   author:
     id: enforcement-engine
-    name: "ComplyTime Enforcement Engine"
+    name: "Example Enforcement Engine"
     type: Software
     version: "1.2.0"
     uri: "https://github.com/gemaraproj/gemara"
