@@ -48,7 +48,7 @@ pages:
     filename: "principlecatalog"
     layer: 1
     schemas:
-      - "PrinciplesCatalog"
+      - "PrincipleCatalog"
       - "Principle"
   - title: "Control Catalog"
     filename: "controlcatalog"

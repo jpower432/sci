@@ -4,8 +4,8 @@ package gemara
 
 @go(gemara)
 
-// PrinciplesCatalog describes a set of related principles and relevant metadata
-#PrinciplesCatalog: {
+// PrincipleCatalog describes a set of related principles and relevant metadata
+#PrincipleCatalog: {
 	#Catalog
 	metadata: type: "PrincipleCatalog"
 
