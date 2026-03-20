@@ -1,5 +1,5 @@
 // Schema lifecycle: experimental | stable | deprecated
-@status("experimental")
+@status("stable")
 package gemara
 
 @go(gemara)
@@ -58,3 +58,6 @@ package gemara
 #AssessmentStep: string @go(-)
 
 #Result: "Not Run" | "Passed" | "Failed" | "Needs Review" | "Not Applicable" | "Unknown" @go(-)
+
+// ConfidenceLevel indicates the evaluator's confidence level in an assessment result.
+#ConfidenceLevel: "Undetermined" | "Low" | "Medium" | "High" @go(-)
