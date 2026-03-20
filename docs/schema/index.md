@@ -94,7 +94,7 @@ Schema documentation generated from CUE. One page per schema file:
 # Install CUE
 go install cuelang.org/go/cmd/cue@latest
 
-# Validate a control catalog using the Layer 2 ControlCatalog definition
+# Validate a control catalog using the ControlCatalog definition
 cue vet -c -d '#ControlCatalog' github.com/gemaraproj/gemara@latest your-controls.yaml
 ```
 
@@ -143,7 +143,7 @@ The core specification release versions the CUE schemas as a single unit.
 
 ### Schema Lifecycle and Major Version Example
 
-Possible schema states include: **Experimental** → **Stable** → **Deprecated**. These are denoted on each layer schema with a `@status(experimental|stable|deprecated)` attribute.
+Possible schema states include: **Experimental** → **Stable** → **Deprecated**. These are denoted on each schema file with a `@status(experimental|stable|deprecated)` attribute.
 
 The following table illustrates how schemas progress through their lifecycle and how major version changes are handled:
 
@@ -167,9 +167,9 @@ The following table illustrates how schemas progress through their lifecycle and
 
 ### Stable Status
 
-* Layers promote independently. Each layer only requires its direct dependencies to be Stable (e.g., Layer 2 requires Layer 1, but not Layer 6).
-* Layers can be promoted to Stable at different times. Layer 2 can be Stable while Layer 6 remains Experimental.
-* Stable schemas may only reference other Stable schemas.
+* Schemas promote independently and at different times (e.g., ControlCatalog can be Stable while Policy remains Experimental).
+* When a schema is promoted to Stable, all types it references must also be Stable (e.g., promoting `#ControlCatalog` requires `#Catalog`, `#Metadata`, `#Group`, and any other referenced types to already be Stable).
+* Stable schemas may only reference other Stable types.
 * Stable schemas maintain backward and forward compatibility within major versions, allowing **additive optional changes** only.
 * Breaking changes require major version increments and should be avoided in all normal circumstances.
 
