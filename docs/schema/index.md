@@ -68,6 +68,12 @@ Click on an artifact to view its schema:
     <h3>Enforcement Log</h3>
     <p>Prevention or remediation based on assessment findings.</p>
   </a>
+
+  <a href="auditlog.html" class="layer-card">
+    <span class="layer-badge">Layer 7</span>
+    <h3>Audit Log</h3>
+    <p>Review of organizational policy and conformance.</p>
+  </a>
 </div>
 
 **[Browse all schemas in the CUE Central Registry →](https://registry.cue.works/docs/github.com/gemaraproj/gemara@latest)**
@@ -92,6 +98,7 @@ Schema documentation generated from CUE. One page per schema file:
 - [Mapping Document](mappingdocument.html)
 - [Evaluation Log](evaluationlog.html)
 - [Enforcement Log](enforcementlog.html)
+- [Audit Log](auditlog.html)
 
 <!-- SCHEMA_LIST_END -->
 
@@ -119,8 +126,8 @@ Schemas follow these naming standards:
 | 2     | Definition  | Threat                    | Control                 | Threat Catalog           | Control Catalog        |
 | 3     | Definition  | Risk                      | Policy                  | Risk Catalog             | —                      |
 | 4     | —           | —                         | —                       | —                        | —                      |
-| 5     | Measurement | Evaluation Result         | Evaluation Result       | Evaluation Log           | Evaluation Log         |
-| 6     | Measurement | Enforcement Result        | Enforcement Result      | Enforcement Log          | Enforcement Log        |
+| 5     | Measurement | Control Evaluation        | Control Evaluation      | Evaluation Log           | Evaluation Log         |
+| 6     | Measurement | Action Result             | Action Result           | Enforcement Log          | Enforcement Log        |
 | 7     | Measurement | —                         | Audit Result            | —                        | Audit Log              |
 
 **Note:** "—" indicates no planned schema implementation.

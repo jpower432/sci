@@ -123,8 +123,18 @@ pages:
     layer: 6
     schemas:
       - "EnforcementLog"
-      - "ActionLog"
+      - "ActionResult"
       - "EnforcementStep"
       - "Justification"
       - "AssessmentFinding"
       - "Disposition"
+  - title: "Audit Log"
+    filename: "auditlog"
+    layer: 7
+    schemas:
+      - "AuditLog"
+      - "ResultType"
+      - "AuditResult"
+      - "Recommendation"
+      - "Evidence"
+      - "EvidenceType"
