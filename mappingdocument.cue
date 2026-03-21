@@ -97,4 +97,4 @@ package gemara
 }
 
 // EntryType enumerates the atomic units within Gemara artifacts that can participate in mappings
-#EntryType: "Guideline" | "Statement" | "Control" | "AssessmentRequirement" | "Capability" | "Threat" | "Risk" | "Vector" @go(-)
+#EntryType: "Guideline" | "Statement" | "Control" | "AssessmentRequirement" | "Capability" | "Threat" | "Risk" | "Vector" | "Principle" @go(-)
