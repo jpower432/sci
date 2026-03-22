@@ -29,6 +29,9 @@ package gemara
 	// description explains the principle and its expected outcomes
 	description: string
 
+	// group references by id a catalog group that this principle belongs to
+	group: string @go(Group)
+
 	// rationale provides the context for this principle
 	rationale?: string
 }

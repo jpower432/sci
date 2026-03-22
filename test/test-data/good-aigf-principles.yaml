@@ -40,6 +40,7 @@ groups:
 principles:
   - id: AIR-PRIN-001
     title: Proactive Data Sanitization
+    group: data-protection
     description: >
       Apply filtering and anonymization techniques before data enters the
       AI processing pipeline, vector databases, or any external service
@@ -47,6 +48,7 @@ principles:
 
   - id: AIR-PRIN-002
     title: Data Classification Awareness
+    group: data-protection
     description: >
       Understand and respect the sensitivity levels and access controls
       associated with source data when determining appropriate filtering
@@ -54,6 +56,7 @@ principles:
 
   - id: AIR-PRIN-003
     title: Principle of Least Exposure
+    group: data-protection
     description: >
       Only include data in AI systems that is necessary for the intended
       business function, and ensure that even this data is appropriately
@@ -61,6 +64,7 @@ principles:
 
   - id: AIR-PRIN-004
     title: Defense in Depth
+    group: security-architecture
     description: >
       Implement multiple layers of filtering at data ingestion, during
       processing, and at output generation to create robust protection
@@ -68,6 +72,7 @@ principles:
 
   - id: AIR-PRIN-005
     title: Auditability and Transparency
+    group: governance
     description: >
       Maintain clear documentation and audit trails of what data filtering
       processes have been applied and why.

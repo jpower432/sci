@@ -9,13 +9,15 @@
 ### Schema Changes Made
 
 - [ ] No schema changes
-- [ ] Control Catalog schema (`controlcatalog.cue`) changes
+- [ ] Audit Log schema (`auditlog.cue`) changes
 - [ ] Capability Catalog schema (`capabilitycatalog.cue`) changes
+- [ ] Control Catalog schema (`controlcatalog.cue`) changes
 - [ ] Enforcement Log schema (`enforcementlog.cue`) changes
 - [ ] Evaluation Log schema (`evaluationlog.cue`) changes
 - [ ] Guidance Catalog schema (`guidancecatalog.cue`) changes
-- [ ] Mapping Document schema (`mapping.cue`) changes
+- [ ] Mapping Document schema (`mappingdocument.cue`) changes
 - [ ] Policy Document schema (`policy.cue`) changes
+- [ ] Principle Catalog schema (`principlecatalog.cue`) changes
 - [ ] Risk Catalog schema (`riskcatalog.cue`) changes
 - [ ] Threat Catalog schema (`threatcatalog.cue`) changes
 - [ ] Vector Catalog schema (`vectorcatalog.cue`) changes
