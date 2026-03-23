@@ -25,8 +25,10 @@ metadata:
 
 source-reference:
   reference-id: AIR-VEC
+  entry-type: Vector
 target-reference:
   reference-id: OWASP-LLM-2025
+  entry-type: Vector
 remarks: >
   AIGF risk vectors mapped to OWASP Top 10 for LLM Applications 2025.
   Mappings derived from OWASP references in AIGF risk frontmatter.
@@ -34,157 +36,103 @@ remarks: >
 mappings:
   # Information Leakage vectors → LLM02 Sensitive Information Disclosure
   - id: MAP-RC001-01-LLM02
-    source:
-      entry-id: AIR-RC-001-01
-      entry-type: Vector
-    target:
-      entry-id: LLM02:2025
-      entry-type: Vector
+    source: AIR-RC-001-01
     relationship: relates-to
     rationale: >
       Model memorization of sensitive data from training or user
       interactions directly contributes to sensitive information
       disclosure.
+    targets:
+      - entry-id: "LLM02:2025"
 
   - id: MAP-RC001-02-LLM02
-    source:
-      entry-id: AIR-RC-001-02
-      entry-type: Vector
-    target:
-      entry-id: LLM02:2025
-      entry-type: Vector
+    source: AIR-RC-001-02
     relationship: relates-to
     rationale: >
       Prompt-based extraction techniques target memorized sensitive
       information, a primary mechanism for LLM information disclosure.
+    targets:
+      - entry-id: "LLM02:2025"
 
   - id: MAP-RC001-03-LLM02
-    source:
-      entry-id: AIR-RC-001-03
-      entry-type: Vector
-    target:
-      entry-id: LLM02:2025
-      entry-type: Vector
+    source: AIR-RC-001-03
     relationship: relates-to
     rationale: >
       Inadequate provider data controls increase the likelihood
       of sensitive information disclosure through hosted models.
+    targets:
+      - entry-id: "LLM02:2025"
 
   - id: MAP-RC001-04-LLM02
-    source:
-      entry-id: AIR-RC-001-04
-      entry-type: Vector
-    target:
-      entry-id: LLM02:2025
-      entry-type: Vector
+    source: AIR-RC-001-04
     relationship: relates-to
     rationale: >
       Deficient provider data handling practices around retention,
       encryption, and deletion expose sensitive information.
+    targets:
+      - entry-id: "LLM02:2025"
 
   - id: MAP-RC001-05-LLM02
-    source:
-      entry-id: AIR-RC-001-05
-      entry-type: Vector
-    target:
-      entry-id: LLM02:2025
-      entry-type: Vector
+    source: AIR-RC-001-05
     relationship: relates-to
     rationale: >
       Fine-tuning with proprietary data embeds sensitive information
       in model weights, creating persistent disclosure risk.
+    targets:
+      - entry-id: "LLM02:2025"
 
   # Data Poisoning vectors → LLM04 Data and Model Poisoning
   - id: MAP-SEC009-01-LLM04
-    source:
-      entry-id: AIR-SEC-009-01
-      entry-type: Vector
-    target:
-      entry-id: LLM04:2025
-      entry-type: Vector
+    source: AIR-SEC-009-01
     relationship: relates-to
     rationale: >
       Training data manipulation through label changes or crafted
       data points is a direct form of data and model poisoning.
+    targets:
+      - entry-id: "LLM04:2025"
 
   - id: MAP-SEC009-02-LLM04
-    source:
-      entry-id: AIR-SEC-009-02
-      entry-type: Vector
-    target:
-      entry-id: LLM04:2025
-      entry-type: Vector
+    source: AIR-SEC-009-02
     relationship: relates-to
     rationale: >
       Exploiting continuous learning pipelines to feed misleading
       information is an ongoing form of data poisoning.
+    targets:
+      - entry-id: "LLM04:2025"
 
-  - id: MAP-SEC009-03-LLM03
-    source:
-      entry-id: AIR-SEC-009-03
-      entry-type: Vector
-    target:
-      entry-id: LLM03:2025
-      entry-type: Vector
+  - id: MAP-SEC009-03-supplychain
+    source: AIR-SEC-009-03
     relationship: relates-to
     rationale: >
       Compromise of third-party data feeds represents a supply chain
       vulnerability that introduces poisoned data into AI systems.
+    targets:
+      - entry-id: "LLM03:2025"
+      - entry-id: "LLM04:2025"
 
-  - id: MAP-SEC009-03-LLM04
-    source:
-      entry-id: AIR-SEC-009-03
-      entry-type: Vector
-    target:
-      entry-id: LLM04:2025
-      entry-type: Vector
-    relationship: relates-to
-    rationale: >
-      Compromised external data feeds are a delivery mechanism for
-      data poisoning attacks on downstream models.
-
-  - id: MAP-SEC009-04-LLM04
-    source:
-      entry-id: AIR-SEC-009-04
-      entry-type: Vector
-    target:
-      entry-id: LLM04:2025
-      entry-type: Vector
+  - id: MAP-SEC009-04-poisoning
+    source: AIR-SEC-009-04
     relationship: relates-to
     rationale: >
       Deliberate bias introduction through data poisoning corrupts
-      model decision-making in credit and loan processing.
-
-  - id: MAP-SEC009-04-LLM05
-    source:
-      entry-id: AIR-SEC-009-04
-      entry-type: Vector
-    target:
-      entry-id: LLM05:2025
-      entry-type: Vector
-    relationship: relates-to
-    rationale: >
-      Poisoning-induced bias produces discriminatory outputs that
-      are not properly validated or sanitized before use.
+      model decision-making and produces discriminatory outputs.
+    targets:
+      - entry-id: "LLM04:2025"
+      - entry-id: "LLM05:2025"
 
   # Model Availability vectors → LLM10 Unbounded Consumption
   - id: MAP-OP007-01-LLM10
-    source:
-      entry-id: AIR-OP-007-01
-      entry-type: Vector
-    target:
-      entry-id: LLM10:2025
-      entry-type: Vector
+    source: AIR-OP-007-01
     relationship: relates-to
     rationale: >
       Denial of Wallet attacks exploit unbounded consumption through
       excessive token usage, long prompts, or poorly throttled
       agentic systems.
+    targets:
+      - entry-id: "LLM10:2025"
 
   - id: MAP-OP007-02-NOMATCH
-    source:
-      entry-id: AIR-OP-007-02
-      entry-type: Vector
+    source: AIR-OP-007-02
     relationship: no-match
     rationale: >
       TSP outage or degradation is an infrastructure availability
@@ -193,105 +141,65 @@ mappings:
       vulnerabilities.
 
   - id: MAP-OP007-03-LLM10
-    source:
-      entry-id: AIR-OP-007-03
-      entry-type: Vector
-    target:
-      entry-id: LLM10:2025
-      entry-type: Vector
+    source: AIR-OP-007-03
     relationship: relates-to
     rationale: >
       VRAM exhaustion from configuration changes, caching, or memory
       leaks is a resource exhaustion condition aligned with unbounded
       consumption.
+    targets:
+      - entry-id: "LLM10:2025"
 
   # Prompt Injection vectors → LLM01 Prompt Injection
   - id: MAP-SEC010-01-LLM01
-    source:
-      entry-id: AIR-SEC-010-01
-      entry-type: Vector
-    target:
-      entry-id: LLM01:2025
-      entry-type: Vector
+    source: AIR-SEC-010-01
     relationship: relates-to
     rationale: >
       Direct prompt injection (jailbreaking) is the primary attack
       pattern described in LLM01.
+    targets:
+      - entry-id: "LLM01:2025"
 
-  - id: MAP-SEC010-02-LLM01
-    source:
-      entry-id: AIR-SEC-010-02
-      entry-type: Vector
-    target:
-      entry-id: LLM01:2025
-      entry-type: Vector
+  - id: MAP-SEC010-02-injection
+    source: AIR-SEC-010-02
     relationship: relates-to
     rationale: >
       Indirect prompt injection via poisoned third-party content
-      is explicitly covered in LLM01 as a variant of prompt injection.
+      is covered in LLM01 and can hijack multi-agent decision-making
+      aligning with LLM06 excessive agency risks.
+    targets:
+      - entry-id: "LLM01:2025"
+      - entry-id: "LLM06:2025"
 
-  - id: MAP-SEC010-02-LLM06
-    source:
-      entry-id: AIR-SEC-010-02
-      entry-type: Vector
-    target:
-      entry-id: LLM06:2025
-      entry-type: Vector
-    relationship: relates-to
-    rationale: >
-      Indirect injection in multi-agent architectures can hijack
-      decision-making and trigger unauthorized actions, aligning
-      with excessive agency risks.
-
-  - id: MAP-SEC010-03-LLM01
-    source:
-      entry-id: AIR-SEC-010-03
-      entry-type: Vector
-    target:
-      entry-id: LLM01:2025
-      entry-type: Vector
+  - id: MAP-SEC010-03-probing
+    source: AIR-SEC-010-03
     relationship: relates-to
     rationale: >
       Model profiling and inversion use prompt injection techniques
       to probe internal model structure and extract proprietary
-      information.
-
-  - id: MAP-SEC010-03-LLM07
-    source:
-      entry-id: AIR-SEC-010-03
-      entry-type: Vector
-    target:
-      entry-id: LLM07:2025
-      entry-type: Vector
-    relationship: relates-to
-    rationale: >
-      Probing to extract proprietary system prompts and configurations
-      directly aligns with system prompt leakage risks.
+      system prompts and configurations.
+    targets:
+      - entry-id: "LLM01:2025"
+      - entry-id: "LLM07:2025"
 
   # Model Overreach → LLM06 Excessive Agency
   - id: MAP-OP018-LLM06
-    source:
-      entry-id: AIR-OP-018
-      entry-type: Vector
-    target:
-      entry-id: LLM06:2025
-      entry-type: Vector
+    source: AIR-OP-018
     relationship: relates-to
     rationale: >
       Model overreach and expanded use beyond validated scope aligns
       with excessive agency where AI systems operate beyond intended
       boundaries.
+    targets:
+      - entry-id: "LLM06:2025"
 
   # Reputational Risk → LLM09 Misinformation
   - id: MAP-OP020-LLM09
-    source:
-      entry-id: AIR-OP-020
-      entry-type: Vector
-    target:
-      entry-id: LLM09:2025
-      entry-type: Vector
+    source: AIR-OP-020
     relationship: relates-to
     rationale: >
       AI-generated offensive, misleading, or inaccurate outputs that
       damage reputation are a manifestation of LLM misinformation
       risks.
+    targets:
+      - entry-id: "LLM09:2025"

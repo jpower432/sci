@@ -18,12 +18,12 @@ metadata:
       version: "1.0"
 source-reference:
   reference-id: SRC
+  entry-type: Control
 target-reference:
   reference-id: TGT
+  entry-type: Guideline
 mappings:
   - id: m1
-    source:
-      entry-id: S1
-      entry-type: Control
+    source: S1
     relationship: implements
-    rationale: This should fail because target is missing
+    rationale: This should fail because targets is missing

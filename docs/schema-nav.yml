@@ -107,7 +107,8 @@ pages:
     schemas:
       - "MappingDocument"
       - "Mapping"
-      - "TypedEntry"
+      - "MappingTarget"
+      - "TypedMapping"
       - "RelationshipType"
   - title: "Evaluation Log"
     filename: "evaluationlog"
