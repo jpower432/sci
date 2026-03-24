@@ -33,7 +33,7 @@ package gemara
 #TypedMapping: {
 	#ArtifactMapping
 
-	// entry-type identifies what kind of atomic unit entries in this direction are
+	// entry-type identifies the type of atomic unit entries in this direction
 	"entry-type": #EntryType @go(EntryType)
 }
 
