@@ -26,4 +26,4 @@ mappings:
   - id: m1
     source: S1
     relationship: implements
-    rationale: This should fail because targets is missing
+    remarks: This should fail because targets is missing

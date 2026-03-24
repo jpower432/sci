@@ -81,17 +81,6 @@ package gemara
 	// relationship describes the nature of the mapping between source and all targets
 	relationship: #RelationshipType @go(Relationship)
 
-	// strength is the author's estimate of how completely the source satisfies the targets; range 1-10
-	strength?: int & >=1 & <=10 @go(Strength)
-
-	"confidence-level"?: #ConfidenceLevel @go(ConfidenceLevel)
-
-	// applicability constrains the contexts in which this mapping holds
-	applicability?: [string, ...string] @go(Applicability)
-
-	// rationale explains why this relationship exists
-	rationale?: string
-
 	// remarks is general prose regarding this mapping
 	remarks?: string
 }

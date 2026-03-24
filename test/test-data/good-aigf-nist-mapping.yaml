@@ -40,32 +40,52 @@ mappings:
   - id: MAP-PREV002-data-filtering
     source: AIR-PREV-002
     relationship: supports
-    rationale: >
-      Data filtering enforces information flow policies, prevents
-      sensitive data exposure, and implements sanitization, masking,
-      and monitoring across AI data pipelines.
     targets:
       - entry-id: AC-4
+        rationale: >
+          Data filtering enforces information flow policies across AI data pipelines.
       - entry-id: AC-22
+        rationale: >
+          Data filtering prevents sensitive data exposure in publicly accessible content.
       - entry-id: MP-6
+        rationale: >
+          Data filtering implements sanitization of media and data stores in AI pipelines.
       - entry-id: PT-2
+        rationale: >
+          Data filtering enforces authority and purpose constraints on data processing.
       - entry-id: SI-4
+        rationale: >
+          Data filtering implements monitoring across AI data pipelines.
       - entry-id: SI-12
+        rationale: >
+          Data filtering supports information management and retention policies.
       - entry-id: SI-15
+        rationale: >
+          Data filtering implements output masking and sanitization.
       - entry-id: SI-19
+        rationale: >
+          Data filtering supports de-identification of personal information.
 
   # AIR-PREV-003: User/App/Model Firewalling
   - id: MAP-PREV003-firewalling
     source: AIR-PREV-003
     relationship: supports
-    rationale: >
-      Layered firewalling at user, application, and model boundaries
-      enforces information flow, boundary protection, input validation,
-      output filtering, and monitoring for AI interactions.
     targets:
       - entry-id: AC-4
+        rationale: >
+          Layered firewalling enforces information flow policies at AI boundaries.
       - entry-id: SC-5
+        rationale: >
+          Firewalling protects against denial of service at model interaction points.
       - entry-id: SC-7
+        rationale: >
+          Firewalling at user, application, and model layers provides boundary protection.
       - entry-id: SI-4
+        rationale: >
+          Firewalling enables monitoring of AI interactions for anomalous activity.
       - entry-id: SI-10
+        rationale: >
+          Firewalling implements input validation for user and application prompts.
       - entry-id: SI-15
+        rationale: >
+          Firewalling implements output filtering for model responses.

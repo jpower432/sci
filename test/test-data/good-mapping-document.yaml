@@ -67,51 +67,59 @@ mappings:
   - id: QA02-2.1-mfr
     source: OSPS-QA-02
     relationship: relates-to
-    strength: 6
-    confidence-level: Medium
-    applicability:
-      - "manufacturer"
-    rationale: >
-      OSPS-QA-02 requires dependency lists and SBOMs. CRA 2.1 requires
-      identifying and documenting vulnerabilities and components. SBOMs
-      address component identification but not the full manufacturer
-      obligation.
     targets:
       - entry-id: "2.1"
+        strength: 6
+        confidence-level: Medium
+        applicability:
+          - "manufacturer"
+        rationale: >
+          OSPS-QA-02 requires dependency lists and SBOMs. CRA 2.1 requires
+          identifying and documenting vulnerabilities and components. SBOMs
+          address component identification but not the full manufacturer
+          obligation.
 
   - id: QA02-2.1-steward
     source: OSPS-QA-02
     relationship: implements
-    strength: 9
-    confidence-level: High
-    applicability:
-      - "open-source-steward"
-    rationale: >
-      For open-source stewards, CRA Article 24 narrows 2.1 to a
-      best-effort duty around vulnerability facilitation. OSPS-QA-02
-      dependency tracking and SBOM generation fulfills this
-      scoped-down obligation.
     targets:
       - entry-id: "2.1"
+        strength: 9
+        confidence-level: High
+        applicability:
+          - "open-source-steward"
+        rationale: >
+          For open-source stewards, CRA Article 24 narrows 2.1 to a
+          best-effort duty around vulnerability facilitation. OSPS-QA-02
+          dependency tracking and SBOM generation fulfills this
+          scoped-down obligation.
 
   - id: VM01-vuln-handling
     source: OSPS-VM-01
     relationship: relates-to
-    confidence-level: High
-    applicability:
-      - "ML2"
-      - "ML3"
     targets:
       - entry-id: "2.5"
+        confidence-level: High
+        applicability:
+          - "ML2"
+          - "ML3"
         rationale: >
           OSPS-VM-01 requires a CVD policy with a clear timeframe for
           response. CRA 2.5 requires timely remediation of
           vulnerabilities.
       - entry-id: "2.6"
+        confidence-level: High
+        applicability:
+          - "ML2"
+          - "ML3"
         rationale: >
           CRA 2.6 requires public disclosure of fixed vulnerabilities
           with advisories. CVD policy scope overlaps.
       - entry-id: "2.7"
+        confidence-level: High
+        applicability:
+          - "ML2"
+          - "ML3"
         rationale: >
           CRA 2.7 requires mechanisms for sharing information about
           vulnerabilities. CVD policy facilitates this.
@@ -119,22 +127,21 @@ mappings:
   - id: VM04-2.4
     source: OSPS-VM-04
     relationship: relates-to
-    confidence-level: High
-    applicability:
-      - "ML3"
-    rationale: >
-      OSPS-VM-04 requires a VEX document for vulnerabilities in
-      components that do not affect the project. This Maturity Level 3
-      requirement strengthens the CRA 2.4 relationship by providing
-      machine-readable exploitability data beyond basic disclosure.
     targets:
       - entry-id: "2.4"
+        confidence-level: High
+        applicability:
+          - "ML3"
+        rationale: >
+          OSPS-VM-04 requires a VEX document for vulnerabilities in
+          components that do not affect the project. This Maturity Level 3
+          requirement strengthens the CRA 2.4 relationship by providing
+          machine-readable exploitability data beyond basic disclosure.
 
   - id: GV01-no-match
     source: OSPS-GV-01
     relationship: no-match
-    confidence-level: High
-    rationale: >
+    remarks: >
       OSPS-GV-01 requires publishing project roles and responsibilities.
       CRA Annex I has no corresponding requirement for governance
       documentation.
