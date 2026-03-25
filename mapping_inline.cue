@@ -21,8 +21,9 @@ package gemara
 	url?: =~"^(https?|file)://[^\\s]+$"
 }
 
+// ArtifactMapping represents a mapping to an external artifact or artifact entry
 #ArtifactMapping: {
-	// ReferenceId should reference the corresponding MappingReference id from metadata
+	// reference-id identifies an element from a MappingReference in the artifact's metadata
 	"reference-id": string @go(ReferenceId)
 
 	// remarks is prose regarding the mapped artifact or the mapping relationship
@@ -31,13 +32,14 @@ package gemara
 
 // MultiEntryMapping represents a mapping to an external reference with one or more entries.
 #MultiEntryMapping: {
+	// top-level reference to the MappingReference entry
 	#ArtifactMapping
 
 	// entries is a list of mapping entries
 	entries: [#ArtifactMapping, ...#ArtifactMapping] @go(Entries)
 }
 
-// EntryMapping represents how a specific entry (control/requirement/procedure) maps to a MappingReference.
+// EntryMapping represents how a specific entry maps to a MappingReference.
 #EntryMapping: {
 	// reference-id is the id for a MappingReference entry in the artifact's metadata
 	"reference-id"?: string @go(ReferenceId)

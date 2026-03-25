@@ -23,37 +23,30 @@ metadata:
 
 source-reference:
   reference-id: ORG-SSD
+  entry-type: Guideline
 target-reference:
   reference-id: OWASP
+  entry-type: Guideline
 remarks: Guidance guidelines ORG.SSD.GL01–GL03 mapped to OWASP for tutorial use.
 
 mappings:
   - id: GL01-A06
-    source:
-      entry-id: ORG.SSD.GL01
-      entry-type: Guideline
-    target:
-      entry-id: "A06"
-      entry-type: Guideline
+    source: ORG.SSD.GL01
     relationship: relates-to
     rationale: Immutable image references support supply chain integrity; OWASP A06 covers vulnerable and outdated components.
+    targets:
+      - entry-id: "A06"
 
   - id: GL02-A01
-    source:
-      entry-id: ORG.SSD.GL02
-      entry-type: Guideline
-    target:
-      entry-id: "A01"
-      entry-type: Guideline
+    source: ORG.SSD.GL02
     relationship: relates-to
     rationale: Branch protection reduces unauthorized code changes; OWASP A01 covers broken access control.
+    targets:
+      - entry-id: "A01"
 
   - id: GL03-A02
-    source:
-      entry-id: ORG.SSD.GL03
-      entry-type: Guideline
-    target:
-      entry-id: "A02"
-      entry-type: Guideline
+    source: ORG.SSD.GL03
     relationship: relates-to
     rationale: VPN on untrusted networks protects data in transit; OWASP A02 covers cryptographic failures.
+    targets:
+      - entry-id: "A02"
