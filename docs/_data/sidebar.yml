@@ -19,6 +19,8 @@
           url: /tutorials/guidance/guidance-guide
     - title: Policy
       children:
+        - title: Risk Catalog Guide
+          url: /tutorials/policy/risk-catalog-guide
         - title: Policy Guide
           url: /tutorials/policy/policy-guide
 - title: ADRs

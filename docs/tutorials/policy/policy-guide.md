@@ -21,7 +21,7 @@ This exercise produces a policy document that captures scope, imported controls 
 
 ### Step 0: Metadata and mapping-references
 
-Set `title` and `metadata` (see [metadata.cue](https://github.com/gemaraproj/gemara/blob/main/metadata.cue) for the standard metadata fields). Include `mapping-references` for every external catalog, guidance document, or policy you reference in `imports` (by `reference-id`). Key fields (see [layer-3.cue](https://github.com/gemaraproj/gemara/blob/main/layer-3.cue) and [metadata.cue](https://github.com/gemaraproj/gemara/blob/main/metadata.cue)):
+Set `title` and `metadata` (see [metadata.cue](https://github.com/gemaraproj/gemara/blob/main/metadata.cue) for the standard metadata fields). Include `mapping-references` for every external catalog, guidance document, or policy you reference in `imports` (by `reference-id`). Key fields (see [layer-3.cue](https://github.com/gemaraproj/gemara/blob/main/layer-3.cue) and [metadata.cue](https://github.com/gemaraproj/gemara/blob/main/metadata.cue):
 
 | Field                         | What It Is                                                                 | Why                                                                 |
 |-------------------------------|----------------------------------------------------------------------------|---------------------------------------------------------------------|
