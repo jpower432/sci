@@ -20,6 +20,7 @@ import "list"
 		metadata: "applicability-groups": [#Group, ...#Group]
 		let _validGroupIds = [for g in groups {g.id}]
 		let _validApplicabilityIds = [for ag in metadata."applicability-groups" {ag.id}]
+
 		// Unify the valid ID list with a list.Contains constraint to require each entry's value exists
 		for i, c in controls {
 			_groupValidation: "\(i)": _validGroupIds & list.Contains(c.group)

@@ -18,6 +18,7 @@ import "list"
 		_uniquePrinciplesIds: {for i, p in principles {(p.id): i}}
 		groups: [#Group, ...#Group]
 		let _validGroupIds = [for g in groups {g.id}]
+
 		// Unify the valid ID list with a list.Contains constraint to require each entry's value exists
 		for i, p in principles {
 			_groupValidation: "\(i)": _validGroupIds & list.Contains(p.group)

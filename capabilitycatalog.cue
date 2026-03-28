@@ -18,6 +18,7 @@ import "list"
 		_uniqueCapabilityIds: {for i, c in capabilities {(c.id): i}}
 		groups: [#Group, ...#Group]
 		let _validGroupIds = [for g in groups {g.id}]
+
 		// Unify the valid ID list with a list.Contains constraint to require each entry's value exists
 		for i, c in capabilities {
 			_groupValidation: "\(i)": _validGroupIds & list.Contains(c.group)

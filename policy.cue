@@ -124,8 +124,8 @@ package gemara
 
 #ModeType:              "Manual" | "Automated"                           @go(-)
 #MethodType:            "Behavioral" | "Intent" | "Remediation" | "Gate" @go(-)
-#EvaluationMethodType:  "Intent" | "Behavioral"                         @go(-)
-#EnforcementMethodType: "Gate" | "Remediation"                          @go(-)
+#EvaluationMethodType:  "Intent" | "Behavioral"                          @go(-)
+#EnforcementMethodType: "Gate" | "Remediation"                           @go(-)
 
 // Parameter defines a configurable parameter for assessment or enforcement activities.
 #Parameter: {
