@@ -44,7 +44,7 @@ package gemara
 	description: string
 
 	// criteria-reference maps this result to specific criteria entries
-	"criteria-reference": #MultiEntryMapping
+	"criteria-reference": #MultiEntryMapping @go(CriteriaReference)
 
 	// evidence records the data sources that support this result
 	evidence?: [#Evidence, ...#Evidence] @go(Evidence)
