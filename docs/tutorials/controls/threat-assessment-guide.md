@@ -8,7 +8,7 @@ description: Step-by-step guide to performing Gemara-compatible threat assessmen
 
 This guide walks through a threat assessment using the [Gemara](https://gemara.openssf.org/) project.
 
-**The basic idea:** Think of a project like a house. First, you identify what the house can do: its **[capabilities](../../model/02-definitions.html#capability)** (e.g., "allow entry/exit", "store belongings"). Then, you identify **[threats](../../model/02-definitions.html#threat)**,, what could go wrong with those capabilities (e.g., "unauthorized entry through unlocked door", "theft of stored belongings").
+**The basic idea:** Think of a project like a house. First, you identify what the house can do: its **[capabilities](../../model/02-definitions.html#capability)** (e.g., "allow entry/exit", "store belongings"). Then, you identify **[threats](../../model/02-definitions.html#threat)**, what could go wrong with those capabilities (e.g., "unauthorized entry through unlocked door", "theft of stored belongings").
 
 In technical terms:
  * **[Capabilities](../../model/02-definitions.html#capability)** define what the technology can do. These form a primary component of the **attack surface** because every intended function represents a potential path for unintended use.
@@ -37,15 +37,9 @@ Declare your scope and mapping references for the `ThreatCatalog`. Key fields:
 | `title` | Display name for the threat catalog (top-level field) | Human-readable label used in reports and tooling output |
 | `metadata.type` | Must be `ThreatCatalog` | Identifies the artifact for `#ThreatCatalog` validation |
 | `metadata.gemara-version` | String (e.g. `1.0.0-rc.1`) | Declares which Gemara specification version the file conforms to (required) |
-<<<<<<< HEAD
-| `mapping-references` with `id: CCC` | Pointer to the CCC Core catalog release | Resolve imported CCC capability and threat IDs used in `imports` and in each threat's `capabilities` |
-| `mapping-references` for scope capabilities | Pointer to your `CapabilityCatalog` (see Step 2) | Resolve IDs such as `SEC.SLAM.CM.CAP01` referenced from each threat's `capabilities` |
-| Top-level `imports` (optional) | List of `#MultiEntryMapping` rows | Pull CCC (or other) threat entries into this catalog without redefining them |
-=======
 | `mapping-references` with `id: CCC` | Pointer to the CCC Core catalog release | Resolve imported CCC capability and threat IDs used in `imports` and in each threat's `capabilities` |
 | `mapping-references` for scope capabilities | Pointer to your `CapabilityCatalog` (see Step 2) | Resolve IDs such as `SEC.SLAM.CM.CAP01` referenced from each threat's `capabilities` |
 | Top-level `imports` (optional) | List of `#MultiEntryMapping` rows | Pull CCC (or other) capability/threat entries into this catalog without redefining them |
->>>>>>> 4180fdc (fix: updates broken links)
 
 **Example (YAML)** — threat catalog metadata only:
 
