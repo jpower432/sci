@@ -87,6 +87,12 @@ func TestSchemaValidation(t *testing.T) {
 		{"invalid mapping document without mapping-references", "./test-data/bad-mapping-document.yaml", "#MappingDocument", true, ""},
 		{"mapping missing target for non-no-match relationship", "./test-data/bad-mapping-no-target.yaml", "#MappingDocument", true, ""},
 
+		// Lexicon — positive
+		{"valid lexicon", "./test-data/good-lexicon.yaml", "#Lexicon", false, ""},
+
+		// Lexicon — negative
+		{"lexicon with duplicate term ids", "./test-data/bad-lexicon-duplicate-term-id.yaml", "#Lexicon", true, ""},
+
 		// GuidanceCatalog — negative
 		{"retired guideline with recommendations", "./test-data/bad-lifecycle.yaml", "#GuidanceCatalog", true, ""},
 

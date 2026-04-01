@@ -110,6 +110,12 @@ pages:
       - "MappingTarget"
       - "TypedMapping"
       - "RelationshipType"
+  - title: "Lexicon"
+    filename: "lexicon"
+    schemas:
+      - "Lexicon"
+      - "LexiconTerm"
+      - "LexiconReference"
   - title: "Evaluation Log"
     filename: "evaluationlog"
     layer: 5
