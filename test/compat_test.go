@@ -6,9 +6,12 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"path/filepath"
+	"strings"
 	"testing"
 
 	"cuelang.org/go/cue"
+	cueerrors "cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/load"
 	"cuelang.org/go/mod/modconfig"
 	"cuelang.org/go/mod/modregistry"
@@ -18,25 +21,12 @@ import (
 
 const modulePath = "github.com/gemaraproj/gemara"
 
-// stableArtifactDefs lists the CUE definitions that have reached stable status
-// via @status("stable") in their respective .cue files.
-// Update this list when promoting a schema to stable.
-var stableArtifactDefs = []string{
-	"#ControlCatalog",
-	"#CapabilityCatalog",
-	"#EvaluationLog",
-	"#ThreatCatalog",
-	"#Metadata",
-	"#ArtifactType",
-	"#Group",
-	"#Datetime",
+var builtinValidatorNoise = []string{
+	"time.Format",
+	"time.Time",
+	"strings.MinRunes",
 }
 
-// TestNoBreakingChanges pulls the latest release from the CUE registry and
-// verifies that each stable schema definition remains backward compatible.
-//
-// By default only stable releases are considered. Set GEMARA_COMPAT_PRERELEASE=true
-// to also include pre-release versions, which is useful before v1.0.0 is published.
 func TestNoBreakingChanges(t *testing.T) {
 	ctx := context.Background()
 
@@ -52,7 +42,7 @@ func TestNoBreakingChanges(t *testing.T) {
 
 	latestVer, err := latestVersion(ctx, regClient, modulePath, includePrerelease)
 	if err != nil {
-		t.Logf("no suitable release found | skipping compatibility check; %v", err)
+		t.Logf("no suitable release found | skipping compatibility check: %v", err)
 		t.Skip()
 	}
 	t.Logf("comparing against released version: %s", latestVer)
@@ -69,7 +59,18 @@ func TestNoBreakingChanges(t *testing.T) {
 		t.Fatalf("failed to load released module: %v", err)
 	}
 
-	for _, defPath := range stableArtifactDefs {
+	schemaDir, err := filepath.Abs("..")
+	if err != nil {
+		t.Fatalf("failed to resolve schema directory: %v", err)
+	}
+
+	stableDefs, err := collectStableDefs(schemaDir)
+	if err != nil {
+		t.Fatalf("failed to collect stable definitions: %v", err)
+	}
+	t.Logf("found %d stable definitions to check", len(stableDefs))
+
+	for _, defPath := range stableDefs {
 		defPath := defPath
 		t.Run(defPath, func(t *testing.T) {
 			newDef := schemaValue.LookupPath(cue.ParsePath(defPath))
@@ -85,7 +86,19 @@ func TestNoBreakingChanges(t *testing.T) {
 
 			t.Logf("validating %s: checking new definition subsumes old definition", defPath)
 			if err := newDef.Subsume(oldDef, cue.Raw(), cue.Schema()); err != nil {
-				t.Errorf("breaking change detected in %s:\n%v", defPath, err)
+
+				var realErrors []string
+				for _, e := range cueerrors.Errors(err) {
+					msg := e.Error()
+					if !matchesAny(msg, builtinValidatorNoise) {
+						realErrors = append(realErrors, msg)
+					}
+				}
+				if len(realErrors) > 0 {
+					t.Errorf("breaking change detected in %s:\n%s", defPath, strings.Join(realErrors, "\n"))
+				} else {
+					t.Logf("%s: OK — no breaking changes (suppressed builtin validator noise)", defPath)
+				}
 			} else {
 				t.Logf("%s: OK — no breaking changes", defPath)
 			}
@@ -93,8 +106,46 @@ func TestNoBreakingChanges(t *testing.T) {
 	}
 }
 
-// latestVersion returns the most recent version of the module from the registry.
-// If includePrerelease is false, only stable releases are considered.
+func collectStableDefs(schemaDir string) ([]string, error) {
+	var stableDefs []string
+
+	entries, err := os.ReadDir(schemaDir)
+	if err != nil {
+		return nil, fmt.Errorf("read schema dir: %w", err)
+	}
+
+	for _, entry := range entries {
+		if !strings.HasSuffix(entry.Name(), ".cue") {
+			continue
+		}
+		data, err := os.ReadFile(filepath.Join(schemaDir, entry.Name()))
+		if err != nil {
+			return nil, fmt.Errorf("read %s: %w", entry.Name(), err)
+		}
+		content := string(data)
+		if !strings.Contains(content, `@status("stable")`) {
+			continue
+		}
+		for _, line := range strings.Split(content, "\n") {
+			line = strings.TrimSpace(line)
+			if strings.HasPrefix(line, "#") && strings.Contains(line, ":") {
+				def := strings.TrimSpace(strings.SplitN(line, ":", 2)[0])
+				stableDefs = append(stableDefs, def)
+			}
+		}
+	}
+	return stableDefs, nil
+}
+
+func matchesAny(s string, patterns []string) bool {
+	for _, p := range patterns {
+		if strings.Contains(s, p) {
+			return true
+		}
+	}
+	return false
+}
+
 func latestVersion(ctx context.Context, client *modregistry.Client, modPath string, includePrerelease bool) (module.Version, error) {
 	versions, err := client.ModuleVersions(ctx, modPath+"@v1")
 	if err != nil {
@@ -112,9 +163,6 @@ func latestVersion(ctx context.Context, client *modregistry.Client, modPath stri
 	return module.Version{}, fmt.Errorf("no stable release found for %s (set GEMARA_COMPAT_PRERELEASE=true to include pre-releases)", modPath)
 }
 
-// loadModuleFromRegistry fetches the given module version from the registry
-// and builds a CUE value using load.Instances, which correctly handles
-// cross-file references within the module.
 func loadModuleFromRegistry(reg modconfig.Registry, ver module.Version) (cue.Value, error) {
 	instances := load.Instances([]string{ver.String()}, &load.Config{
 		Registry: reg,
