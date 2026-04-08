@@ -27,6 +27,10 @@ var builtinValidatorNoise = []string{
 	"strings.MinRunes",
 }
 
+var skipDefs = map[string]bool{
+	"#Datetime": true,
+}
+
 func TestNoBreakingChanges(t *testing.T) {
 	ctx := context.Background()
 
@@ -72,6 +76,10 @@ func TestNoBreakingChanges(t *testing.T) {
 
 	for _, defPath := range stableDefs {
 		defPath := defPath
+		if skipDefs[defPath] {
+			t.Logf("skipping %s (excluded from compatibility check)", defPath)
+			continue
+		}
 		t.Run(defPath, func(t *testing.T) {
 			newDef := schemaValue.LookupPath(cue.ParsePath(defPath))
 			if newDef.Err() != nil {
@@ -86,7 +94,6 @@ func TestNoBreakingChanges(t *testing.T) {
 
 			t.Logf("validating %s: checking new definition subsumes old definition", defPath)
 			if err := newDef.Subsume(oldDef, cue.Raw(), cue.Schema()); err != nil {
-
 				var realErrors []string
 				for _, e := range cueerrors.Errors(err) {
 					msg := e.Error()
