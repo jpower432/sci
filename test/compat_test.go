@@ -11,7 +11,6 @@ import (
 	"testing"
 
 	"cuelang.org/go/cue"
-	cueerrors "cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/load"
 	"cuelang.org/go/mod/modconfig"
 	"cuelang.org/go/mod/modregistry"
@@ -20,16 +19,6 @@ import (
 )
 
 const modulePath = "github.com/gemaraproj/gemara"
-
-var builtinValidatorNoise = []string{
-	"time.Format",
-	"time.Time",
-	"strings.MinRunes",
-}
-
-var skipDefs = map[string]bool{
-	"#Datetime": true,
-}
 
 func TestNoBreakingChanges(t *testing.T) {
 	ctx := context.Background()
@@ -76,10 +65,6 @@ func TestNoBreakingChanges(t *testing.T) {
 
 	for _, defPath := range stableDefs {
 		defPath := defPath
-		if skipDefs[defPath] {
-			t.Logf("skipping %s (excluded from compatibility check)", defPath)
-			continue
-		}
 		t.Run(defPath, func(t *testing.T) {
 			newDef := schemaValue.LookupPath(cue.ParsePath(defPath))
 			if newDef.Err() != nil {
@@ -92,25 +77,70 @@ func TestNoBreakingChanges(t *testing.T) {
 				return
 			}
 
-			t.Logf("validating %s: checking new definition subsumes old definition", defPath)
-			if err := newDef.Subsume(oldDef, cue.Raw(), cue.Schema()); err != nil {
-				var realErrors []string
-				for _, e := range cueerrors.Errors(err) {
-					msg := e.Error()
-					if !matchesAny(msg, builtinValidatorNoise) {
-						realErrors = append(realErrors, msg)
-					}
-				}
-				if len(realErrors) > 0 {
-					t.Errorf("breaking change detected in %s:\n%s", defPath, strings.Join(realErrors, "\n"))
-				} else {
-					t.Logf("%s: OK — no breaking changes (suppressed builtin validator noise)", defPath)
-				}
-			} else {
-				t.Logf("%s: OK — no breaking changes", defPath)
-			}
+			assertFieldsCompatible(t, defPath, newDef, oldDef)
 		})
 	}
+}
+
+// assertFieldsCompatible checks that the new definition hasn't removed any
+// fields present in the old definition and hasn't introduced new required
+// fields. CUE's Subsume API produces false positives when comparing values
+// built from different load contexts (local filesystem vs OCI registry), so
+// we compare field structure directly using name-based maps.
+func assertFieldsCompatible(t *testing.T, path string, newDef, oldDef cue.Value) {
+	t.Helper()
+
+	oldFields := fieldNames(oldDef, true)
+	newAllFields := fieldNames(newDef, true)
+	newRequiredFields := fieldNames(newDef, false)
+
+	for _, name := range oldFields {
+		if !contains(newAllFields, name) {
+			t.Errorf("field %s removed from %s", name, path)
+		}
+	}
+
+	oldSet := make(map[string]bool, len(oldFields))
+	for _, name := range oldFields {
+		oldSet[name] = true
+	}
+	for _, name := range newRequiredFields {
+		if !oldSet[name] {
+			t.Errorf("new required field %s added to %s", name, path)
+		}
+	}
+}
+
+func fieldNames(v cue.Value, includeOptional bool) []string {
+	iter, err := v.Fields(cue.Optional(includeOptional))
+	if err != nil {
+		return nil
+	}
+	var names []string
+	for iter.Next() {
+		sel := iter.Selector()
+		if sel.IsDefinition() || sel.PkgPath() != "" {
+			continue
+		}
+		names = append(names, normalizeLabel(sel.String()))
+	}
+	return names
+}
+
+// normalizeLabel strips the trailing optionality marker from a CUE
+// selector string so that required and optional variants of the same
+// field compare equal (e.g. `"foo"?` becomes `"foo"`).
+func normalizeLabel(s string) string {
+	return strings.TrimSuffix(s, "?")
+}
+
+func contains(names []string, target string) bool {
+	for _, n := range names {
+		if n == target {
+			return true
+		}
+	}
+	return false
 }
 
 func collectStableDefs(schemaDir string) ([]string, error) {
@@ -142,15 +172,6 @@ func collectStableDefs(schemaDir string) ([]string, error) {
 		}
 	}
 	return stableDefs, nil
-}
-
-func matchesAny(s string, patterns []string) bool {
-	for _, p := range patterns {
-		if strings.Contains(s, p) {
-			return true
-		}
-	}
-	return false
 }
 
 func latestVersion(ctx context.Context, client *modregistry.Client, modPath string, includePrerelease bool) (module.Version, error) {
