@@ -389,13 +389,30 @@ a[href^="http"]:not([href*="gemara"]):not([href*="openssf"]):not(.social-media-l
   }
 }
 
-.theme-toggle {
+.header-actions {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+
+  @media screen and (max-width: 768px) {
+    position: absolute;
+    top: var(--spacing-md);
+    right: var(--spacing-md);
+    z-index: 10;
+  }
+}
+
+.theme-toggle,
+.site-github {
   flex: 0 0 auto;
   background: var(--color-bg-secondary);
   border: 2px solid var(--color-border);
   border-radius: 50%;
   padding: 0;
   cursor: pointer;
+  text-decoration: none;
+  border-bottom: none !important;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   display: flex;
   align-items: center;
@@ -462,13 +479,9 @@ a[href^="http"]:not([href*="gemara"]):not([href*="openssf"]):not(.social-media-l
   }
 
   @media screen and (max-width: 768px) {
-    position: absolute;
-    top: var(--spacing-md);
-    right: var(--spacing-md);
     width: 40px;
     height: 40px;
     font-size: 1.1rem;
-    z-index: 10;
   }
 
   @media screen and (max-width: 600px) {
