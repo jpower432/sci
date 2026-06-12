@@ -5,7 +5,7 @@ title: Add Evidence to AssessmentLog
 
 - **ADR:** 0022
 - **Proposal Author(s):** @jpower432, @eddie-knight
-- **Status:** Proposed
+- **Status:** Accepted
 
 ## Context
 
