@@ -79,8 +79,11 @@ package gemara
 	// collected-at is the timestamp when the evidence was gathered
 	"collected-at": #Datetime @go(CollectedAt)
 
-	// payload is the raw evidence data collected
+	// payload is the raw evidence data collected inline
 	payload?: _ @go(Payload,type=any)
+
+	// origin references the source consulted during evidence collection
+	origin?: #EvidenceMapping @go(Origin)
 
 	// description explains what this evidence represents
 	description?: string

@@ -53,3 +53,23 @@ package gemara
 	// remarks is prose describing the mapping relationship
 	remarks?: string
 }
+
+// EvidenceMapping references a source consulted during evidence collection.
+// Properties describe the specific observation, not the artifact itself.
+#EvidenceMapping: {
+	// reference-id ties this evidence to a mapping-reference in the artifact's metadata
+	"reference-id": string @go(ReferenceId)
+
+	// coordinate identifies a specific origin within the referenced source
+	// (line number, JSON path, API endpoint path, file fragment)
+	coordinate?: string
+
+	// entry-id identifies a specific entry within a structured Gemara artifact
+	"entry-id"?: string @go(EntryId)
+
+	// digest is a hash of the evidence content at collection time
+	digest?: string
+
+	// remarks is prose regarding this evidence reference
+	remarks?: string
+}
