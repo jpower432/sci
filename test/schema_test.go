@@ -121,6 +121,7 @@ func TestSchemaValidation(t *testing.T) {
 
 		// AuditLog — negative
 		{"audit log missing summary criteria and results", "./test-data/bad-audit-log.yaml", "#AuditLog", true, ""},
+		{"audit log evidence source with invalid digest format", "./test-data/bad-audit-log-invalid-digest.yaml", "#AuditLog", true, ""},
 
 		// CapabilityCatalog — negative
 		{"capability with invalid group", "./test-data/bad-capability-invalid-group.yaml", "#CapabilityCatalog", true, ""},
