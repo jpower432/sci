@@ -69,6 +69,7 @@ package gemara
 
 // Evidence records what was cited to support an opinion for a specific activity:
 // raw data for the evaluation layer, evaluation and enforcement artifacts for the audit layer.
+// At least one of payload or source MUST be present; an entry with neither is semantically incomplete.
 #Evidence: {
 	// id uniquely identifies this evidence
 	id: string
@@ -79,8 +80,11 @@ package gemara
 	// collected-at is the timestamp when the evidence was gathered
 	"collected-at": #Datetime @go(CollectedAt)
 
-	// payload is the raw evidence data collected
+	// payload is the raw evidence data collected inline
 	payload?: _ @go(Payload,type=any)
+
+	// source identifies the artifact or system from which this evidence was collected
+	source?: #EvidenceMapping @go(Source)
 
 	// description explains what this evidence represents
 	description?: string
