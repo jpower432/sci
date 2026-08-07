@@ -8,6 +8,11 @@ metadata:
     id: pvtr
     name: PVTR
     type: Software
+  mapping-references:
+    - id: github-api
+      title: "GitHub REST API"
+      version: "2025"
+      url: "https://api.github.com"
 result: Failed
 target:
   id: github-repo
@@ -36,6 +41,10 @@ evaluations:
     - id: EV-AC-01-01
       type: api-response
       collected-at: 2025-08-22T16:02:00.000003000Z
+      source:
+        reference-id: github-api
+        coordinate: "/orgs/revanite-io/settings"
+        digest: "sha256:b3c4d5e6f7a8901bcdef234567890abcdef1234567890abcdef1234567890ab12"
       payload:
         login: revanite-io
         two_factor_requirement_enabled: true

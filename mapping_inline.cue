@@ -20,7 +20,7 @@ package gemara
 	// description is prose regarding the artifact's purpose or content
 	description?: string
 
-	// url is the path where the artifact may be retrieved; preferrably responds with Gemara-compatible YAML/JSON
+	// url is the path where the artifact may be retrieved; preferably responds with Gemara-compatible YAML/JSON
 	url?: =~"^(https?|file)://[^\\s]+$"
 }
 
@@ -51,5 +51,28 @@ package gemara
 	"entry-id": string @go(EntryId)
 
 	// remarks is prose describing the mapping relationship
+	remarks?: string
+}
+
+// EvidenceMapping identifies the source from which evidence was collected.
+// reference-id names the MappingReference; coordinate or entry-id gives
+// specificity within it; digest pins the observed content at collection time.
+#EvidenceMapping: {
+	// reference-id ties this evidence to a mapping-reference in the artifact's metadata
+	"reference-id": string @go(ReferenceId)
+
+	// coordinate is the precise location within the stream identified by reference-id
+	// (e.g. an API path, file path, or JSON path expression).
+	// Do not set if entry-id is set.
+	coordinate?: string
+
+	// entry-id identifies a specific entry within a referenced Gemara artifact.
+	// Do not set if coordinate is set.
+	"entry-id"?: string @go(EntryId)
+
+	// digest is a cryptographic hash of the observed content at collection time; format: algorithm:encoded (e.g. sha256:abc123...)
+	digest?: =~"^[a-z0-9]+(?:[+._-][a-z0-9]+)*:[a-zA-Z0-9=_-]+$"
+
+	// remarks is prose regarding this evidence reference
 	remarks?: string
 }

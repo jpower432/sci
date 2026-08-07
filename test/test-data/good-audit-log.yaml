@@ -75,6 +75,10 @@ results:
         type: EvaluationLog
         description: "PVTR evaluation results for documentation controls"
         collected-at: "2025-08-22T16:02:00Z"
+        source:
+          reference-id: eval-log
+          entry-id: "assessment-do-01"
+          digest: "sha256:c4d5e6f7a8b9012cdef34567890abcdef1234567890abcdef1234567890abc123"
     recommendations:
       - id: REC-01
         text: "Add user guide references to the Security Insights file and publish basic user documentation."
@@ -110,3 +114,7 @@ results:
         type: api-response
         description: "Dependency manifests from the GitHub dependency graph SBOM endpoint"
         collected-at: "2026-02-10T15:05:00Z"
+        source:
+          reference-id: github-api
+          coordinate: "/repos/gemaraproj/gemara/dependency-graph/sbom"
+          digest: "sha256:a1b2c3d4e5f67890abcdef1234567890abcdef1234567890abcdef1234567890"
