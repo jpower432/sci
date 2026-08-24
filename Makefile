@@ -68,9 +68,23 @@ genopenapi:
 #
 # TEST BACKWARD COMPATIBILITY
 #
+# Repo whose releases hold the v1 baseline OpenAPI asset.
+REPO ?= gemaraproj/gemara
+
 breaking-check:
-	@echo "  >  Running backward compatibility check ..."
-	@cd test && go test -v -run TestNoBreakingChanges ./...
+	@echo "  >  Checking for breaking schema changes ..."
+	@tag=$$(gh api "repos/$(REPO)/releases" --paginate \
+		--jq '.[] | select(.prerelease == false) | select(.tag_name | test("^v1\\.")) | select(any(.assets[]?; .name == "openapi.yaml")) | .tag_name' \
+		| sort -V | tail -n1); \
+	if [ -z "$$tag" ]; then \
+		echo "  >  No v1 baseline release with an openapi.yaml asset found; skipping breaking-change check"; \
+		exit 0; \
+	fi; \
+	echo "  >  Comparing against v1 baseline $$tag"; \
+	tmp=$$(mktemp -d); \
+	trap 'rm -rf "$$tmp"' EXIT; \
+	gh release download "$$tag" --repo "$(REPO)" --pattern openapi.yaml --dir "$$tmp"; \
+	( cd cmd && go run . breaking-check --schema .. --base "$$tmp/openapi.yaml" )
 	@echo "  >  Backward compatibility check complete."
 
 #

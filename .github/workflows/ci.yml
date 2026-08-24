@@ -25,3 +25,7 @@ jobs:
           go-version: stable
       - name: Run Schema Test
         run: make test
+      - name: Check breaking changes
+        run: make breaking-check
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
