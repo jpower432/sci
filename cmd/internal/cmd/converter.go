@@ -40,6 +40,11 @@ type OpenAPIComponents struct {
 	Schemas map[string]interface{} `yaml:"schemas" json:"schemas"`
 }
 
+// hiddenBase maps a hidden definition name (e.g. "_MappingStrict") to the
+// visible definition it constrains (e.g. "Mapping"), so refs can be rewritten
+// and the hidden definition omitted from output. Populated before parsing.
+var hiddenBase map[string]string
+
 type SchemaInfo struct {
 	Type        string                 `yaml:"type,omitempty" json:"type,omitempty"`
 	Description string                 `yaml:"description,omitempty" json:"description,omitempty"`
@@ -48,6 +53,7 @@ type SchemaInfo struct {
 	Pattern     string                 `yaml:"pattern,omitempty" json:"pattern,omitempty"`
 	Format      string                 `yaml:"format,omitempty" json:"format,omitempty"`
 	Items       interface{}            `yaml:"items,omitempty" json:"items,omitempty"`
+	Enum        []string               `yaml:"enum,omitempty" json:"enum,omitempty"`
 	Ref         string                 `yaml:"$ref,omitempty" json:"$ref,omitempty"`
 	XStatus     string                 `yaml:"x-status,omitempty" json:"x-status,omitempty"`
 }
@@ -105,6 +111,26 @@ func convertCUEToOpenAPI(schemaDir, outputPath string, opts ConvertOpts) error {
 	seen := make(map[string]bool)
 	manifest := make(map[string][]string) // filename → schema names
 	files := insts[0].Files
+
+	// Pre-pass: map hidden definitions (#_Name) to the visible definition
+	// they constrain, so they can be filtered and their refs rewritten.
+	hiddenBase = make(map[string]string)
+	for _, f := range files {
+		for _, decl := range f.Decls {
+			field, ok := decl.(*ast.Field)
+			if !ok {
+				continue
+			}
+			ident, ok := field.Label.(*ast.Ident)
+			if !ok || !strings.HasPrefix(ident.Name, "#_") {
+				continue
+			}
+			if base := findBaseIdent(field.Value); base != "" {
+				hiddenBase[strings.TrimPrefix(ident.Name, "#")] = base
+			}
+		}
+	}
+
 	names := make([]string, 0, len(files))
 	byName := make(map[string]*ast.File)
 	for _, f := range files {
@@ -205,6 +231,9 @@ func parseFile(file *ast.File, spec *OpenAPISpec, seen map[string]bool, rootName
 			continue
 		}
 		typeName := strings.TrimPrefix(ident.Name, "#")
+		if _, hidden := hiddenBase[typeName]; hidden {
+			continue // internal validation helper; refs are rewritten to its base
+		}
 		if rootName != "" && ident.Name == "#"+rootName {
 			if field.Comments() != nil {
 				for _, cg := range field.Comments() {
@@ -339,6 +368,73 @@ func parseDefinitionField(field *ast.Field, spec *OpenAPISpec, fileStatus string
 	}
 }
 
+// findBaseIdent walks a conjunction like `{...} & #Base & {...}` and returns
+// the first visible definition name it embeds or unifies with.
+func findBaseIdent(expr ast.Expr) string {
+	switch x := expr.(type) {
+	case *ast.Ident:
+		if strings.HasPrefix(x.Name, "#") && !strings.HasPrefix(x.Name, "#_") {
+			return strings.TrimPrefix(x.Name, "#")
+		}
+	case *ast.BinaryExpr:
+		if x.Op == token.AND {
+			if n := findBaseIdent(x.X); n != "" {
+				return n
+			}
+			return findBaseIdent(x.Y)
+		}
+	case *ast.StructLit:
+		for _, elt := range x.Elts {
+			if ed, ok := elt.(*ast.EmbedDecl); ok {
+				if n := findBaseIdent(ed.Expr); n != "" {
+					return n
+				}
+			}
+		}
+	}
+	return ""
+}
+
+// refTarget resolves a definition reference name, substituting hidden
+// definitions with the visible definition they constrain.
+func refTarget(name string) string {
+	n := strings.TrimPrefix(name, "#")
+	if base, ok := hiddenBase[n]; ok {
+		return base
+	}
+	return n
+}
+
+// collectEnumStrings flattens a disjunction of string literals ("a" | *"b" | "c")
+// into its values. Returns ok=false if any branch is not a string literal.
+func collectEnumStrings(expr ast.Expr) ([]string, bool) {
+	switch x := expr.(type) {
+	case *ast.BinaryExpr:
+		if x.Op != token.OR {
+			return nil, false
+		}
+		left, ok := collectEnumStrings(x.X)
+		if !ok {
+			return nil, false
+		}
+		right, ok := collectEnumStrings(x.Y)
+		if !ok {
+			return nil, false
+		}
+		return append(left, right...), true
+	case *ast.UnaryExpr:
+		// Default marker: *"value"
+		if x.Op == token.MUL {
+			return collectEnumStrings(x.X)
+		}
+	case *ast.BasicLit:
+		if x.Kind == token.STRING {
+			return []string{strings.Trim(x.Value, "\"")}, true
+		}
+	}
+	return nil, false
+}
+
 func convertStructToSchema(st *ast.StructLit, spec *OpenAPISpec, description string) *SchemaInfo {
 	schema := &SchemaInfo{
 		Type:        "object",
@@ -355,7 +451,7 @@ func convertStructToSchema(st *ast.StructLit, spec *OpenAPISpec, description str
 			fieldSchema := convertFieldToSchema(x, spec, pendingComment)
 			if fieldSchema != nil {
 				fieldName := getFieldName(x)
-				if fieldName != "" {
+				if fieldName != "" && !strings.HasPrefix(fieldName, "_") {
 					schema.Properties[fieldName] = fieldSchema
 					// Check if field is required
 					if x.Optional == token.NoPos {
@@ -427,8 +523,7 @@ func convertIdentToSchema(ident *ast.Ident, spec *OpenAPISpec, description strin
 		return &SchemaInfo{Type: "boolean", Description: description}
 	} else if strings.HasPrefix(name, "#") {
 		// Type reference
-		refType := strings.TrimPrefix(name, "#")
-		return &SchemaInfo{Ref: fmt.Sprintf("#/components/schemas/%s", refType), Description: description}
+		return &SchemaInfo{Ref: fmt.Sprintf("#/components/schemas/%s", refTarget(name)), Description: description}
 	}
 
 	return &SchemaInfo{Type: "string", Description: description}
@@ -461,6 +556,9 @@ func convertBinaryExprToSchema(expr *ast.BinaryExpr, spec *OpenAPISpec, descript
 
 	// Handle union types (disjunctions)
 	if expr.Op == token.OR {
+		if values, ok := collectEnumStrings(expr); ok {
+			return &SchemaInfo{Type: "string", Description: description, Enum: values}
+		}
 		return &SchemaInfo{Type: "string", Description: description}
 	}
 
@@ -483,12 +581,11 @@ func convertListLitToSchema(list *ast.ListLit, spec *OpenAPISpec, description st
 		// Also check for [#Contact, ...] pattern
 		if ident, ok := elt.(*ast.Ident); ok {
 			if strings.HasPrefix(ident.Name, "#") {
-				refType := strings.TrimPrefix(ident.Name, "#")
 				return &SchemaInfo{
 					Type:        "array",
 					Description: description,
 					Items: &SchemaInfo{
-						Ref: fmt.Sprintf("#/components/schemas/%s", refType),
+						Ref: fmt.Sprintf("#/components/schemas/%s", refTarget(ident.Name)),
 					},
 				}
 			}

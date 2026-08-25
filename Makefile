@@ -9,6 +9,7 @@ all: tidy cuefmtcheck lintcue lintinsights test
 test:
 	@echo "  >  Running schema validation tests ..."
 	@cd test && go test -v ./...
+	@cd cmd && go test ./...
 	@echo "  >  Schema validation tests complete."
 
 
