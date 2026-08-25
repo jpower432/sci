@@ -90,7 +90,7 @@ breaking-check:
 	gh release download "$$tag" --repo "$(REPO)" --pattern openapi.yaml --dir "$$tmp" \
 		|| { echo "  >  ERROR: failed to download baseline asset for $$tag" >&2; exit 1; }; \
 	allow=""; \
-	if [ -f .oasdiff-allow ]; then allow="--allow .oasdiff-allow"; fi; \
+	if [ -f .oasdiff-allow ]; then allow="--allow ../.oasdiff-allow"; fi; \
 	( cd cmd && go run . breaking-check --schema .. --base "$$tmp/openapi.yaml" $$allow )
 	@echo "  >  Backward compatibility check complete."
 
