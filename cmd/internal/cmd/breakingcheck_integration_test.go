@@ -59,6 +59,25 @@ func TestBreakingCheckIntegration(t *testing.T) {
 	if code != 1 {
 		t.Fatalf("expected exit code 1 for a dropped required property, got %d", code)
 	}
+
+	// Narrow an enum by dropping a member. This exercises the converter's enum
+	// emission through the real generator: if the projection stopped emitting
+	// enum constraints, the baseline would carry none, the diff would see no
+	// enum to narrow, and the gate would silently miss the change.
+	narrowedYaml := filepath.Join(tmp, "narrowed.yaml")
+	narrowedSchema, err := dropOneEnumValue(baseYaml, narrowedYaml)
+	if err != nil {
+		t.Fatalf("dropOneEnumValue: %v", err)
+	}
+	t.Logf("dropped an enum value from schema %q", narrowedSchema)
+
+	code, err = runBreakingCheck(breakingCheckOpts{basePath: baseYaml, candidatePath: narrowedYaml})
+	if err != nil {
+		t.Fatalf("runBreakingCheck (narrowed): %v", err)
+	}
+	if code != 1 {
+		t.Fatalf("expected exit code 1 for a narrowed enum, got %d", code)
+	}
 }
 
 // dropOneRequired reads the OpenAPI document at src, removes the first entry from
@@ -116,4 +135,60 @@ func dropOneRequired(src, dst string) (string, error) {
 		return name, nil
 	}
 	return "", fmt.Errorf("no stable schema with a non-empty required list found in %q", src)
+}
+
+// dropOneEnumValue reads the OpenAPI document at src, removes the first member
+// from the first stable component schema that declares a non-empty enum, writes
+// the result to dst, and returns the name of the mutated schema. Narrowing an
+// enum is producer-breaking (a value the API used to accept is now rejected). It
+// fails if no such schema exists, so the test cannot silently pass on an empty
+// diff — which is exactly what happens if the converter stops emitting enums.
+func dropOneEnumValue(src, dst string) (string, error) {
+	data, err := os.ReadFile(src)
+	if err != nil {
+		return "", fmt.Errorf("reading %q: %w", src, err)
+	}
+	var doc map[string]interface{}
+	if err := yaml.Unmarshal(data, &doc); err != nil {
+		return "", fmt.Errorf("unmarshaling %q: %w", src, err)
+	}
+
+	components, ok := doc["components"].(map[string]interface{})
+	if !ok {
+		return "", fmt.Errorf("no components map in %q", src)
+	}
+	schemas, ok := components["schemas"].(map[string]interface{})
+	if !ok {
+		return "", fmt.Errorf("no components.schemas map in %q", src)
+	}
+
+	names := make([]string, 0, len(schemas))
+	for name := range schemas {
+		names = append(names, name)
+	}
+	sort.Strings(names)
+
+	for _, name := range names {
+		schema, ok := schemas[name].(map[string]interface{})
+		if !ok {
+			continue
+		}
+		if status, _ := schema["x-status"].(string); status == "experimental" {
+			continue
+		}
+		enum, ok := schema["enum"].([]interface{})
+		if !ok || len(enum) == 0 {
+			continue
+		}
+		schema["enum"] = enum[1:]
+		out, err := yaml.Marshal(doc)
+		if err != nil {
+			return "", fmt.Errorf("marshaling mutated doc: %w", err)
+		}
+		if err := os.WriteFile(dst, out, 0644); err != nil {
+			return "", fmt.Errorf("writing %q: %w", dst, err)
+		}
+		return name, nil
+	}
+	return "", fmt.Errorf("no stable schema with a non-empty enum found in %q", src)
 }
