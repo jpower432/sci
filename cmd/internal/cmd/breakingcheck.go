@@ -21,11 +21,11 @@ type breakingCheckOpts struct {
 }
 
 // filterAllowed drops changes matched by the allowlist. An entry keyed
-// "<id> <path>" drops only that change on that schema path.
+// "<id> <schema>" drops only that change on that schema.
 func filterAllowed(changes []Change, allowed map[string]bool) []Change {
 	var out []Change
 	for _, c := range changes {
-		if allowed[c.ID+" "+c.Path] {
+		if allowed[c.ID+" "+c.Schema] {
 			continue
 		}
 		out = append(out, c)
@@ -34,9 +34,9 @@ func filterAllowed(changes []Change, allowed map[string]bool) []Change {
 }
 
 // loadAllowlist reads an allowlist file of oasdiff exceptions, one per line.
-// Each entry is a path-scoped "<id> <path>" pair (see filterAllowed). Blank lines
-// and lines beginning with '#' are ignored. An empty
-// path yields an empty (non-nil) map and a nil error.
+// Each entry is a schema-scoped "<id> <schema>" pair (see filterAllowed). Blank
+// lines and lines beginning with '#' are ignored. An empty path yields an empty
+// (non-nil) map and a nil error.
 func loadAllowlist(path string) (allowed map[string]bool, err error) {
 	allowed = make(map[string]bool)
 	if path == "" {
@@ -116,7 +116,7 @@ func runBreakingCheck(opts breakingCheckOpts) (exitCode int, err error) {
 
 	remaining := filterAllowed(changes, allowed)
 	for _, c := range remaining {
-		fmt.Printf("ERR[%s] %s: %s\n", c.ID, c.Path, c.Text)
+		fmt.Printf("ERR[%s] %s: %s\n", c.ID, c.Schema, c.Text)
 	}
 	if len(remaining) > 0 {
 		return 1, nil
@@ -149,6 +149,6 @@ allowlist.`,
 	}
 	cmd.Flags().StringVar(&opts.schemaDir, "schema", "../..", "Path to the CUE package directory")
 	cmd.Flags().StringVar(&opts.basePath, "base", "", "Path to the baseline OpenAPI file to diff against (required)")
-	cmd.Flags().StringVar(&opts.allowPath, "allow", "", "Path to an allowlist file of path-scoped oasdiff exceptions (\"<id> <path>\", one per line)")
+	cmd.Flags().StringVar(&opts.allowPath, "allow", "", "Path to an allowlist file of schema-scoped oasdiff exceptions (\"<id> <schema>\", one per line)")
 	return cmd
 }

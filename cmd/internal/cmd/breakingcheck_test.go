@@ -69,30 +69,65 @@ func TestLoadAllowlistParsesEntries(t *testing.T) {
 
 func TestFilterAllowed(t *testing.T) {
 	changes := []Change{
-		{ID: "a", Path: "/_schema/Foo", Text: "x"},
-		{ID: "b", Path: "/_schema/Foo", Text: "y"},
+		{ID: "a", Schema: "Foo", Text: "x"},
+		{ID: "b", Schema: "Foo", Text: "y"},
 	}
-	got := filterAllowed(changes, map[string]bool{"a /_schema/Foo": true})
+	got := filterAllowed(changes, map[string]bool{"a Foo": true})
 	if len(got) != 1 || got[0].ID != "b" {
 		t.Fatalf("expected only [b], got %+v", got)
 	}
 }
 
-func TestFilterAllowedPathScoped(t *testing.T) {
+func TestFilterAllowedSchemaScoped(t *testing.T) {
 	changes := []Change{
-		{ID: "a", Path: "/_schema/Foo", Text: "x"},
-		{ID: "a", Path: "/_schema/Bar", Text: "y"},
+		{ID: "a", Schema: "Foo", Text: "x"},
+		{ID: "a", Schema: "Bar", Text: "y"},
 	}
-	// A path-scoped entry drops only the matching change, not every change
+	// A schema-scoped entry drops only the matching change, not every change
 	// sharing the check ID.
-	got := filterAllowed(changes, map[string]bool{"a /_schema/Foo": true})
-	if len(got) != 1 || got[0].Path != "/_schema/Bar" {
+	got := filterAllowed(changes, map[string]bool{"a Foo": true})
+	if len(got) != 1 || got[0].Schema != "Bar" {
 		t.Fatalf("expected only the Bar change to remain, got %+v", got)
 	}
-	// A bare check ID (no path) matches nothing: entries must be path-scoped.
+	// A bare check ID (no schema) matches nothing: entries must be schema-scoped.
 	got = filterAllowed(changes, map[string]bool{"a": true})
 	if len(got) != 2 {
 		t.Fatalf("expected a bare ID to drop nothing, got %+v", got)
+	}
+}
+
+// TestRunBreakingCheckAllowSuppresses exercises the full --allow path: a real
+// detected breaking change is suppressed when its "<id> <schema>" entry is in
+// the allowlist, and the check then passes.
+func TestRunBreakingCheckAllowSuppresses(t *testing.T) {
+	// Without an allowlist, dropping a required property is breaking (exit 1).
+	code, err := runBreakingCheck(breakingCheckOpts{
+		basePath:      "testdata/base.yaml",
+		candidatePath: "testdata/rev_remove.yaml",
+	})
+	if err != nil {
+		t.Fatalf("runBreakingCheck: %v", err)
+	}
+	if code != 1 {
+		t.Fatalf("expected exit code 1 without allowlist, got %d", code)
+	}
+
+	// Allowlisting that exact "<id> <schema>" pair suppresses it (exit 0).
+	allow := filepath.Join(t.TempDir(), ".oasdiff-allow")
+	content := "# result became optional is an accepted, reviewed change\nresponse-property-became-optional ControlEvaluation\n"
+	if err := os.WriteFile(allow, []byte(content), 0644); err != nil {
+		t.Fatalf("writing allowlist: %v", err)
+	}
+	code, err = runBreakingCheck(breakingCheckOpts{
+		basePath:      "testdata/base.yaml",
+		candidatePath: "testdata/rev_remove.yaml",
+		allowPath:     allow,
+	})
+	if err != nil {
+		t.Fatalf("runBreakingCheck (allowed): %v", err)
+	}
+	if code != 0 {
+		t.Fatalf("expected exit code 0 with matching allowlist entry, got %d", code)
 	}
 }
 

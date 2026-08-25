@@ -76,9 +76,7 @@ REPO ?= gemaraproj/gemara
 
 breaking-check:
 	@echo "  >  Checking for breaking schema changes ..."
-	@pre='select(.prerelease == false) | '; \
-	if [ "$$GEMARA_COMPAT_PRERELEASE" = "true" ]; then pre=''; fi; \
-	filter='.[] | '"$$pre"'select(.tag_name | test("^v1\\.")) | select(any(.assets[]?; .name == "openapi.yaml")) | .tag_name'; \
+	@filter='.[] | select(.prerelease == false) | select(.tag_name | test("^v1\\.")) | select(any(.assets[]?; .name == "openapi.yaml")) | .tag_name'; \
 	tags=$$(gh api "repos/$(REPO)/releases" --paginate --jq "$$filter") \
 		|| { echo "  >  ERROR: failed to query releases from $(REPO); aborting breaking-change check" >&2; exit 1; }; \
 	tag=$$(printf '%s\n' "$$tags" | sort -V | tail -n1); \

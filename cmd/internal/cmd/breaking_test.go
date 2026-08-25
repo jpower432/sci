@@ -74,10 +74,10 @@ func TestBreakingChangesExemptsExperimental(t *testing.T) {
 	}
 }
 
-// TestBreakingChangesCarriesPath confirms each reported change carries the
-// oasdiff path so multi-schema output is attributable and the allowlist can be
-// keyed per schema.
-func TestBreakingChangesCarriesPath(t *testing.T) {
+// TestBreakingChangesCarriesSchema confirms each reported change carries the
+// schema name (the internal "/_schema/" wrapper stripped) so multi-schema
+// output is attributable and the allowlist can be keyed per schema.
+func TestBreakingChangesCarriesSchema(t *testing.T) {
 	base, err := loadWrapped("testdata/base.yaml")
 	if err != nil {
 		t.Fatalf("load base: %v", err)
@@ -94,8 +94,8 @@ func TestBreakingChangesCarriesPath(t *testing.T) {
 		t.Fatalf("expected at least one breaking change")
 	}
 	for _, c := range got {
-		if c.Path == "" {
-			t.Fatalf("expected non-empty Path on change %+v", c)
+		if c.Schema != "ControlEvaluation" {
+			t.Fatalf("expected schema %q, got %+v", "ControlEvaluation", c)
 		}
 	}
 }

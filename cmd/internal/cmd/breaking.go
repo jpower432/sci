@@ -4,6 +4,7 @@ package cmd
 
 import (
 	"encoding/json"
+	"strings"
 
 	"github.com/getkin/kin-openapi/openapi3"
 	"github.com/oasdiff/oasdiff/checker"
@@ -12,10 +13,11 @@ import (
 )
 
 // Change is an ERR-level backward-incompatible change reported by oasdiff.
+// Schema is the Gemara schema (component) the change was found on.
 type Change struct {
-	ID   string
-	Path string
-	Text string
+	ID     string
+	Schema string
+	Text   string
 }
 
 // loadWrapped loads an OpenAPI document and synthesizes bidirectional paths for
@@ -97,7 +99,10 @@ func breakingChanges(base, rev *openapi3.T) ([]Change, error) {
 	var out []Change
 	for _, c := range checker.CheckBackwardCompatibility(checker.NewConfig(checker.GetAllChecks()), d, sources) {
 		if c.GetLevel() == checker.ERR {
-			out = append(out, Change{ID: c.GetId(), Path: c.GetPath(), Text: c.GetUncolorizedText(loc)})
+			// Paths are the synthesized "/_schema/<name>" wrappers; expose just
+			// the schema name so output and allowlist entries stay user-facing.
+			schema := strings.TrimPrefix(c.GetPath(), "/_schema/")
+			out = append(out, Change{ID: c.GetId(), Schema: schema, Text: c.GetUncolorizedText(loc)})
 		}
 	}
 	return out, nil

@@ -75,12 +75,23 @@ Sometimes a breaking change is deliberate. There are exactly two sanctioned ways
    intentional evolution of the contract.
 2. **Allowlist the specific change.** Add the offending exception to a `.oasdiff-allow` file at the
    repository root; `make breaking-check` passes it to the check via `--allow` automatically when the
-   file exists. Scope each entry as tightly as possible: prefer the path-scoped form
-   `<check-id> <path>` (both are printed for every reported change, e.g.
-   `ERR[request-property-enum-value-removed] /_schema/ControlEvaluation: ...`), which allowlists that
-   change on that schema only. This MUST be done in a reviewed PR, and the file MUST include a justification 
-   comment (lines beginning with `#`) explaining why the change is acceptable.
-   Use this for narrowly scoped, well-understood exceptions.
+   file exists. Each entry is a schema-scoped `<check-id> <schema>` pair, one per line, so the
+   exception applies only to that one schema. The check ID and schema are both printed for every
+   reported change, so you can copy them straight from the output — e.g. a change reported as:
+
+   ```
+   ERR[request-property-enum-value-removed] ControlEvaluation: removed the enum value ...
+   ```
+
+   is allowlisted with:
+
+   ```
+   request-property-enum-value-removed ControlEvaluation
+   ```
+
+   This MUST be done in a reviewed PR, and the file MUST include a justification comment (lines
+   beginning with `#`) explaining why the change is acceptable. Use this for narrowly scoped,
+   well-understood exceptions.
 
 Do not work around the gate by any other means.
 
