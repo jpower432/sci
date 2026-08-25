@@ -133,6 +133,7 @@ a baseline OpenAPI file using oasdiff. The baseline is supplied via --base
 (fetched from the latest v1 release by the Makefile/CI). Backward-incompatible
 (ERR-level) changes fail the check unless their oasdiff check ID is listed in the
 allowlist.`,
+		SilenceUsage: true,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			code, err := runBreakingCheck(opts)
 			if err != nil {

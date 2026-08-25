@@ -29,6 +29,9 @@ func loadWrapped(path string) (*openapi3.T, error) {
 	if doc.Paths == nil {
 		doc.Paths = openapi3.NewPaths()
 	}
+	if doc.Components == nil {
+		doc.Components = &openapi3.Components{}
+	}
 	for name := range doc.Components.Schemas {
 		ref := doc.Components.Schemas[name] // already-resolved SchemaRef
 		mt := openapi3.NewContentWithJSONSchemaRef(ref)
