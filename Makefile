@@ -6,10 +6,12 @@ all: tidy cuefmtcheck lintcue lintinsights test
 # SCHEMA VALIDATION TESTS
 #
 
+# -count=1: the tests read the *.cue schemas at runtime, which Go's test cache
+# cannot track, so cached passes can go stale against edited schemas.
 test:
 	@echo "  >  Running schema validation tests ..."
-	@cd test && go test -v ./...
-	@cd cmd && go test ./...
+	@cd test && go test -v -count=1 ./...
+	@cd cmd && go test -v -count=1 ./...
 	@echo "  >  Schema validation tests complete."
 
 

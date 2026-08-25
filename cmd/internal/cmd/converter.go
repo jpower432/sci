@@ -43,6 +43,9 @@ type OpenAPIComponents struct {
 // hiddenBase maps a hidden definition name (e.g. "_MappingStrict") to the
 // visible definition it constrains (e.g. "Mapping"), so refs can be rewritten
 // and the hidden definition omitted from output. Populated before parsing.
+// Rewriting a ref intentionally drops the hidden definition's extra
+// constraints (e.g. conditional requiredness), which OpenAPI cannot express;
+// the ref collapses to the visible base type.
 var hiddenBase map[string]string
 
 type SchemaInfo struct {
@@ -125,9 +128,11 @@ func convertCUEToOpenAPI(schemaDir, outputPath string, opts ConvertOpts) error {
 			if !ok || !strings.HasPrefix(ident.Name, "#_") {
 				continue
 			}
-			if base := findBaseIdent(field.Value); base != "" {
-				hiddenBase[strings.TrimPrefix(ident.Name, "#")] = base
+			base := findBaseIdent(field.Value)
+			if base == "" {
+				return fmt.Errorf("hidden definition %s does not unify with a visible definition; cue2openapi cannot rewrite refs to it", ident.Name)
 			}
+			hiddenBase[strings.TrimPrefix(ident.Name, "#")] = base
 		}
 	}
 
@@ -369,7 +374,9 @@ func parseDefinitionField(field *ast.Field, spec *OpenAPISpec, fileStatus string
 }
 
 // findBaseIdent walks a conjunction like `{...} & #Base & {...}` and returns
-// the first visible definition name it embeds or unifies with.
+// the first visible definition name it embeds or unifies with. Inside struct
+// literals only embed declarations are inspected, so an attribute-only struct
+// like `{@go(-)}` never counts as a base.
 func findBaseIdent(expr ast.Expr) string {
 	switch x := expr.(type) {
 	case *ast.Ident:
@@ -423,7 +430,8 @@ func collectEnumStrings(expr ast.Expr) ([]string, bool) {
 		}
 		return append(left, right...), true
 	case *ast.UnaryExpr:
-		// Default marker: *"value"
+		// Default marker: *"value". The default itself is deliberately not
+		// emitted as an OpenAPI `default`; only the enum value is kept.
 		if x.Op == token.MUL {
 			return collectEnumStrings(x.X)
 		}
@@ -451,7 +459,13 @@ func convertStructToSchema(st *ast.StructLit, spec *OpenAPISpec, description str
 			fieldSchema := convertFieldToSchema(x, spec, pendingComment)
 			if fieldSchema != nil {
 				fieldName := getFieldName(x)
-				if fieldName != "" && !strings.HasPrefix(fieldName, "_") {
+				// Only an unquoted _name label is hidden in CUE; a quoted
+				// "_name" is a regular exported field.
+				hidden := false
+				if id, ok := x.Label.(*ast.Ident); ok {
+					hidden = strings.HasPrefix(id.Name, "_")
+				}
+				if fieldName != "" && !hidden {
 					schema.Properties[fieldName] = fieldSchema
 					// Check if field is required
 					if x.Optional == token.NoPos {
