@@ -50,3 +50,52 @@ func TestBreakingChanges(t *testing.T) {
 		})
 	}
 }
+
+// TestBreakingChangesExemptsExperimental confirms that a schema carrying
+// x-status "experimental" is exempted from the gate: loadWrapped maps it to
+// oasdiff's x-stability-level "alpha", which the default (beta) threshold
+// filters out before the breaking-change checks run. A break that would fail
+// for a stable schema must produce zero ERR changes here.
+func TestBreakingChangesExemptsExperimental(t *testing.T) {
+	base, err := loadWrapped("testdata/base_experimental.yaml")
+	if err != nil {
+		t.Fatalf("load base: %v", err)
+	}
+	rev, err := loadWrapped("testdata/rev_experimental_break.yaml")
+	if err != nil {
+		t.Fatalf("load rev: %v", err)
+	}
+	got, err := breakingChanges(base, rev)
+	if err != nil {
+		t.Fatalf("breakingChanges: %v", err)
+	}
+	if len(got) != 0 {
+		t.Fatalf("expected experimental schema to be exempt, got %d changes: %+v", len(got), got)
+	}
+}
+
+// TestBreakingChangesCarriesPath confirms each reported change carries the
+// oasdiff path so multi-schema output is attributable and the allowlist can be
+// keyed per schema.
+func TestBreakingChangesCarriesPath(t *testing.T) {
+	base, err := loadWrapped("testdata/base.yaml")
+	if err != nil {
+		t.Fatalf("load base: %v", err)
+	}
+	rev, err := loadWrapped("testdata/rev_remove.yaml")
+	if err != nil {
+		t.Fatalf("load rev: %v", err)
+	}
+	got, err := breakingChanges(base, rev)
+	if err != nil {
+		t.Fatalf("breakingChanges: %v", err)
+	}
+	if len(got) == 0 {
+		t.Fatalf("expected at least one breaking change")
+	}
+	for _, c := range got {
+		if c.Path == "" {
+			t.Fatalf("expected non-empty Path on change %+v", c)
+		}
+	}
+}

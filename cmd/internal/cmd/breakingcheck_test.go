@@ -68,10 +68,31 @@ func TestLoadAllowlistParsesEntries(t *testing.T) {
 }
 
 func TestFilterAllowed(t *testing.T) {
-	changes := []Change{{ID: "a", Text: "x"}, {ID: "b", Text: "y"}}
-	got := filterAllowed(changes, map[string]bool{"a": true})
+	changes := []Change{
+		{ID: "a", Path: "/_schema/Foo", Text: "x"},
+		{ID: "b", Path: "/_schema/Foo", Text: "y"},
+	}
+	got := filterAllowed(changes, map[string]bool{"a /_schema/Foo": true})
 	if len(got) != 1 || got[0].ID != "b" {
 		t.Fatalf("expected only [b], got %+v", got)
+	}
+}
+
+func TestFilterAllowedPathScoped(t *testing.T) {
+	changes := []Change{
+		{ID: "a", Path: "/_schema/Foo", Text: "x"},
+		{ID: "a", Path: "/_schema/Bar", Text: "y"},
+	}
+	// A path-scoped entry drops only the matching change, not every change
+	// sharing the check ID.
+	got := filterAllowed(changes, map[string]bool{"a /_schema/Foo": true})
+	if len(got) != 1 || got[0].Path != "/_schema/Bar" {
+		t.Fatalf("expected only the Bar change to remain, got %+v", got)
+	}
+	// A bare check ID (no path) matches nothing: entries must be path-scoped.
+	got = filterAllowed(changes, map[string]bool{"a": true})
+	if len(got) != 2 {
+		t.Fatalf("expected a bare ID to drop nothing, got %+v", got)
 	}
 }
 

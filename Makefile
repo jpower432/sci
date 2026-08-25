@@ -73,9 +73,12 @@ REPO ?= gemaraproj/gemara
 
 breaking-check:
 	@echo "  >  Checking for breaking schema changes ..."
-	@tag=$$(gh api "repos/$(REPO)/releases" --paginate \
-		--jq '.[] | select(.prerelease == false) | select(.tag_name | test("^v1\\.")) | select(any(.assets[]?; .name == "openapi.yaml")) | .tag_name' \
-		| sort -V | tail -n1); \
+	@pre='select(.prerelease == false) | '; \
+	if [ "$$GEMARA_COMPAT_PRERELEASE" = "true" ]; then pre=''; fi; \
+	filter='.[] | '"$$pre"'select(.tag_name | test("^v1\\.")) | select(any(.assets[]?; .name == "openapi.yaml")) | .tag_name'; \
+	tags=$$(gh api "repos/$(REPO)/releases" --paginate --jq "$$filter") \
+		|| { echo "  >  ERROR: failed to query releases from $(REPO); aborting breaking-change check" >&2; exit 1; }; \
+	tag=$$(printf '%s\n' "$$tags" | sort -V | tail -n1); \
 	if [ -z "$$tag" ]; then \
 		echo "  >  No v1 baseline release with an openapi.yaml asset found; skipping breaking-change check"; \
 		exit 0; \
@@ -83,8 +86,11 @@ breaking-check:
 	echo "  >  Comparing against v1 baseline $$tag"; \
 	tmp=$$(mktemp -d); \
 	trap 'rm -rf "$$tmp"' EXIT; \
-	gh release download "$$tag" --repo "$(REPO)" --pattern openapi.yaml --dir "$$tmp"; \
-	( cd cmd && go run . breaking-check --schema .. --base "$$tmp/openapi.yaml" )
+	gh release download "$$tag" --repo "$(REPO)" --pattern openapi.yaml --dir "$$tmp" \
+		|| { echo "  >  ERROR: failed to download baseline asset for $$tag" >&2; exit 1; }; \
+	allow=""; \
+	if [ -f .oasdiff-allow ]; then allow="--allow .oasdiff-allow"; fi; \
+	( cd cmd && go run . breaking-check --schema .. --base "$$tmp/openapi.yaml" $$allow )
 	@echo "  >  Backward compatibility check complete."
 
 #

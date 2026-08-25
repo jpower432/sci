@@ -73,9 +73,13 @@ Sometimes a breaking change is deliberate. There are exactly two sanctioned ways
 1. **Bump the module major version to `@v2`.** A major bump establishes a new baseline lineage, so
    `v1` consumers are never silently broken. Use this when the breaking change is part of a broader,
    intentional evolution of the contract.
-2. **Allowlist the specific change.** Add the offending oasdiff check ID to an allowlist file and pass
-   it to the check via `--allow`. This MUST be done in a reviewed PR, and the allowlist file MUST
-   include a justification comment (lines beginning with `#`) explaining why the change is acceptable.
+2. **Allowlist the specific change.** Add the offending exception to a `.oasdiff-allow` file at the
+   repository root; `make breaking-check` passes it to the check via `--allow` automatically when the
+   file exists. Scope each entry as tightly as possible: prefer the path-scoped form
+   `<check-id> <path>` (both are printed for every reported change, e.g.
+   `ERR[request-property-enum-value-removed] /_schema/ControlEvaluation: ...`), which allowlists that
+   change on that schema only. This MUST be done in a reviewed PR, and the file MUST include a justification 
+   comment (lines beginning with `#`) explaining why the change is acceptable.
    Use this for narrowly scoped, well-understood exceptions.
 
 Do not work around the gate by any other means.

@@ -1,0 +1,12 @@
+openapi: 3.0.3
+info: {title: Gemara, version: v1.0.0}
+components:
+  schemas:
+    ControlEvaluation:
+      type: object
+      x-status: experimental
+      properties:
+        name: {type: string}
+        result: {type: string}
+        message: {type: string}
+      required: [name, result, message]

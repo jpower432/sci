@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"sort"
 	"testing"
 
 	"github.com/goccy/go-yaml"
@@ -83,9 +84,21 @@ func dropOneRequired(src, dst string) (string, error) {
 		return "", fmt.Errorf("no components.schemas map in %q", src)
 	}
 
-	for name, raw := range schemas {
-		schema, ok := raw.(map[string]interface{})
+	// Iterate deterministically and skip experimental schemas: the gate exempts
+	// them (x-status experimental → x-stability-level alpha), so a break there is
+	// not flagged. The test must mutate a stable schema to exercise detection.
+	names := make([]string, 0, len(schemas))
+	for name := range schemas {
+		names = append(names, name)
+	}
+	sort.Strings(names)
+
+	for _, name := range names {
+		schema, ok := schemas[name].(map[string]interface{})
 		if !ok {
+			continue
+		}
+		if status, _ := schema["x-status"].(string); status == "experimental" {
 			continue
 		}
 		required, ok := schema["required"].([]interface{})
@@ -102,5 +115,5 @@ func dropOneRequired(src, dst string) (string, error) {
 		}
 		return name, nil
 	}
-	return "", fmt.Errorf("no schema with a non-empty required list found in %q", src)
+	return "", fmt.Errorf("no stable schema with a non-empty required list found in %q", src)
 }
