@@ -24,4 +24,5 @@ func Execute() {
 
 func init() {
 	rootCmd.AddCommand(newCue2OpenAPICmd())
+	rootCmd.AddCommand(newBreakingCheckCmd())
 }

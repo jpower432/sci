@@ -49,6 +49,52 @@ Adding a new artifact type requires schema changes, test data, and documentation
 | 7        | Run `cue fmt .` and `make cuefmtcheck` to verify formatting                                   |
 | 8        | Run `make lintcue` and `make test` to confirm all checks pass                                 |
 
+## Schema compatibility
+
+The schemas form a public contract. A CI gate compares an OpenAPI projection of the current
+schema against the latest released `v1` baseline and fails the check on any backward-incompatible
+change. The gate enforces compatibility in **both directions**: it is consumer-safe (a response
+may not drop a property or a guarantee that existing readers depend on) and producer-safe (a request
+may not add a new requirement that existing writers cannot satisfy).
+
+Run the check locally before opening a PR:
+
+```
+make breaking-check
+```
+
+This generates the OpenAPI projection, fetches the latest `v1` release as the baseline, and reports
+any breaking changes with their [oasdiff](https://github.com/oasdiff/oasdiff) check IDs.
+
+### Making an intentional breaking change
+
+Sometimes a breaking change is deliberate. There are exactly two sanctioned ways to introduce one:
+
+1. **Bump the module major version to `@v2`.** A major bump establishes a new baseline lineage, so
+   `v1` consumers are never silently broken. Use this when the breaking change is part of a broader,
+   intentional evolution of the contract.
+2. **Allowlist the specific change.** Add the offending exception to a `.oasdiff-allow` file at the
+   repository root; `make breaking-check` passes it to the check via `--allow` automatically when the
+   file exists. Each entry is a schema-scoped `<check-id> <schema>` pair, one per line, so the
+   exception applies only to that one schema. The check ID and schema are both printed for every
+   reported change, so you can copy them straight from the output — e.g. a change reported as:
+
+   ```
+   ERR[request-property-enum-value-removed] ControlEvaluation: removed the enum value ...
+   ```
+
+   is allowlisted with:
+
+   ```
+   request-property-enum-value-removed ControlEvaluation
+   ```
+
+   This MUST be done in a reviewed PR, and the file MUST include a justification comment (lines
+   beginning with `#`) explaining why the change is acceptable. Use this for narrowly scoped,
+   well-understood exceptions.
+
+Do not work around the gate by any other means.
+
 ## Releases
 
 Releases are automatically created when a PR is merged into `main` with the `release` label. To trigger a release:
