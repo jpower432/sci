@@ -71,6 +71,7 @@ package gemara
 	"confidence-level"?: #ConfidenceLevel @go(ConfidenceLevel)
 	// Evidence records the raw data cited to support this assessment's opinion.
 	evidence?: [#Evidence, ...#Evidence] @go(Evidence)
+	evidence?: [#_EvidenceStrict, ...#_EvidenceStrict]
 }
 
 #AssessmentStep: string @go(-)

@@ -20,8 +20,10 @@ package gemara
 	// description is prose regarding the artifact's purpose or content
 	description?: string
 
-	// url is the path where the artifact may be retrieved; preferably responds with Gemara-compatible YAML/JSON
-	url?: =~"^(https?|file)://[^\\s]+$"
+	// url is the path where the artifact may be retrieved; preferably responds with Gemara-compatible YAML/JSON.
+	// Any URI scheme is accepted (e.g. https, file, oci, s3, arn) so evidence can be
+	// addressed wherever it actually lives.
+	url?: =~"^[a-zA-Z][a-zA-Z0-9+.-]*:[^\\s]+$"
 }
 
 // ArtifactMapping represents a mapping to an external artifact or artifact entry
@@ -62,12 +64,12 @@ package gemara
 	"reference-id": string @go(ReferenceId)
 
 	// coordinate is the precise location within the stream identified by reference-id
-	// (e.g. an API path, file path, or JSON path expression).
-	// Do not set if entry-id is set.
+	// (e.g. an API path, file path, or JSON path expression). May be combined with
+	// entry-id to identify a sub-location within that entry's output.
 	coordinate?: string
 
 	// entry-id identifies a specific entry within a referenced Gemara artifact.
-	// Do not set if coordinate is set.
+	// May be combined with coordinate to identify a sub-location within that entry's output.
 	"entry-id"?: string @go(EntryId)
 
 	// digest is a cryptographic hash of the observed content at collection time; format: algorithm:encoded (e.g. sha256:abc123...)
