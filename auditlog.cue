@@ -58,6 +58,7 @@ import "list"
 
 	// evidence records the data sources that support this result
 	evidence?: [#Evidence, ...#Evidence] @go(Evidence)
+	evidence?: [#_EvidenceStrict, ...#_EvidenceStrict]
 
 	// recommendations records corrective actions for this result
 	recommendations?: [#Recommendation, ...#Recommendation] @go(Recommendations)
@@ -96,6 +97,16 @@ import "list"
 
 	// description explains what this evidence represents
 	description?: string
+}
+
+// _EvidenceStrict layers the "at least one of payload or source" rule on top of #Evidence
+#_EvidenceStrict: {
+	@go(-)
+} & #Evidence & {
+	payload?: _
+	if payload == _|_ {
+		source: #EvidenceMapping
+	}
 }
 
 // EvidenceType categorizes the kind of evidence. It remains an open enum:
