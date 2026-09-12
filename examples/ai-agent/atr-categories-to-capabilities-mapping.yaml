@@ -7,7 +7,7 @@ metadata:
   description: >
     Maps Agent Threat Rules (ATR) detection rule categories to the AI agent
     capabilities that create the opportunity for each category of threat.
-    The source artifact is the ATR rule corpus, grouped by its nine detection
+    The source artifact is the ATR rule corpus, grouped by its detection
     categories; the target artifact is the AI Agent Capability Catalog.
     Relationships are expressed as relates-to following the convention that
     external cross-references are refined by downstream consumers in their
@@ -30,7 +30,7 @@ metadata:
         Open MIT detection standard for AI agent threats. Rules are grouped
         into detection categories under rules/; the reference-ids below are
         those category identifiers.
-    - id: ATR-AI-AGENT-CAP
+    - id: ATR-AI-AGENT-CAPABILITY-CATALOG
       title: AI Agent Capability Catalog
       version: "0.1.0"
       description: >
@@ -41,7 +41,7 @@ source-reference:
   reference-id: ATR
   entry-type: Control
 target-reference:
-  reference-id: ATR-AI-AGENT-CAP
+  reference-id: ATR-AI-AGENT-CAPABILITY-CATALOG
   entry-type: Capability
 remarks: >
   Each source entry-id is an ATR rule category. Targets are capability ids in
@@ -205,3 +205,17 @@ mappings:
           over-privileged skills, which can only execute because the agent
           loads and runs third-party skills and plugins with its own
           privileges.
+
+  - id: MAP-model-security
+    source: model-security
+    relationship: relates-to
+    targets:
+      - entry-id: CAP-MODEL-INFERENCE
+        strength: 6
+        confidence-level: Medium
+        rationale: >
+          Behaviour-extraction rules detect systematic probing of decision
+          boundaries and system prompts, which depends on the agent exposing
+          model inference to callers. The remaining rules in this category
+          address the model supply chain, which this capability catalog does
+          not yet model.
