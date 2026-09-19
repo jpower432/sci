@@ -122,11 +122,16 @@ func TestSchemaValidation(t *testing.T) {
 
 		// AuditLog — positive
 		{"valid audit log", "./test-data/good-audit-log.yaml", "#AuditLog", false, ""},
+		{"audit log evidence mapping with both coordinate and entry-id", "./test-data/good-audit-log-coordinate-and-entry-id.yaml", "#AuditLog", false, ""},
 
 		// AuditLog — negative
 		{"audit log missing summary criteria and results", "./test-data/bad-audit-log.yaml", "#AuditLog", true, ""},
 		{"audit log evidence source with invalid digest format", "./test-data/bad-audit-log-invalid-digest.yaml", "#AuditLog", true, ""},
 		{"audit result referencing undeclared criteria", "./test-data/bad-audit-log-undeclared-criteria.yaml", "#AuditLog", true, ""},
+		{"audit log evidence with neither payload nor source", "./test-data/bad-audit-log-evidence-neither.yaml", "#AuditLog", true, ""},
+		{"audit log mapping reference url with no scheme", "./test-data/bad-audit-log-url-no-scheme.yaml", "#AuditLog", true, ""},
+		{"audit log mapping reference url with a non-alphabetic scheme", "./test-data/bad-audit-log-url-invalid-scheme.yaml", "#AuditLog", true, ""},
+		{"audit log target uri with no scheme", "./test-data/bad-audit-log-uri-no-scheme.yaml", "#AuditLog", true, ""},
 
 		// CapabilityCatalog — negative
 		{"capability with invalid group", "./test-data/bad-capability-invalid-group.yaml", "#CapabilityCatalog", true, ""},
