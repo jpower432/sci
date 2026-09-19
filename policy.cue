@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 // Schema lifecycle: experimental | stable | deprecated
-@status("experimental")
+@gemara(status="experimental")
 package gemara
 
 @go(gemara)
@@ -119,7 +119,7 @@ package gemara
 	id:           string
 	type:         #MethodType
 	mode:         #ModeType
-	required:     *false | bool
+	required:     *false | bool @gemara(default=false)
 	description?: string
 	executor?:    #Actor
 }

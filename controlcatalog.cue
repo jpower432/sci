@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 // Schema lifecycle: experimental | stable | deprecated
-@status("stable")
+@gemara(status="stable")
 package gemara
 
 import "list"
@@ -14,7 +14,7 @@ import "list"
 	metadata: type: "ControlCatalog"
 
 	// controls is a list of unique controls defined by this catalog
-	controls?: [#Control, ...#Control] @go(Controls)
+	controls?: [#Control, ...#Control] @gemara(projectable=false) @go(Controls)
 
 	if controls != _|_ {
 		_uniqueControlIds: {for i, c in controls {(c.id): i}}
@@ -59,7 +59,7 @@ import "list"
 	threats?: [#MultiEntryMapping, ...#MultiEntryMapping] @go(Threats)
 
 	// state is the lifecycle state of this control
-	state: #Lifecycle @go(State) @yaml("state,omitempty")
+	state: #Lifecycle @gemara(default="Active") @go(State) @yaml("state,omitempty")
 
 	// replaced-by references the control that supersedes this one when deprecated or retired
 	"replaced-by"?: #EntryMapping @go(ReplacedBy,optional=nillable) @yaml("replaced-by,omitempty")
@@ -80,7 +80,7 @@ import "list"
 	recommendation?: string
 
 	// state is the lifecycle state of this assessment requirement
-	state: #Lifecycle @go(State) @yaml("state,omitempty")
+	state: #Lifecycle @gemara(default="Active") @go(State) @yaml("state,omitempty")
 
 	// replaced-by references the assessment requirement that supersedes this one when deprecated or retired
 	"replaced-by"?: #EntryMapping @go(ReplacedBy,optional=nillable) @yaml("replaced-by,omitempty")

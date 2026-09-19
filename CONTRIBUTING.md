@@ -66,6 +66,21 @@ make breaking-check
 This generates the OpenAPI projection, fetches the latest `v1` release as the baseline, and reports
 any breaking changes with their [oasdiff](https://github.com/oasdiff/oasdiff) check IDs.
 
+### Projection directives
+
+The `cue2openapi` projection reads its Gemara-specific metadata from `@gemara(...)` attributes:
+
+| Directive | Scope | OpenAPI output |
+|:----------|:------|:---------------|
+| `@gemara(status="stable")` | File | `x-status` on its definitions |
+| `@gemara(format="date-time")` | Definition | `format` |
+| `@gemara(default=false)` | Field with the same CUE default | `default`, and the field is optional on the wire |
+
+Allowed status values are `experimental`, `stable`, and `deprecated`. A default directive must match
+the CUE default so the validation and wire contracts cannot diverge. Keep CUE doc comments as the
+source for descriptions and CUE constraints such as `time.Format` as the source for validation; these
+are projected only where the upstream encoder cannot represent them.
+
 ### Making an intentional breaking change
 
 Sometimes a breaking change is deliberate. There are exactly two sanctioned ways to introduce one:

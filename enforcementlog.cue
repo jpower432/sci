@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 // Schema lifecycle: experimental | stable | deprecated
-@status("experimental")
+@gemara(status="experimental")
 package gemara
 
 @go(gemara)
@@ -13,7 +13,7 @@ package gemara
 	// disposition is the aggregate enforcement disposition across all actions in this log
 	disposition: #Disposition
 	// actions is the list of enforcement actions performed
-	actions: [#ActionResult, ...#ActionResult] @go(Actions,type=[]*ActionResult)
+	actions: [#ActionResult, ...#ActionResult] @gemara(projectable=false) @go(Actions,type=[]*ActionResult)
 	// Enforce that Clear dispositions only contain Passed assessment results
 	actions: [...{
 		if disposition == "Clear" {

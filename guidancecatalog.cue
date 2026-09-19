@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 // Schema lifecycle: experimental | stable | deprecated
-@status("experimental")
+@gemara(status="experimental")
 package gemara
 
 import "list"
@@ -20,7 +20,7 @@ import "list"
 	"front-matter"?: string @go(FrontMatter) @yaml("front-matter,omitempty")
 
 	// guidelines is a list of unique guidelines defined by this catalog
-	guidelines?: [#Guideline, ...#Guideline] @go(Guidelines)
+	guidelines?: [#Guideline, ...#Guideline] @gemara(projectable=false) @go(Guidelines)
 
 	// exemptions provides information about situations where this guidance is not applicable
 	exemptions?: [#Exemption, ...#Exemption] @go(Exemptions)
@@ -99,7 +99,7 @@ import "list"
 	"see-also"?: [string, ...string] @go(SeeAlso) @yaml("see-also,omitempty")
 
 	// state is the lifecycle state of this guideline
-	state: #Lifecycle @go(State) @yaml("state,omitempty")
+	state: #Lifecycle @gemara(default="Active") @go(State) @yaml("state,omitempty")
 
 	// replaced-by references the guideline that supersedes this one when deprecated or retired
 	"replaced-by"?: #EntryMapping @go(ReplacedBy,optional=nillable) @yaml("replaced-by,omitempty")

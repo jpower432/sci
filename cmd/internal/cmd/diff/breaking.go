@@ -1,9 +1,12 @@
 // SPDX-License-Identifier: Apache-2.0
 
-package cmd
+package diff
 
 import (
+	"bufio"
 	"encoding/json"
+	"fmt"
+	"os"
 	"strings"
 
 	"github.com/getkin/kin-openapi/openapi3"
@@ -18,6 +21,52 @@ type Change struct {
 	ID     string
 	Schema string
 	Text   string
+}
+
+// filterAllowed drops changes matched by the allowlist. An entry keyed
+// "<id> <schema>" drops only that change on that schema.
+func filterAllowed(changes []Change, allowed map[string]bool) []Change {
+	var out []Change
+	for _, c := range changes {
+		if allowed[c.ID+" "+c.Schema] {
+			continue
+		}
+		out = append(out, c)
+	}
+	return out
+}
+
+// loadAllowlist reads an allowlist file of oasdiff exceptions, one per line.
+// Each entry is a schema-scoped "<id> <schema>" pair (see filterAllowed). Blank
+// lines and lines beginning with '#' are ignored. An empty path yields an empty
+// (non-nil) map and a nil error.
+func loadAllowlist(path string) (allowed map[string]bool, err error) {
+	allowed = make(map[string]bool)
+	if path == "" {
+		return allowed, nil
+	}
+	f, err := os.Open(path)
+	if err != nil {
+		return nil, fmt.Errorf("opening allowlist %q: %w", path, err)
+	}
+	defer func() {
+		if cerr := f.Close(); cerr != nil && err == nil {
+			err = fmt.Errorf("closing allowlist %q: %w", path, cerr)
+		}
+	}()
+
+	scanner := bufio.NewScanner(f)
+	for scanner.Scan() {
+		line := strings.TrimSpace(scanner.Text())
+		if line == "" || strings.HasPrefix(line, "#") {
+			continue
+		}
+		allowed[line] = true
+	}
+	if serr := scanner.Err(); serr != nil {
+		return nil, fmt.Errorf("reading allowlist %q: %w", path, serr)
+	}
+	return allowed, err
 }
 
 // loadWrapped loads an OpenAPI document and synthesizes bidirectional paths for

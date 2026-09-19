@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 // Schema lifecycle: experimental | stable | deprecated
-@status("experimental")
+@gemara(status="experimental")
 package gemara
 
 import "list"
@@ -90,7 +90,7 @@ import "list"
 	// rank optionally orders risks for the same catalog (e.g. when several share the same severity).
 	// Lower values mean higher relative importance. Omitted when the four severity levels are enough.
 	// When set, each value must be unique among all risks in the catalog that specify rank.
-	rank?: int @go(Rank) @yaml("rank,omitempty")
+	rank?: int @gemara(projectable=false) @go(Rank) @yaml("rank,omitempty")
 
 	// owner defines the RACI roles responsible for managing this risk
 	owner?: #RACI @go(Owner)
