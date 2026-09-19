@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 // Schema lifecycle: experimental | stable | deprecated
-@status("stable")
+@gemara(status="stable")
 
 package gemara
 
@@ -10,7 +10,7 @@ import "time"
 @go(gemara)
 
 // Datetime represents an ISO 8601 formatted datetime string
-#Datetime: time.Format("2006-01-02T15:04:05Z07:00") @go(Datetime,format="date-time")
+#Datetime: time.Format("2006-01-02T15:04:05Z07:00") @gemara(format="date-time") @go(Datetime,format="date-time")
 
 // Group represents a classification or grouping that can be used in different contexts with semantic meaning derived from its usage
 #Group: {

@@ -6,12 +6,14 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/gemaraproj/gemara/internal/cmd/diff"
+	"github.com/gemaraproj/gemara/internal/cmd/projection"
 	"github.com/spf13/cobra"
 )
 
 var rootCmd = &cobra.Command{
-	Use:   "gemara-docs",
-	Short: "Gemara CLI tool for schema conversion",
+	Use:   "gemara-tools",
+	Short: "Gemara CLI tool for schema conversion and diff",
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.
@@ -23,6 +25,6 @@ func Execute() {
 }
 
 func init() {
-	rootCmd.AddCommand(newCue2OpenAPICmd())
-	rootCmd.AddCommand(newBreakingCheckCmd())
+	rootCmd.AddCommand(projection.NewCue2OpenAPICmd())
+	rootCmd.AddCommand(diff.NewBreakingCheckCmd())
 }

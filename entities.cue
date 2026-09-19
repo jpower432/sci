@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 // Schema lifecycle: experimental | stable | deprecated
-@status("stable")
+@gemara(status="stable")
 package gemara
 
 @go(gemara)

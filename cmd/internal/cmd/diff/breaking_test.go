@@ -1,8 +1,12 @@
 // SPDX-License-Identifier: Apache-2.0
 
-package cmd
+package diff
 
-import "testing"
+import (
+	"os"
+	"path/filepath"
+	"testing"
+)
 
 func hasID(changes []Change, id string) bool {
 	for _, c := range changes {
@@ -53,7 +57,7 @@ func TestBreakingChanges(t *testing.T) {
 
 // TestBreakingChangesExemptsExperimental confirms that a schema carrying
 // x-status "experimental" is exempted from the gate: loadWrapped maps it to
-// oasdiff's x-stability-level "alpha", which the default (beta) threshold
+// diff's x-stability-level "alpha", which the default (beta) threshold
 // filters out before the breaking-change checks run. A break that would fail
 // for a stable schema must produce zero ERR changes here.
 func TestBreakingChangesExemptsExperimental(t *testing.T) {
@@ -97,5 +101,86 @@ func TestBreakingChangesCarriesSchema(t *testing.T) {
 		if c.Schema != "ControlEvaluation" {
 			t.Fatalf("expected schema %q, got %+v", "ControlEvaluation", c)
 		}
+	}
+}
+
+func TestLoadAllowlistOpenErrorPropagates(t *testing.T) {
+	// A directory opens but cannot be read as a file; the scan/read (or on some
+	// platforms the open) must surface a non-nil error rather than being silenced.
+	dir := t.TempDir()
+	if _, err := loadAllowlist(dir); err == nil {
+		t.Fatalf("expected error for directory path, got nil")
+	}
+
+	// A non-existent path must also error rather than returning a nil map silently.
+	missing := filepath.Join(dir, "does-not-exist.txt")
+	got, err := loadAllowlist(missing)
+	if err == nil {
+		t.Fatalf("expected error for missing path, got nil")
+	}
+	if got != nil {
+		t.Fatalf("expected nil map on error, got %+v", got)
+	}
+}
+
+func TestLoadAllowlistEmptyPath(t *testing.T) {
+	got, err := loadAllowlist("")
+	if err != nil {
+		t.Fatalf("loadAllowlist(\"\"): %v", err)
+	}
+	if got == nil {
+		t.Fatalf("expected non-nil empty map for empty path")
+	}
+	if len(got) != 0 {
+		t.Fatalf("expected empty map, got %+v", got)
+	}
+}
+
+func TestLoadAllowlistParsesEntries(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "allow.txt")
+	content := "# a comment\n\nfirst-id\n  second-id  \n# another\nthird-id\n"
+	if err := os.WriteFile(path, []byte(content), 0644); err != nil {
+		t.Fatalf("writing allowlist: %v", err)
+	}
+	got, err := loadAllowlist(path)
+	if err != nil {
+		t.Fatalf("loadAllowlist: %v", err)
+	}
+	for _, id := range []string{"first-id", "second-id", "third-id"} {
+		if !got[id] {
+			t.Fatalf("expected %q in allowlist, got %+v", id, got)
+		}
+	}
+	if len(got) != 3 {
+		t.Fatalf("expected 3 entries, got %+v", got)
+	}
+}
+
+func TestFilterAllowed(t *testing.T) {
+	changes := []Change{
+		{ID: "a", Schema: "Foo", Text: "x"},
+		{ID: "b", Schema: "Foo", Text: "y"},
+	}
+	got := filterAllowed(changes, map[string]bool{"a Foo": true})
+	if len(got) != 1 || got[0].ID != "b" {
+		t.Fatalf("expected only [b], got %+v", got)
+	}
+}
+
+func TestFilterAllowedSchemaScoped(t *testing.T) {
+	changes := []Change{
+		{ID: "a", Schema: "Foo", Text: "x"},
+		{ID: "a", Schema: "Bar", Text: "y"},
+	}
+	// A schema-scoped entry drops only the matching change, not every change
+	// sharing the check ID.
+	got := filterAllowed(changes, map[string]bool{"a Foo": true})
+	if len(got) != 1 || got[0].Schema != "Bar" {
+		t.Fatalf("expected only the Bar change to remain, got %+v", got)
+	}
+	// A bare check ID (no schema) matches nothing: entries must be schema-scoped.
+	got = filterAllowed(changes, map[string]bool{"a": true})
+	if len(got) != 2 {
+		t.Fatalf("expected a bare ID to drop nothing, got %+v", got)
 	}
 }
