@@ -78,7 +78,7 @@ func TestBreakingChangesReportsRemovedRequestProperty(t *testing.T) {
 
 // TestBreakingChangesExemptsExperimental confirms that a schema carrying
 // x-status "experimental" is exempted from the gate: loadWrapped maps it to
-// diff's x-stability-level "alpha", which the default (beta) threshold
+// oasdiff's x-stability-level "alpha", which the default (beta) threshold
 // filters out before the breaking-change checks run. A break that would fail
 // for a stable schema must produce zero ERR changes here.
 func TestBreakingChangesExemptsExperimental(t *testing.T) {

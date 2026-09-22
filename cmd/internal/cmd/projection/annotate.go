@@ -115,7 +115,7 @@ func fieldDeprecations(v cue.Value) (map[string]string, error) {
 }
 
 // docText joins a value's doc comments exactly as the upstream encoder does in
-// encoding/projection's getDoc (build.go:222-236 in v0.15.4): raw comment text
+// encoding/openapi's getDoc (build.go:222-236 in v0.15.4): raw comment text
 // joined with a blank line, trimmed once at the end. Matching it matters
 // because a restored description sits in the same document as encoder-emitted
 // ones, and the two must not render differently.

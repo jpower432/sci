@@ -44,7 +44,7 @@ func TestBreakingCheckIntegration(t *testing.T) {
 
 	// Mutate the candidate by dropping a required entry from one schema. Removing
 	// a required property is consumer-breaking (the response can no longer promise
-	// it), so diff must classify this as an ERR-level change.
+	// it), so oasdiff must classify this as an ERR-level change.
 	mutatedYaml := filepath.Join(tmp, "mutated.yaml")
 	mutatedSchema, err := dropOneRequired(baseYaml, mutatedYaml)
 	if err != nil {

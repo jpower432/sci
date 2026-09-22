@@ -43,7 +43,7 @@ type prepInfo struct {
 	DroppedConditionals []string
 }
 
-// prepare rewrites a CUE file into the subset cuelang.org/go/encoding/projection
+// prepare rewrites a CUE file into the subset cuelang.org/go/encoding/openapi
 // accepts. Every rewrite here is a rewrite of the *input*; none of them is
 // allowed to change what the generated schema means.
 //
@@ -78,7 +78,7 @@ func prepare(f *ast.File) (*prepInfo, error) {
 			}
 		case *ast.CallExpr:
 			// CUE CONVERTER WORKAROUND (cuelang.org/go, all versions through v0.18.0-alpha.1):
-			// encoding/projection panics on a time.Format() reachable inside a
+			// encoding/openapi panics on a time.Format() reachable inside a
 			// list — build.go:432 type-asserts v.Syntax(cue.Concrete(true))
 			// to ast.Expr without checking, and gets an *ast.File:
 			//

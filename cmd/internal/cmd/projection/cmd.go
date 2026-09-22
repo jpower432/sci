@@ -11,7 +11,7 @@ import (
 var cue2OpenAPICmd = &cobra.Command{
 	Use:   "cue2openapi",
 	Short: "Convert CUE schema to OpenAPI YAML",
-	Long: `Convert CUE schema definitions to OpenAPI 3.1.0 YAML format.
+	Long: `Convert CUE schema definitions to OpenAPI 3.0.3 YAML format.
 This command processes CUE files and generates an OpenAPI specification
 that can be used for API documentation and validation.`,
 	RunE: runCue2OpenAPI,
