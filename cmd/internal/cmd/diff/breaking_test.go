@@ -6,6 +6,8 @@ import (
 	"os"
 	"path/filepath"
 	"testing"
+
+	"github.com/oasdiff/oasdiff/checker"
 )
 
 func hasID(changes []Change, id string) bool {
@@ -29,6 +31,7 @@ func TestBreakingChanges(t *testing.T) {
 	}{
 		{"identical", "testdata/base.yaml", ""},
 		{"removed_required", "testdata/rev_remove.yaml", "response-property-became-optional"},
+		{"deleted_required_property", "testdata/rev_delete_required_property.yaml", "response-required-property-removed"},
 		{"added_required", "testdata/rev_add.yaml", "new-required-request-property"},
 		{"enum_narrowed", "testdata/rev_enum_narrow.yaml", "request-property-enum-value-removed"},
 	}
@@ -52,6 +55,24 @@ func TestBreakingChanges(t *testing.T) {
 				t.Fatalf("expected change ID %q, got %+v", tc.wantID, got)
 			}
 		})
+	}
+}
+
+func TestBreakingChangesReportsRemovedRequestProperty(t *testing.T) {
+	base, err := loadWrapped("testdata/base.yaml")
+	if err != nil {
+		t.Fatalf("load base: %v", err)
+	}
+	rev, err := loadWrapped("testdata/rev_delete_required_property.yaml")
+	if err != nil {
+		t.Fatalf("load rev: %v", err)
+	}
+	got, err := breakingChanges(base, rev)
+	if err != nil {
+		t.Fatalf("breakingChanges: %v", err)
+	}
+	if !hasID(got, checker.RequestPropertyRemovedId) {
+		t.Fatalf("expected removed request property, got %+v", got)
 	}
 }
 

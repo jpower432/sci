@@ -106,3 +106,35 @@ response-required-property-removed Threat
 # bool`) is not listed because both schemas are experimental and already exempt.
 response-property-became-optional AssessmentRequirement
 response-property-became-optional Control
+
+# Strict schema compatibility checks added after this transition file was first
+# written. These changes are the same projection-fidelity transition documented
+# above: allOf now preserves embedded CUE definitions rather than flattening or
+# dropping their fields. Remove these entries with the rest of this file after
+# re-baselining against a faithful OpenAPI release.
+response-required-property-removed Actor
+response-required-property-removed ControlCatalog
+response-required-property-removed Resource
+response-required-property-removed ThreatCatalog
+request-property-removed Actor
+request-property-removed AssessmentLog
+request-property-removed AssessmentRequirement
+request-property-removed Catalog
+request-property-removed Control
+request-property-removed ControlCatalog
+request-property-removed Log
+request-property-removed Metadata
+request-property-removed Resource
+request-property-removed Threat
+request-property-removed ThreatCatalog
+response-optional-property-removed Actor
+response-optional-property-removed AssessmentLog
+response-optional-property-removed AssessmentRequirement
+response-optional-property-removed Catalog
+response-optional-property-removed Control
+response-optional-property-removed ControlCatalog
+response-optional-property-removed Log
+response-optional-property-removed Metadata
+response-optional-property-removed Resource
+response-optional-property-removed Threat
+response-optional-property-removed ThreatCatalog

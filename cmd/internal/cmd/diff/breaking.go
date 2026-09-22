@@ -23,6 +23,20 @@ type Change struct {
 	Text   string
 }
 
+// strictSchemaSeverityLevels promotes schema-level warnings that can change a
+// stable artifact contract. Path, parameter, header, and webhook warnings are
+// not relevant to the synthetic component-schema operations.
+func strictSchemaSeverityLevels() map[string]checker.Level {
+	return map[string]checker.Level{
+		checker.RequestBodyAllOfRemovedId:         checker.ERR,
+		checker.RequestPropertyAllOfRemovedId:     checker.ERR,
+		checker.RequestPropertyPatternChangedId:   checker.ERR,
+		checker.RequestPropertyRemovedId:          checker.ERR,
+		checker.ResponseOptionalPropertyRemovedId: checker.ERR,
+		checker.ResponseRequiredPropertyRemovedId: checker.ERR,
+	}
+}
+
 // filterAllowed drops changes matched by the allowlist. An entry keyed
 // "<id> <schema>" drops only that change on that schema.
 func filterAllowed(changes []Change, allowed map[string]bool) []Change {
@@ -146,7 +160,8 @@ func breakingChanges(base, rev *openapi3.T) ([]Change, error) {
 	}
 	loc := checker.NewDefaultLocalizer()
 	var out []Change
-	for _, c := range checker.CheckBackwardCompatibility(checker.NewConfig(checker.GetAllChecks()), d, sources) {
+	config := checker.NewConfig(checker.GetAllChecks(), checker.WithSeverityLevels(strictSchemaSeverityLevels()))
+	for _, c := range checker.CheckBackwardCompatibility(config, d, sources) {
 		if c.GetLevel() == checker.ERR {
 			// Paths are the synthesized "/_schema/<name>" wrappers; expose just
 			// the schema name so output and allowlist entries stay user-facing.
