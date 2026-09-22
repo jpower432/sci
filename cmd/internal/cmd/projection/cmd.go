@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
-package cmd
+package projection
 
 import (
 	"fmt"
@@ -26,7 +26,7 @@ var cue2OpenAPIFlags struct {
 	title        string
 }
 
-func newCue2OpenAPICmd() *cobra.Command {
+func NewCue2OpenAPICmd() *cobra.Command {
 	cue2OpenAPICmd.Flags().StringVarP(&cue2OpenAPIFlags.schemaDir, "schema", "s", "../..", "Path to the CUE package directory")
 	cue2OpenAPICmd.Flags().StringVarP(&cue2OpenAPIFlags.outputPath, "output", "o", "openapi.yaml", "Output path for OpenAPI schema")
 	cue2OpenAPICmd.Flags().StringVarP(&cue2OpenAPIFlags.manifestPath, "manifest", "m", "", "Optional path to write schema→file manifest JSON")
@@ -37,13 +37,30 @@ func newCue2OpenAPICmd() *cobra.Command {
 }
 
 func runCue2OpenAPI(cmd *cobra.Command, args []string) error {
-	if err := convertCUEToOpenAPI(cue2OpenAPIFlags.schemaDir, cue2OpenAPIFlags.outputPath, ConvertOpts{
-		ManifestPath: cue2OpenAPIFlags.manifestPath,
-		Root:         cue2OpenAPIFlags.root,
-		Version:      cue2OpenAPIFlags.version,
-		Title:        cue2OpenAPIFlags.title,
-	}); err != nil {
+	c := NewConverter(cue2OpenAPIFlags.manifestPath, cue2OpenAPIFlags.root)
+	if err := c.Load(cue2OpenAPIFlags.schemaDir); err != nil {
 		return err
+	}
+	if err := c.Prep(); err != nil {
+		return err
+	}
+	options := []ConvertOption{WithTitle(cue2OpenAPIFlags.title)}
+	if cue2OpenAPIFlags.version != "" {
+		options = append(options, WithVersion(cue2OpenAPIFlags.version))
+	}
+	if err := c.Convert(cue2OpenAPIFlags.schemaDir, options...); err != nil {
+		return err
+	}
+	if err := c.Post(); err != nil {
+		return err
+	}
+	if err := c.WriteOpenAPI(cue2OpenAPIFlags.outputPath); err != nil {
+		return err
+	}
+	if cue2OpenAPIFlags.manifestPath != "" {
+		if err := c.WriteManifest(cue2OpenAPIFlags.manifestPath); err != nil {
+			return err
+		}
 	}
 
 	fmt.Printf("OpenAPI schema generated successfully at %s\n", cue2OpenAPIFlags.outputPath)

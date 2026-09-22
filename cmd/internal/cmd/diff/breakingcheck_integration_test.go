@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
-package cmd
+package diff
 
 import (
 	"fmt"
@@ -13,8 +13,8 @@ import (
 )
 
 // schemaRoot is the repo root (relative to this test's working directory,
-// cmd/internal/cmd) where the top-level CUE schema files live.
-const schemaRoot = "../../.."
+// cmd/internal/cmd/diff) where the top-level CUE schema files live.
+const schemaRoot = "../../../.."
 
 // TestBreakingCheckIntegration exercises the full breaking-check pipeline end to
 // end: it generates an OpenAPI projection of the current CUE schema, confirms an
@@ -29,7 +29,7 @@ func TestBreakingCheckIntegration(t *testing.T) {
 
 	tmp := t.TempDir()
 	baseYaml := filepath.Join(tmp, "base.yaml")
-	if err := convertCUEToOpenAPI(schemaRoot, baseYaml, ConvertOpts{}); err != nil {
+	if err := convertCUEToOpenAPI(schemaRoot, baseYaml); err != nil {
 		t.Fatalf("convertCUEToOpenAPI(%q): %v", schemaRoot, err)
 	}
 

@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 // Schema lifecycle: experimental | stable | deprecated
-@status("experimental")
+@gemara(status="experimental")
 package gemara
 
 import "list"
@@ -14,7 +14,7 @@ import "list"
 	metadata: type: "PrincipleCatalog"
 
 	// principles is a list of unique principles defined by this catalog
-	principles?: [#Principle, ...#Principle] @go(Principles)
+	principles?: [#Principle, ...#Principle] @gemara(projectable=false) @go(Principles)
 
 	if principles != _|_ {
 		_uniquePrinciplesIds: {for i, p in principles {(p.id): i}}

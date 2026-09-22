@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 // Schema lifecycle: experimental | stable | deprecated
-@status("experimental")
+@gemara(status="experimental")
 package gemara
 
 import "list"
@@ -73,7 +73,7 @@ import "list"
 	text: string
 
 	// required indicates whether this recommendation is a mandatory corrective action
-	required: *false | bool
+	required: *false | bool @gemara(default=false)
 }
 
 // Evidence records what was cited to support an opinion for a specific activity:
