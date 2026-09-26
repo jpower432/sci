@@ -72,6 +72,18 @@ package gemara
 // failed, or the algorithm is unregistered/unimplemented).
 // Absence of digest means no integrity claim was made, not that the content is
 // known unchanged.
+//
+// It is one digest rather than a set of them. The algorithm travels in the value,
+// so adopting a new one needs no schema change, and the MUST-support floor means
+// the digest a citation carries is one every conforming verifier can check —
+// which is all that ISO 19011's requirement that audit evidence be verifiable
+// asks for. A set would buy only simultaneous publication for verifiers of
+// differing capability, which the floor already removes, at the cost of a rule
+// this schema cannot enforce: a set holding one matching and one mismatching
+// digest has two defensible readings, and CUE cannot hash. Handing a subject or
+// materials list to an in-toto verifier would need that type's DigestSet; the
+// place for it then is a content descriptor primitive, not a wider #Digest,
+// whose Go and OpenAPI projections every consumer reads.
 #Digest: (=~"^[a-z0-9]+(?:[+._-][a-z0-9]+)*:[a-zA-Z0-9=_-]+$" &
 	(=~"^(?:sha256:[a-f0-9]{64}|sha512:[a-f0-9]{128}|blake3:[a-f0-9]{64})$" |
 	!~"^(?:sha256|sha512|blake3):")) @go(-)
