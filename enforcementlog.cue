@@ -14,16 +14,41 @@ package gemara
 	disposition: #Disposition
 	// actions is the list of enforcement actions performed
 	actions: [#ActionResult, ...#ActionResult] @gemara(projectable=false) @go(Actions,type=[]*ActionResult)
-	// Enforce that Clear dispositions only contain Passed assessment results
+
+	// ---- Validation --------------------------------------------------------
+	// Comments in validation sections stay detached (blank line after), so they
+	// are never published as a field's API description.
+
+	// A Clear disposition only ever justifies itself with Passed assessments.
+
 	actions: [...{
 		if disposition == "Clear" {
 			justification: assessments: [...{result: "Passed"}]
 		}
 	}]
+
+	// Action ids are unique within the log, so an action can be referenced
+	// unambiguously.
+
+	_uniqueActionIds: {for i, a in actions {(a.id): i}}
+
+	// Finding ids must be unique across the whole log, not just within one
+	// action's justification: a reference to a finding id would otherwise be
+	// ambiguous between actions. The value names the action position, so a
+	// collision names both.
+
+	_uniqueFindingIds: {
+		for i, a in actions for j, f in a.justification.assessments {
+			(f.id): "actions[\(i)].justification.assessments[\(j)]"
+		}
+	}
 }
 
 // ActionResult captures a performed enforcement action.
 #ActionResult: {
+	// id allows this entry to be referenced by other elements
+	id: string
+
 	// disposition is the enforcement action taken
 	disposition: #Disposition @go(Disposition)
 
@@ -60,6 +85,9 @@ package gemara
 
 // AssessmentFinding maps an enforcement action to its originating assessment data across Layer 2, Layer 3, and Layer 5.
 #AssessmentFinding: {
+	// id allows this entry to be referenced by other elements
+	id: string
+
 	// result is the assessment outcome that triggered the enforcement action
 	result: #Result
 

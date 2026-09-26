@@ -1,0 +1,55 @@
+metadata:
+  id: EVAL-DUP-REQUIREMENT
+  type: EvaluationLog
+  gemara-version: "1.1.0"
+  version: 1.0.0
+  description: A control evaluation must assess each requirement once, so an
+    AssessmentFinding citing (control, requirement) addresses one assessment log.
+  author:
+    id: pvtr
+    name: PVTR
+    type: Software
+  mapping-references:
+    - id: OSPS-B
+      title: Open Source Project Security Baseline
+      version: "2025.02"
+      url: https://baseline.openssf.org/versions/2025-02-25.html
+result: Failed
+target:
+  id: github-repo
+  name: GitHub Repository
+  type: Software
+evaluations:
+- name: access control
+  control:
+    reference-id: OSPS-B
+    entry-id: OSPS-AC-01
+  result: Failed
+  message: Conflicting results recorded for one requirement
+  assessment-logs:
+  - requirement:
+      entry-id: OSPS-AC-01.01
+    description: Verify that multi-factor authentication is required.
+    result: Passed
+    message: MFA is required
+    applicability:
+    - Maturity Level 1
+    steps:
+    - github.com/revanite-io/pvtr-github-repo/evaluation_plans/osps/access_control.orgRequiresMFA
+    steps-executed: 1
+    start: 2025-08-22T16:02:00.000000000Z
+    end: 2025-08-22T16:02:00.000003708Z
+  # Same requirement assessed twice within one control evaluation: an
+  # AssessmentFinding citing OSPS-AC-01 / OSPS-AC-01.01 cannot say which it means.
+  - requirement:
+      entry-id: OSPS-AC-01.01
+    description: Verify that multi-factor authentication is required.
+    result: Failed
+    message: MFA is not required
+    applicability:
+    - Maturity Level 1
+    steps:
+    - github.com/revanite-io/pvtr-github-repo/evaluation_plans/osps/access_control.orgRequiresMFA
+    steps-executed: 1
+    start: 2025-08-22T16:04:00.000000000Z
+    end: 2025-08-22T16:04:00.000002115Z

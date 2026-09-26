@@ -49,30 +49,24 @@ owner:
 
 summary: "Access control and quality controls are strong. Documentation controls have gaps requiring remediation."
 
-criteria:
-  - reference-id: security-policy
-    remarks: "Organizational policy establishing the audit's scope."
-  - reference-id: OSPS
-    remarks: "Baseline whose controls each result is scored against."
+policy:
+  reference-id: security-policy
+  remarks: "Organizational policy establishing the audit's scope; it imports the OSPS baseline."
 
-results:
-  - id: AR-AC-01
-    title: "MFA enforcement verified"
-    type: Strength
-    description: "Multi-factor authentication is enforced at the organization level for all contributors."
-    criteria-reference:
+coverage:
+  - id: COV-AC-01
+    requirement:
       reference-id: OSPS
-      entries:
-        - reference-id: OSPS-AC-01
+      entry-id: OSPS-AC-01
+    assessment-present:
+      outcome: Pass
 
-  - id: AR-DO-01
-    title: "User documentation missing"
-    type: Gap
-    description: "No user guide is published or referenced in the Security Insights data."
-    criteria-reference:
+  - id: COV-DO-01
+    requirement:
       reference-id: OSPS
-      entries:
-        - reference-id: OSPS-DO-01
+      entry-id: OSPS-DO-01
+    assessment-present:
+      outcome: Pass
     evidence:
       - id: EV-DO-01
         type: EvaluationLog
@@ -82,7 +76,50 @@ results:
           reference-id: eval-log
           entry-id: "assessment-do-01"
           coordinate: "$.results[0].checks[2]"
-          digest: "sha256:c4d5e6f7a8b9012cdef34567890abcdef1234567890abcdef1234567890abc123"
+          digest: "sha256:c4d5e6f7a8b9012cdef34567890abcdef1234567890abcdef1234567890abc12"
+
+  - id: COV-DO-02
+    requirement:
+      reference-id: OSPS
+      entry-id: OSPS-DO-02
+    assessment-present:
+      outcome: Pass
+    evidence:
+      - id: EV-DO-02
+        type: EnforcementLog
+        description: "Enforcement actions taken for documentation failures"
+        collected-at: "2025-08-22T16:05:00Z"
+        source:
+          reference-id: enforcement-log
+
+  - id: COV-QA-02
+    requirement:
+      reference-id: OSPS
+      entry-id: OSPS-QA-02
+    assessment-present:
+      outcome: Pass
+    evidence:
+      - id: EV-QA-01
+        type: urn:gemara:evidence:api-response
+        description: "Dependency manifests from the GitHub dependency graph SBOM endpoint"
+        collected-at: "2026-02-10T15:05:00Z"
+        source:
+          reference-id: github-api
+          coordinate: "/repos/gemaraproj/gemara/dependency-graph/sbom"
+          digest: "sha256:a1b2c3d4e5f67890abcdef1234567890abcdef1234567890abcdef1234567890"
+
+results:
+  - id: AR-AC-01
+    title: "MFA enforcement verified"
+    type: Strength
+    description: "Multi-factor authentication is enforced at the organization level for all contributors."
+    check-id: COV-AC-01
+
+  - id: AR-DO-01
+    title: "User documentation missing"
+    type: Gap
+    description: "No user guide is published or referenced in the Security Insights data."
+    check-id: COV-DO-01
     recommendations:
       - id: REC-01
         text: "Add user guide references to the Security Insights file and publish basic user documentation."
@@ -92,17 +129,7 @@ results:
     title: "Vulnerability reporting channel not formalized"
     type: Finding
     description: "Private vulnerability reporting was not enabled prior to enforcement remediation."
-    criteria-reference:
-      reference-id: OSPS
-      entries:
-        - reference-id: OSPS-DO-02
-    evidence:
-      - id: EV-DO-02
-        type: EnforcementLog
-        description: "Enforcement actions taken for documentation failures"
-        collected-at: "2025-08-22T16:05:00Z"
-        source:
-          reference-id: enforcement-log
+    check-id: COV-DO-02
     recommendations:
       - id: REC-02
         text: "Formalize the private vulnerability reporting process and document it in SECURITY.md."
@@ -111,16 +138,4 @@ results:
     title: "Dependency manifests present"
     type: Observation
     description: "Repository includes dependency manifests and the dependency graph is accessible via GitHub API."
-    criteria-reference:
-      reference-id: OSPS
-      entries:
-        - reference-id: OSPS-QA-02
-    evidence:
-      - id: EV-QA-01
-        type: api-response
-        description: "Dependency manifests from the GitHub dependency graph SBOM endpoint"
-        collected-at: "2026-02-10T15:05:00Z"
-        source:
-          reference-id: github-api
-          coordinate: "/repos/gemaraproj/gemara/dependency-graph/sbom"
-          digest: "sha256:a1b2c3d4e5f67890abcdef1234567890abcdef1234567890abcdef1234567890"
+    check-id: COV-QA-02

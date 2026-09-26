@@ -24,7 +24,8 @@ target:
   uri: "https://github.com/gemaraproj/gemara"
 
 actions:
-  - disposition: Enforced
+  - id: ACT-01
+    disposition: Enforced
     method:
       reference-id: security-policy
       entry-id: EM-GATE-01
@@ -34,7 +35,8 @@ actions:
       - github.com/gemaraproj/gemara/enforcement/gate.BlockMerge
     justification:
       assessments:
-        - result: Failed
+        - id: FIND-01
+          result: Failed
           requirement:
             reference-id: security-policy
             entry-id: OSPS-DO-01.01

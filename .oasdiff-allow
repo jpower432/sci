@@ -138,3 +138,32 @@ response-optional-property-removed Metadata
 response-optional-property-removed Resource
 response-optional-property-removed Threat
 response-optional-property-removed ThreatCatalog
+### Task 2: require metadata.version
+#
+# Metadata.version was optional; a MappingReference pinning an artifact
+# always requires a version (MappingReference.version is required), so a
+# citation could point at an artifact with no version to match. Making
+# version required is a tightening of an existing optional field, not the
+# addition of a new required field, which this project permits in v1.
+request-property-became-required Metadata
+
+### Evidence consolidation: #Evidence moves to stable evidence.cue
+#
+# In the v1.5.0 baseline #Evidence lived in experimental auditlog.cue
+# (x-status: experimental) while stable evaluationlog.cue consumed it. These
+# changes land together with its promotion to stable, so relative to the
+# published baseline each is a change to an experimental type. None removes a
+# field or relaxes a constraint a producer relied on.
+#
+# payload: string -> any. The baseline projected payload as `string`; its CUE
+# type has always been `_` (any). The projection is now faithful (gemara#468).
+response-property-type-changed Evidence
+# source/reference-id "removed": false positive. EvidenceMapping still lists
+# reference-id as required. `source` changed from a bare $ref to an allOf-wrapped
+# $ref (the encoder wraps a $ref that carries a sibling description, since
+# OpenAPI 3.0 ignores $ref siblings) and oasdiff does not see through the wrapper.
+response-required-property-removed Evidence
+# EvidenceType: `#ArtifactType | string` -> `#ArtifactType | #URL`. A deliberate
+# tightening so a typo cannot pass as an evidence kind (field lineage audit 29a),
+# made while the type was still experimental, before its promotion to stable.
+response-body-one-of-added EvidenceType

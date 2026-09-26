@@ -21,6 +21,10 @@ import "list"
 	// risks is a list of risks defined by this catalog
 	risks?: [#Risk, ...#Risk] @go(Risks)
 
+	// ---- Validation --------------------------------------------------------
+	// Comments in validation sections stay detached (blank line after), so they
+	// are never published as a field's API description.
+
 	if risks != _|_ {
 		_uniqueRiskIds: {for i, r in risks {(r.id): i}}
 		// Each distinct rank value may appear at most once among risks that set rank (partial ranking allowed).

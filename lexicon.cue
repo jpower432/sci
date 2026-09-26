@@ -18,6 +18,10 @@ package gemara
 	// terms is one or more defined entries for linking and rendering
 	terms: [#LexiconTerm, ...#LexiconTerm] @go(Terms)
 
+	// ---- Validation --------------------------------------------------------
+	// Comments in validation sections stay detached (blank line after), so they
+	// are never published as a field's API description.
+
 	_uniqueTermIds: {for i, t in terms {(t.id): i}}
 }
 
@@ -45,5 +49,5 @@ package gemara
 	citation: string
 
 	// url points to supporting material when available
-	url?: =~"^(https?|file)://[^\\s]+$"
+	url?: #URL
 }

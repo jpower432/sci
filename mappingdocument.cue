@@ -25,10 +25,14 @@ package gemara
 	// mappings is one or more atomic relationships between entries in the referenced artifacts
 	mappings: [#_MappingStrict, ...#_MappingStrict] @go(Mappings,type=[]Mapping)
 
-	_uniqueMappingIds: {for i, m in mappings {(m.id): i}}
-
 	// remarks is prose regarding this mapping document
 	remarks?: string
+
+	// ---- Validation --------------------------------------------------------
+	// Comments in validation sections stay detached (blank line after), so they
+	// are never published as a field's API description.
+
+	_uniqueMappingIds: {for i, m in mappings {(m.id): i}}
 }
 
 // TypedMapping extends ArtifactMapping with a required entry-type for all entries in this direction
@@ -101,6 +105,8 @@ package gemara
 	"equivalent" |
 	// source fully contains the target's scope and more
 	"subsumes" |
+	// target fully contains the source's scope and more
+	"subsumed-by" |
 	// source has no counterpart in the target artifact
 	"no-match" |
 	// source and target are related but the nature is unspecified

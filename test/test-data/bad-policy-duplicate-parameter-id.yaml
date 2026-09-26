@@ -1,0 +1,55 @@
+metadata:
+  id: BAD-DUP-PARAM
+  type: Policy
+  gemara-version: "1.1.0"
+  version: "1.0.0"
+  description: Parameter ids must be unique within their assessment plan, so an
+    executor resolving a parameter by id gets one value.
+  author:
+    id: security-team
+    name: Security Team
+    type: Human
+  mapping-references:
+    - id: "ISO-27001"
+      title: "ISO/IEC 27001"
+      version: "2022"
+      description: "Information security management systems"
+title: Policy with duplicate parameter ids in one plan
+contacts:
+  responsible:
+    - name: IT Director
+  accountable:
+    - name: Chief Information Security Officer
+scope:
+  in:
+    technologies:
+      - Web Applications
+imports:
+  guidance:
+    - reference-id: ISO-27001
+adherence:
+  assessment-plans:
+    - id: AP-01
+      requirement:
+        reference-id: ISO-27001
+        entry-id: EX.C01.R01
+      frequency-days: 90
+      evaluation-methods:
+        - id: EV-AUTO-01
+          type: Behavioral
+          mode: Automated
+      parameters:
+        - id: threshold
+          label: Minimum review count
+          description: How many approving reviews a change requires.
+          accepted-values:
+            - "1"
+            - "2"
+        # Same parameter id: an executor cannot tell which value applies.
+        - id: threshold
+          label: Maximum age in days
+          description: How old an assessment result may be before it is stale.
+          accepted-values:
+            - "30"
+            - "90"
+  non-compliance: Non-compliant systems are quarantined pending remediation.

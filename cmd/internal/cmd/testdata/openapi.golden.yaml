@@ -61,6 +61,9 @@ components:
           allOf:
           - $ref: "#/components/schemas/Datetime"
           description: end is the timestamp when the enforcement action concluded
+        id:
+          description: id allows this entry to be referenced by other elements
+          type: string
         justification:
           allOf:
           - $ref: "#/components/schemas/Justification"
@@ -83,6 +86,7 @@ components:
           minItems: 1
           type: array
       required:
+      - id
       - disposition
       - method
       - start
@@ -171,6 +175,9 @@ components:
     AssessmentFinding:
       description: AssessmentFinding maps an enforcement action to its originating assessment data across Layer 2, Layer 3, and Layer 5.
       properties:
+        id:
+          description: id allows this entry to be referenced by other elements
+          type: string
         log:
           allOf:
           - $ref: "#/components/schemas/EntryMapping"
@@ -188,6 +195,7 @@ components:
           - $ref: "#/components/schemas/Result"
           description: result is the assessment outcome that triggered the enforcement action
       required:
+      - id
       - result
       - log
       type: object
@@ -220,6 +228,12 @@ components:
             type: object
           minItems: 1
           type: array
+        execution:
+          allOf:
+          - $ref: "#/components/schemas/ExecutionFacts"
+          description: |-
+            execution records what this run used under its plan. A cited plan obliges
+            the record; without a plan there is nothing to record against.
         message:
           description: Message provides additional context about the assessment result.
           type: string
@@ -237,7 +251,7 @@ components:
         result:
           allOf:
           - $ref: "#/components/schemas/Result"
-          description: Result is the overall outcome of the assessment procedure, matching the result of the last step that was run.
+          description: "Result is the aggregate outcome of the assessment procedure, by the precedence documented on #Result."
         start:
           allOf:
           - $ref: "#/components/schemas/Datetime"
@@ -252,6 +266,8 @@ components:
           type: array
         steps-executed:
           description: Steps-executed is the number of steps that were executed as part of the assessment.
+          maximum: 1.0
+          minimum: 0.0
           type: integer
       required:
       - requirement
@@ -278,9 +294,16 @@ components:
           minItems: 1
           type: array
         evidence-requirements:
-          type: string
-        frequency:
-          type: string
+          allOf:
+          - $ref: "#/components/schemas/EvidenceRequirements"
+          description: "evidence-requirements states what evidence this requirement needs and how\nlong a collected item stays usable. It declares no evidence types: an\nexpectation belongs to a policy and a requirement."
+        frequency-days:
+          description: |-
+            frequency-days is how often this requirement is re-examined, in days.
+            Cadence belongs to the requirement, not to a method or a plan instance.
+          exclusiveMinimum: true
+          minimum: 0.0
+          type: integer
         id:
           type: string
         parameters:
@@ -288,12 +311,16 @@ components:
             $ref: "#/components/schemas/Parameter"
           minItems: 1
           type: array
-        requirement-id:
-          type: string
+        requirement:
+          allOf:
+          - $ref: "#/components/schemas/EntryMapping"
+          description: |-
+            requirement names the assessment requirement this plan governs, in the
+            catalog it comes from.
       required:
       - id
-      - requirement-id
-      - frequency
+      - requirement
+      - frequency-days
       - evaluation-methods
       type: object
       x-status: experimental
@@ -369,14 +396,18 @@ components:
       - required:
         - metadata
         - summary
-        - criteria
+        - policy
+        - coverage
         - results
       description: AuditLog records results from an audit performed against a target resource
       properties:
-        criteria:
-          description: criteria defines the acceptable state for the audited resource
+        coverage:
+          description: |-
+            coverage records, for every requirement the evaluation resolved, what
+            this audit checked and how it came out. It is complete by construction:
+            one entry per effective requirement, including the boring passes.
           items:
-            $ref: "#/components/schemas/ArtifactMapping"
+            $ref: "#/components/schemas/RequirementCoverage"
           minItems: 1
           type: array
         metadata:
@@ -393,12 +424,25 @@ components:
           allOf:
           - $ref: "#/components/schemas/RACI"
           description: owner defines the RACI roles responsible for managing the audit
+        policy:
+          allOf:
+          - $ref: "#/components/schemas/ArtifactMapping"
+          description: |-
+            policy is the single policy this audit was conducted against, at its
+            pinned version. Auditing a baseline means authoring a policy that
+            imports it.
         results:
-          description: results records audit results against the criteria
+          description: results are the auditor's opinions, which are selective by nature.
           items:
             $ref: "#/components/schemas/AuditResult"
           minItems: 1
           type: array
+        risk-tolerance-met:
+          allOf:
+          - $ref: "#/components/schemas/CheckOutcome"
+          description: |-
+            risk-tolerance-met records the policy-level tolerance check, which is not
+            per-requirement.
         summary:
           description: summary provides the high-level conclusion
           type: string
@@ -407,21 +451,15 @@ components:
     AuditResult:
       description: AuditResult records a single result with supporting evidence and recommendations.
       properties:
-        criteria-reference:
-          allOf:
-          - $ref: "#/components/schemas/MultiEntryMapping"
-          description: criteria-reference maps this result to specific criteria entries
+        check-id:
+          description: |-
+            check-id names the coverage entry whose check prompted this result, when
+            one did. A result about the audit as a whole omits it rather than
+            inventing a check to point at.
+          type: string
         description:
           description: description explains the result in detail
           type: string
-        evidence:
-          description: evidence records the data sources that support this result
-          items:
-            allOf:
-            - $ref: "#/components/schemas/Evidence"
-            type: object
-          minItems: 1
-          type: array
         id:
           description: id uniquely identifies this result
           type: string
@@ -443,7 +481,6 @@ components:
       - title
       - type
       - description
-      - criteria-reference
       type: object
       x-status: experimental
     Capability:
@@ -548,6 +585,35 @@ components:
       - reference-id
       type: object
       x-status: experimental
+    CheckOutcome:
+      description: CheckOutcome is the result of one audit check.
+      properties:
+        message:
+          type: string
+        outcome:
+          enum:
+          - Pass
+          - Fail
+          - Not Applicable
+          - Undetermined
+          type: string
+      required:
+      - outcome
+      type: object
+      x-status: experimental
+    CollectionMethod:
+      anyOf:
+      - enum:
+        - EXAMINE
+        - INTERVIEW
+        - TEST
+        - UNKNOWN
+      - {}
+      description: |-
+        CollectionMethod records how evidence was obtained. Values mirror OSCAL's
+        assessment methods.
+      type: string
+      x-status: stable
     ConfidenceLevel:
       description: ConfidenceLevel indicates the evaluator's confidence level in an assessment result.
       enum:
@@ -678,11 +744,8 @@ components:
       properties:
         assessment-logs:
           description: |-
-            Enforce that control reference and the assessments' references match
-            This formulation uses the control's reference if the assessment doesn't include a reference
-            
-            
-            Require start timestamp on assessments that actually executed
+            assessment-logs records each assessment procedure executed against this
+            control's requirements.
             
             (Enforced by the CUE schema; not by this OpenAPI projection.)
           items:
@@ -720,6 +783,18 @@ components:
     Datetime:
       description: Datetime represents an ISO 8601 formatted datetime string
       format: date-time
+      type: string
+      x-status: stable
+    Digest:
+      description: "Digest is a cryptographic hash of a full octet stream; format: algorithm:encoded\n(e.g. sha256:<64 lowercase hex>). sha256 is the MUST-support floor for every\nconforming verifier; sha512 and blake3 are MAY. Registered algorithms are\nadditionally checked for that algorithm's encoding and length; any other\nalgorithm is checked for grammar only, per the OCI rule that unrecognized\nalgorithms complying with the grammar pass.\n\nThe hash covers the full octet stream retrieved from download-url exactly\nas delivered. A verifier reports exactly one of three outcomes per citation\n— verified, integrity-failure, or unverifiable (no digest, no download-url, retrieval\nfailed, or the algorithm is unregistered/unimplemented).\nAbsence of digest means no integrity claim was made, not that the content is\nknown unchanged."
+      oneOf:
+      - allOf:
+        - pattern: ^[a-z0-9]+(?:[+._-][a-z0-9]+)*:[a-zA-Z0-9=_-]+$
+        - pattern: ^(?:sha256:[a-f0-9]{64}|sha512:[a-f0-9]{128}|blake3:[a-f0-9]{64})$
+      - allOf:
+        - pattern: ^[a-z0-9]+(?:[+._-][a-z0-9]+)*:[a-zA-Z0-9=_-]+$
+        - not:
+            pattern: "^(?:sha256|sha512|blake3):"
       type: string
       x-status: stable
     Dimensions:
@@ -782,9 +857,6 @@ components:
         actions:
           description: |-
             actions is the list of enforcement actions performed
-            
-            
-            Enforce that Clear dispositions only contain Passed assessment results
             
             (Enforced by the CUE schema; not by this OpenAPI projection.)
           items:
@@ -925,27 +997,38 @@ components:
       type: string
       x-status: experimental
     Evidence:
-      description: |-
-        Evidence records what was cited to support an opinion for a specific activity:
-        raw data for the evaluation layer, evaluation and enforcement artifacts for the audit layer.
-        At least one of payload or source MUST be present; an entry with neither is semantically incomplete.
+      description: "Evidence records what was cited to support an opinion for a specific activity:\nraw data for the evaluation layer, evaluation and enforcement artifacts for the audit layer.\nAt least one of payload or source MUST be present; an entry with neither is semantically incomplete.\npayload carries decoded evidence inline and is not digested; integrity for\nreferenced evidence is expressed by source.digest over source.download-url,\nvia #ContentDescriptor."
       properties:
         collected-at:
           allOf:
           - $ref: "#/components/schemas/Datetime"
           description: collected-at is the timestamp when the evidence was gathered
+        collector:
+          allOf:
+          - $ref: "#/components/schemas/Actor"
+          description: collector is the party that gathered it into this log.
         description:
           description: description explains what this evidence represents
           type: string
         id:
           description: id uniquely identifies this evidence
           type: string
+        method:
+          allOf:
+          - $ref: "#/components/schemas/CollectionMethod"
+          description: method describes how the evidence was collected.
+        originator:
+          allOf:
+          - $ref: "#/components/schemas/Actor"
+          description: originator is the party that produced the evidence content.
         payload:
           description: payload is the raw evidence data collected inline
         source:
           allOf:
           - $ref: "#/components/schemas/EvidenceMapping"
-          description: source identifies the artifact or system from which this evidence was collected
+          description: |-
+            source identifies the artifact or system from which this evidence was collected and
+            retrieval information.
         type:
           allOf:
           - $ref: "#/components/schemas/EvidenceType"
@@ -955,40 +1038,74 @@ components:
       - type
       - collected-at
       type: object
-      x-status: experimental
+      x-status: stable
     EvidenceMapping:
-      description: |-
-        EvidenceMapping identifies the source from which evidence was collected.
-        reference-id names the MappingReference; coordinate or entry-id gives
-        specificity within it; digest pins the observed content at collection time.
+      description: "EvidenceMapping identifies the source from which evidence was collected.\nreference-id names the MappingReference; coordinate and entry-id are reader\nhints for locating content within it. Content addressing and integrity\n(download-url, digest, size, media-type) come from #ContentDescriptor."
       properties:
         coordinate:
           description: |-
             coordinate is the precise location within the stream identified by reference-id
             (e.g. an API path, file path, or JSON path expression). May be combined with
-            entry-id to identify a sub-location within that entry's output.
+            entry-id. It is a reader hint, not an address a verifier resolves, and not an
+            input to digest.
           type: string
         digest:
-          description: "digest is a cryptographic hash of the observed content at collection time; format: algorithm:encoded (e.g. sha256:abc123...)"
-          pattern: ^[a-z0-9]+(?:[+._-][a-z0-9]+)*:[a-zA-Z0-9=_-]+$
-          type: string
+          allOf:
+          - $ref: "#/components/schemas/Digest"
+          description: "digest is a cryptographic hash of the full octet stream retrieved from\ndownload-url. See #Digest for what a verifier must do with it."
+        download-url:
+          allOf:
+          - $ref: "#/components/schemas/URL"
+          description: |-
+            Embedded information about how evidence can be retrieved.
+            download-url is the address this content can be retrieved from is it not
+            available from the MappingReference.url.
         entry-id:
           description: |-
             entry-id identifies a specific entry within a referenced Gemara artifact.
-            May be combined with coordinate to identify a sub-location within that entry's output.
+            May be combined with coordinate. It is a reader hint, not an address a
+            verifier resolves, and not an input to digest.
+          type: string
+        media-type:
+          description: |-
+            media-type is the IANA media type of the content at download-url,
+            e.g. application/json, text/yaml.
+          pattern: "^[a-zA-Z0-9][a-zA-Z0-9!#$&.+^_-]*/[a-zA-Z0-9][a-zA-Z0-9!#$&.+^_-]*$"
           type: string
         reference-id:
-          description: reference-id ties this evidence to a mapping-reference in the artifact's metadata
+          description: reference-id defines the evidence artifact source's identifying information.
           type: string
         remarks:
           description: remarks is prose regarding this evidence reference
           type: string
+        size:
+          description: size is the length, in bytes, of the octet stream at download-url.
+          minimum: 0.0
+          type: integer
       required:
       - reference-id
       type: object
       x-status: stable
+    EvidenceRequirements:
+      description: "EvidenceRequirements states what evidence a requirement needs and how long a\ncollected item stays usable. valid-for-days is a different clock from\nfrequency-days: how long evidence stays probative, not how often the\nrequirement is re-examined."
+      properties:
+        description:
+          type: string
+        valid-for-days:
+          exclusiveMinimum: true
+          minimum: 0.0
+          type: integer
+      required:
+      - description
+      - valid-for-days
+      type: object
+      x-status: experimental
     EvidenceType:
-      anyOf:
+      description: |-
+        EvidenceType categorizes the kind of evidence. It remains an open enum:
+        recommended values include artifact types already known to Gemara (e.g.
+        EvaluationLog, EnforcementLog) plus categories for common evidence forms.
+      oneOf:
       - enum:
         - CapabilityCatalog
         - ControlCatalog
@@ -1003,13 +1120,34 @@ components:
         - VectorCatalog
         - PrincipleCatalog
         - AuditLog
-      - {}
-      description: |-
-        EvidenceType categorizes the kind of evidence. It remains an open enum:
-        recommended values include artifact types already known to Gemara (e.g.
-        EvaluationLog, EnforcementLog) plus categories for common evidence forms.
+      - pattern: "^[a-zA-Z][a-zA-Z0-9+.-]*:[^\\s]+$"
       type: string
-      x-status: experimental
+      x-status: stable
+    ExecutionFacts:
+      description: "ExecutionFacts records what a run actually used under its plan: which of the\nplan's methods ran, who ran it when that differs from the run's executor, and\nthe parameter values used. A log cites a plan to say what was supposed to\nhappen; these are what did."
+      properties:
+        executor:
+          allOf:
+          - $ref: "#/components/schemas/Actor"
+          description: |-
+            executor is the actor that performed this assessment, recorded only when
+            it differs from the run's executor.
+        method-id:
+          description: |-
+            method-id names the accepted method from the cited plan that this
+            assessment executed. Method ids are unique across a policy, so no further
+            qualifier is needed.
+          type: string
+        parameters:
+          description: parameters are the selected values for execution correlated to the plan's parameters
+          items:
+            $ref: "#/components/schemas/ParameterValue"
+          minItems: 1
+          type: array
+      required:
+      - method-id
+      type: object
+      x-status: stable
     Exemption:
       description: Exemption describes a single scenario where the catalog is not applicable
       properties:
@@ -1296,9 +1434,9 @@ components:
           description: citation identifies the source material in prose
           type: string
         url:
+          allOf:
+          - $ref: "#/components/schemas/URL"
           description: url points to supporting material when available
-          pattern: "^(https?|file)://[^\\s]+$"
-          type: string
       required:
       - citation
       type: object
@@ -1444,19 +1582,19 @@ components:
           type: string
         id:
           description: |-
-            id identifies this mapping reference within the artifact and, when url
-            is absent, the referenced artifact's metadata.id.
+            id identifies this mapping reference within the artifact; every reference-id
+            in the artifact MUST equal one of these ids or the artifact's own metadata.id.
           type: string
         title:
           description: title describes the purpose of this mapping reference at a glance
           type: string
         url:
+          allOf:
+          - $ref: "#/components/schemas/URL"
           description: |-
             url is the path where the artifact may be retrieved; preferably responds with Gemara-compatible YAML/JSON.
             Any URI scheme is accepted (e.g. https, file, oci, s3, arn) so evidence can be
             addressed wherever it actually lives.
-          pattern: "^[a-zA-Z][a-zA-Z0-9+.-]*:[^\\s]+$"
-          type: string
         version:
           description: version is the version identifier of the artifact being mapped to
           type: string
@@ -1539,12 +1677,15 @@ components:
           - $ref: "#/components/schemas/ArtifactType"
           description: type identifies the kind of Gemara artifact for unambiguous parsing
         version:
-          description: version is the version identifier of this artifact
+          description: |-
+            version is the version identifier of this artifact; it MUST be present so
+            that a MappingReference pinning this artifact has a value to match.
           type: string
       required:
       - id
       - type
       - gemara-version
+      - version
       - description
       - author
       type: object
@@ -1623,6 +1764,18 @@ components:
       - description
       type: object
       x-status: experimental
+    ParameterValue:
+      description: "ParameterValue records the value an execution used for a plan parameter.\nThe id names a #Parameter declared by the plan that was executed."
+      properties:
+        id:
+          type: string
+        value:
+          type: string
+      required:
+      - id
+      - value
+      type: object
+      x-status: stable
     Policy:
       description: Policy represents a policy document with metadata, contacts, scope, imports, implementation plan, risks, and adherence requirements.
       properties:
@@ -1788,9 +1941,99 @@ components:
       - supported-by
       - equivalent
       - subsumes
+      - subsumed-by
       - no-match
       - relates-to
       type: string
+      x-status: experimental
+    RequirementCoverage:
+      description: |-
+        RequirementCoverage records what an audit checked for one requirement. Each
+        check is a named field so that a check never made is visible as a missing
+        field rather than an absent list entry.
+      properties:
+        assessment-present:
+          allOf:
+          - $ref: "#/components/schemas/CheckOutcome"
+          description: "assessment-present records whether the requirement was assessed at all.\nIt is required: it is what makes coverage complete rather than selective."
+        assessments:
+          description: assessments are the assessments this audit read, if any.
+          items:
+            $ref: "#/components/schemas/EvidenceMapping"
+          minItems: 1
+          type: array
+        evidence:
+          description: evidence records the data sources that support this result
+          items:
+            allOf:
+            - $ref: "#/components/schemas/Evidence"
+            type: object
+          minItems: 1
+          type: array
+        evidence-fresh:
+          allOf:
+          - $ref: "#/components/schemas/CheckOutcome"
+          description: |-
+            evidence-fresh records whether that evidence was collected within the
+            plan's valid-for-days.
+        evidence-present:
+          allOf:
+          - $ref: "#/components/schemas/CheckOutcome"
+          description: |-
+            evidence-present records whether the requirement's assessments carry at
+            least one evidence entry.
+        executor-matched:
+          allOf:
+          - $ref: "#/components/schemas/CheckOutcome"
+          description: |-
+            executor-matched records whether the executor matched the plan's, compared
+            by authoritative identifier rather than by internal short name.
+        frequency-met:
+          allOf:
+          - $ref: "#/components/schemas/CheckOutcome"
+          description: |-
+            frequency-met records whether each required method ran within the
+            requirement's frequency-days.
+        id:
+          type: string
+        method-allowed:
+          allOf:
+          - $ref: "#/components/schemas/CheckOutcome"
+          description: method-allowed records whether the method that ran is one the plan allows.
+        parameters-matched:
+          allOf:
+          - $ref: "#/components/schemas/CheckOutcome"
+          description: |-
+            parameters-matched records whether the recorded parameter values are the
+            ones the plan declares, within their accepted values.
+        plan-bound:
+          allOf:
+          - $ref: "#/components/schemas/CheckOutcome"
+          description: |-
+            plan-bound records whether the assessment ran under the plan the policy
+            binds to this requirement.
+        required-methods:
+          description: required-methods records one outcome per method the plan requires.
+          items:
+            properties:
+              method-id:
+                type: string
+              outcome:
+                $ref: "#/components/schemas/CheckOutcome"
+            required:
+            - method-id
+            - outcome
+            type: object
+          type: array
+        requirement:
+          allOf:
+          - $ref: "#/components/schemas/EntryMapping"
+          description: requirement names an entry of the evaluation log's effective-requirements.
+      required:
+      - id
+      - requirement
+      - assessment-present
+      type: object
       x-status: experimental
     Resource:
       allOf:
@@ -1807,6 +2050,11 @@ components:
       type: object
       x-status: stable
     Result:
+      description: |-
+        Result is an assessment outcome. Aggregation at every rollup (assessment,
+        control evaluation, log) follows the precedence
+        Failed > Unknown > Needs Review > Passed > Not Applicable, and Not Run never
+        overwrites another value.
       enum:
       - Not Run
       - Passed
@@ -2074,6 +2322,11 @@ components:
           description: entry-type identifies the type of atomic unit entries in this direction
       type: object
       x-status: experimental
+    URL:
+      description: URL validates an absolute URI with any scheme (e.g. https, file, oci, s3).
+      pattern: "^[a-zA-Z][a-zA-Z0-9+.-]*:[^\\s]+$"
+      type: string
+      x-status: stable
     Vector:
       description: A Vector represents a method, pathway, or technique through which a threat may be realized or an attack may be carried out.
       properties:

@@ -1,0 +1,62 @@
+metadata:
+  id: EVAL-DUP-CONTROL
+  type: EvaluationLog
+  gemara-version: "1.1.0"
+  version: 1.0.0
+  description: A log must evaluate each control once, so AssessmentFinding.log can
+    address an evaluation by its control reference.
+  author:
+    id: pvtr
+    name: PVTR
+    type: Software
+  mapping-references:
+    - id: OSPS-B
+      title: Open Source Project Security Baseline
+      version: "2025.02"
+      url: https://baseline.openssf.org/versions/2025-02-25.html
+result: Failed
+target:
+  id: github-repo
+  name: GitHub Repository
+  type: Software
+evaluations:
+- name: access control
+  control:
+    reference-id: OSPS-B
+    entry-id: OSPS-AC-01
+  result: Passed
+  message: Access controls are in place
+  assessment-logs:
+  - requirement:
+      entry-id: OSPS-AC-01.01
+    description: Verify that multi-factor authentication is required.
+    result: Passed
+    message: MFA is required
+    applicability:
+    - Maturity Level 1
+    steps:
+    - github.com/revanite-io/pvtr-github-repo/evaluation_plans/osps/access_control.orgRequiresMFA
+    steps-executed: 1
+    start: 2025-08-22T16:02:00.000000000Z
+    end: 2025-08-22T16:02:00.000003708Z
+# Second evaluation of the same control: (reference-id, entry-id) is the natural
+# key an EntryMapping resolves against, so this makes the reference ambiguous.
+- name: access control, evaluated again
+  control:
+    reference-id: OSPS-B
+    entry-id: OSPS-AC-01
+  result: Failed
+  message: Access controls are missing
+  assessment-logs:
+  - requirement:
+      entry-id: OSPS-AC-01.01
+    description: Verify that multi-factor authentication is required.
+    result: Failed
+    message: MFA is not required
+    applicability:
+    - Maturity Level 1
+    steps:
+    - github.com/revanite-io/pvtr-github-repo/evaluation_plans/osps/access_control.orgRequiresMFA
+    steps-executed: 1
+    start: 2025-08-22T16:03:00.000000000Z
+    end: 2025-08-22T16:03:00.000004120Z

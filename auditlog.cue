@@ -19,25 +19,63 @@ import "list"
 	// summary provides the high-level conclusion
 	summary: string
 
-	// criteria defines the acceptable state for the audited resource
-	criteria: [#ArtifactMapping, ...#ArtifactMapping]
+	// policy is the single policy this audit was conducted against, at its
+	// pinned version. Auditing a baseline means authoring a policy that
+	// imports it.
+	policy: #ArtifactMapping
 
-	// results records audit results against the criteria
+	// coverage records, for every requirement the evaluation resolved, what
+	// this audit checked and how it came out. It is complete by construction:
+	// one entry per effective requirement, including the boring passes.
+	coverage: [#RequirementCoverage, ...#RequirementCoverage]
+
+	// results are the auditor's opinions, which are selective by nature.
 	results: [#AuditResult, ...#AuditResult] @go(Results,type=[]*AuditResult)
 
-	if results != _|_ {
-		_uniqueResultIds: {for i, r in results {(r.id): i}}
-		let _validCriteriaIds = [for c in criteria {c."reference-id"}]
+	// risk-tolerance-met records the policy-level tolerance check, which is not
+	// per-requirement.
+	"risk-tolerance-met"?: #CheckOutcome @go(RiskToleranceMet)
 
-		// Unify the valid ID list with a list.Contains constraint to require each result scores against declared criteria
-		for i, r in results {
-			_criteriaValidation: "\(i)": _validCriteriaIds & list.Contains(r."criteria-reference"."reference-id")
+	// ---- Validation --------------------------------------------------------
+	// Comments in validation sections stay detached (blank line after), so they
+	// are never published as a field's API description.
+
+	// Every reference-id names a declared mapping-reference or the audit's own
+	// id: the audited policy, each covered requirement, each evidence source.
+
+	_refIds: _ // computed on #Log; named here only so this block can reference it
+
+	_refValidation: "policy": _refIds & list.Contains(policy."reference-id")
+	for i, c in coverage {
+		_refValidation: "coverage-\(i)": _refIds & list.Contains(c.requirement."reference-id")
+		if c.evidence != _|_ {
+			for j, e in c.evidence if e.source != _|_ {
+				_refValidation: "coverage-\(i)-evidence-\(j)": _refIds & list.Contains(e.source."reference-id")
+			}
 		}
+	}
+
+	// Coverage ids are unique, because a result addresses one by check-id.
+
+	_uniqueCoverageIds: {for i, c in coverage {(c.id): i}}
+
+	// A result's check-id, when present, names one of this audit's coverage
+	// entries, so an opinion and the check that prompted it cannot disagree.
+
+	_coverageIds: [for c in coverage {c.id}]
+	for i, r in results if r."check-id" != _|_ {
+		_checkValidation: "\(i)": _coverageIds & list.Contains(r."check-id")
 	}
 }
 
 // ResultType classifies the nature of an audit result
 #ResultType: "Gap" | "Finding" | "Observation" | "Strength" @go(-)
+
+// CheckOutcome is the result of one audit check.
+#CheckOutcome: {
+	outcome:  "Pass" | "Fail" | "Not Applicable" | "Undetermined"
+	message?: string
+}
 
 // AuditResult records a single result with supporting evidence and recommendations.
 #AuditResult: {
@@ -53,12 +91,10 @@ import "list"
 	// description explains the result in detail
 	description: string
 
-	// criteria-reference maps this result to specific criteria entries
-	"criteria-reference": #MultiEntryMapping @go(CriteriaReference)
-
-	// evidence records the data sources that support this result
-	evidence?: [#Evidence, ...#Evidence] @go(Evidence)
-	evidence?: [#_EvidenceStrict, ...#_EvidenceStrict]
+	// check-id names the coverage entry whose check prompted this result, when
+	// one did. A result about the audit as a whole omits it rather than
+	// inventing a check to point at.
+	"check-id"?: string @go(CheckId)
 
 	// recommendations records corrective actions for this result
 	recommendations?: [#Recommendation, ...#Recommendation] @go(Recommendations)
@@ -76,40 +112,63 @@ import "list"
 	required: *false | bool @gemara(default=false)
 }
 
-// Evidence records what was cited to support an opinion for a specific activity:
-// raw data for the evaluation layer, evaluation and enforcement artifacts for the audit layer.
-// At least one of payload or source MUST be present; an entry with neither is semantically incomplete.
-#Evidence: {
-	// id uniquely identifies this evidence
+// RequirementCoverage records what an audit checked for one requirement. Each
+// check is a named field so that a check never made is visible as a missing
+// field rather than an absent list entry.
+#RequirementCoverage: {
 	id: string
+	// requirement names an entry of the evaluation log's effective-requirements.
+	requirement: #EntryMapping
 
-	// type categorizes the kind of evidence
-	type: #EvidenceType
+	// assessments are the assessments this audit read, if any.
+	assessments?: [#EvidenceMapping, ...#EvidenceMapping]
 
-	// collected-at is the timestamp when the evidence was gathered
-	"collected-at": #Datetime @go(CollectedAt)
+	// evidence records the data sources that support this result
+	evidence?: [#Evidence, ...#Evidence] @go(Evidence)
 
-	// payload is the raw evidence data collected inline
-	payload?: _ @go(Payload,type=any)
+	// assessment-present records whether the requirement was assessed at all.
+	// It is required: it is what makes coverage complete rather than selective.
+	"assessment-present": #CheckOutcome @go(AssessmentPresent)
 
-	// source identifies the artifact or system from which this evidence was collected
-	source?: #EvidenceMapping @go(Source)
+	// plan-bound records whether the assessment ran under the plan the policy
+	// binds to this requirement.
+	"plan-bound"?: #CheckOutcome @go(PlanBound)
 
-	// description explains what this evidence represents
-	description?: string
+	// method-allowed records whether the method that ran is one the plan allows.
+	"method-allowed"?: #CheckOutcome @go(MethodAllowed)
+
+	// executor-matched records whether the executor matched the plan's, compared
+	// by authoritative identifier rather than by internal short name.
+	"executor-matched"?: #CheckOutcome @go(ExecutorMatched)
+
+	// parameters-matched records whether the recorded parameter values are the
+	// ones the plan declares, within their accepted values.
+	"parameters-matched"?: #CheckOutcome @go(ParametersMatched)
+
+	// frequency-met records whether each required method ran within the
+	// requirement's frequency-days.
+	"frequency-met"?: #CheckOutcome @go(FrequencyMet)
+
+	// evidence-present records whether the requirement's assessments carry at
+	// least one evidence entry.
+	"evidence-present"?: #CheckOutcome @go(EvidencePresent)
+
+	// evidence-fresh records whether that evidence was collected within the
+	// plan's valid-for-days.
+	EF="evidence-fresh"?: #CheckOutcome @go(EvidenceFresh)
+
+	// required-methods records one outcome per method the plan requires.
+	"required-methods"?: [...{"method-id": string, outcome: #CheckOutcome}] @go(RequiredMethods)
+
+	// ---- Validation --------------------------------------------------------
+
+	// Each evidence entry carries a payload, a source, or both.
+
+	evidence?: [#_EvidenceStrict, ...#_EvidenceStrict]
+
+	// evidence-fresh only means something once evidence was found. It is read
+	// through the EF alias because a quoted name in a CUE expression is a
+	// string literal, not a field, so testing it directly always succeeds.
+
+	if EF != _|_ {"evidence-present": #CheckOutcome}
 }
-
-// _EvidenceStrict layers the "at least one of payload or source" rule on top of #Evidence
-#_EvidenceStrict: {
-	@go(-)
-} & #Evidence & {
-	payload?: _
-	if payload == _|_ {
-		source: #EvidenceMapping
-	}
-}
-
-// EvidenceType categorizes the kind of evidence. It remains an open enum:
-// recommended values include artifact types already known to Gemara (e.g.
-// EvaluationLog, EnforcementLog) plus categories for common evidence forms.
-#EvidenceType: #ArtifactType | string @go(-)

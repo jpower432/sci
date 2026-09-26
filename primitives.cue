@@ -7,8 +7,8 @@ package gemara
 
 // MappingReference represents a reference to an external document with full metadata.
 #MappingReference: {
-	// id identifies this mapping reference within the artifact and, when url
-	// is absent, the referenced artifact's metadata.id.
+	// id identifies this mapping reference within the artifact; every reference-id
+	// in the artifact MUST equal one of these ids or the artifact's own metadata.id.
 	id: string
 
 	// title describes the purpose of this mapping reference at a glance
@@ -23,7 +23,7 @@ package gemara
 	// url is the path where the artifact may be retrieved; preferably responds with Gemara-compatible YAML/JSON.
 	// Any URI scheme is accepted (e.g. https, file, oci, s3, arn) so evidence can be
 	// addressed wherever it actually lives.
-	url?: =~"^[a-zA-Z][a-zA-Z0-9+.-]*:[^\\s]+$"
+	url?: #URL
 }
 
 // ArtifactMapping represents a mapping to an external artifact or artifact entry
@@ -56,25 +56,22 @@ package gemara
 	remarks?: string
 }
 
-// EvidenceMapping identifies the source from which evidence was collected.
-// reference-id names the MappingReference; coordinate or entry-id gives
-// specificity within it; digest pins the observed content at collection time.
-#EvidenceMapping: {
-	// reference-id ties this evidence to a mapping-reference in the artifact's metadata
-	"reference-id": string @go(ReferenceId)
+// URL validates an absolute URI with any scheme (e.g. https, file, oci, s3).
+#URL: =~"^[a-zA-Z][a-zA-Z0-9+.-]*:[^\\s]+$" @go(-)
 
-	// coordinate is the precise location within the stream identified by reference-id
-	// (e.g. an API path, file path, or JSON path expression). May be combined with
-	// entry-id to identify a sub-location within that entry's output.
-	coordinate?: string
-
-	// entry-id identifies a specific entry within a referenced Gemara artifact.
-	// May be combined with coordinate to identify a sub-location within that entry's output.
-	"entry-id"?: string @go(EntryId)
-
-	// digest is a cryptographic hash of the observed content at collection time; format: algorithm:encoded (e.g. sha256:abc123...)
-	digest?: =~"^[a-z0-9]+(?:[+._-][a-z0-9]+)*:[a-zA-Z0-9=_-]+$"
-
-	// remarks is prose regarding this evidence reference
-	remarks?: string
-}
+// Digest is a cryptographic hash of a full octet stream; format: algorithm:encoded
+// (e.g. sha256:<64 lowercase hex>). sha256 is the MUST-support floor for every
+// conforming verifier; sha512 and blake3 are MAY. Registered algorithms are
+// additionally checked for that algorithm's encoding and length; any other
+// algorithm is checked for grammar only, per the OCI rule that unrecognized
+// algorithms complying with the grammar pass.
+//
+// The hash covers the full octet stream retrieved from download-url exactly
+// as delivered. A verifier reports exactly one of three outcomes per citation
+// — verified, integrity-failure, or unverifiable (no digest, no download-url, retrieval
+// failed, or the algorithm is unregistered/unimplemented).
+// Absence of digest means no integrity claim was made, not that the content is
+// known unchanged.
+#Digest: (=~"^[a-z0-9]+(?:[+._-][a-z0-9]+)*:[a-zA-Z0-9=_-]+$" &
+	(=~"^(?:sha256:[a-f0-9]{64}|sha512:[a-f0-9]{128}|blake3:[a-f0-9]{64})$" |
+	!~"^(?:sha256|sha512|blake3):")) @go(-)

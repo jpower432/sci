@@ -44,3 +44,9 @@ generated/
 cmd/cue2openapi/cue2openapi
 cmd/cmd
 cmd/gemara-docs
+
+# Spec drive development artifacts
+docs/superpowers/
+.superpowers
+
+

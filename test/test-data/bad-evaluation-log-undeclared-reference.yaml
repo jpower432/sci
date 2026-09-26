@@ -13,7 +13,7 @@ metadata:
       title: Open Source Project Security Baseline
       version: "2025.02"
       url: https://baseline.openssf.org/versions/2025-02-25.html
-result: Unknown
+result: Needs Review
 target:
   id: github-repo
   name: GitHub Repository
@@ -21,9 +21,9 @@ target:
 evaluations:
 - name: access control
   control:
-    reference-id: OSPS-B
+    reference-id: NOT-DECLARED-ANYWHERE
     entry-id: OSPS-AC-01
-  result: Unknown
+  result: Needs Review
   message: Assessments did not execute
   assessment-logs:
   # Not Run: no start time is recorded because the procedure never began

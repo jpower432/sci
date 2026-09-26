@@ -83,10 +83,17 @@ func TestSchemaValidation(t *testing.T) {
 		{"valid policy", "./test-data/good-policy.yaml", "#Policy", false, ""},
 		{"valid security policy", "./test-data/good-security-policy.yml", "#Policy", false, ""},
 
+		// Policy — negative (identity of EntryMapping targets)
+		{"policy with duplicate assessment plan ids", "./test-data/bad-policy-duplicate-plan-id.yaml", "#Policy", true, "_uniquePlanIds"},
+		{"policy with method id colliding across sites", "./test-data/bad-policy-duplicate-method-id.yaml", "#Policy", true, "_uniqueMethodIds"},
+		{"policy with duplicate parameter ids", "./test-data/bad-policy-duplicate-parameter-id.yaml", "#Policy", true, "_uniqueParameterIds"},
+
 		// ControlCatalog — negative
 		{"invalid YAML", "./test-data/bad.yaml", "#ControlCatalog", true, ""},
 		{"invalid JSON", "./test-data/bad.json", "#ControlCatalog", true, ""},
 		{"controls without groups", "./test-data/bad-no-groups.yaml", "#ControlCatalog", true, ""},
+		{"control catalog without a version", "./test-data/bad-control-catalog-missing-version.yaml", "#ControlCatalog", true, ""},
+		{"control with duplicate assessment requirement ids", "./test-data/bad-control-catalog-duplicate-requirement-id.yaml", "#ControlCatalog", true, ""},
 
 		// MappingDocument — positive
 		{"valid mapping document", "./test-data/good-mapping-document.yaml", "#MappingDocument", false, ""},
@@ -111,6 +118,10 @@ func TestSchemaValidation(t *testing.T) {
 
 		// EvaluationLog — negative
 		{"executed assessment missing start", "./test-data/bad-evaluation-log-missing-start.yaml", "#EvaluationLog", true, ""},
+		{"evaluation log citing an undeclared reference", "./test-data/bad-evaluation-log-undeclared-reference.yaml", "#EvaluationLog", true, ""},
+		{"evidence with an inline payload and a download-url", "./test-data/bad-evaluation-log-payload-with-download-url.yaml", "#EvaluationLog", true, "inline payload cannot also have a source download-url"},
+		{"log evaluating the same control twice", "./test-data/bad-evaluation-log-duplicate-control.yaml", "#EvaluationLog", true, ""},
+		{"control evaluation assessing the same requirement twice", "./test-data/bad-evaluation-log-duplicate-requirement.yaml", "#EvaluationLog", true, ""},
 
 		// EnforcementLog — positive
 		{"valid enforcement log", "./test-data/good-enforcement-log.yaml", "#EnforcementLog", false, ""},
@@ -119,19 +130,23 @@ func TestSchemaValidation(t *testing.T) {
 		{"enforcement action with invalid disposition", "./test-data/bad-enforcement-log.yaml", "#EnforcementLog", true, ""},
 		{"enforcement action missing log reference", "./test-data/bad-enforcement-missing-log.yaml", "#EnforcementLog", true, ""},
 		{"clear disposition with failed assessment", "./test-data/bad-enforcement-clear-failed.yaml", "#EnforcementLog", true, ""},
+		{"enforcement log with duplicate action ids", "./test-data/bad-enforcement-duplicate-action-id.yaml", "#EnforcementLog", true, ""},
+		{"enforcement log with duplicate finding ids across actions", "./test-data/bad-enforcement-duplicate-finding-id.yaml", "#EnforcementLog", true, ""},
 
 		// AuditLog — positive
 		{"valid audit log", "./test-data/good-audit-log.yaml", "#AuditLog", false, ""},
 		{"audit log evidence mapping with both coordinate and entry-id", "./test-data/good-audit-log-coordinate-and-entry-id.yaml", "#AuditLog", false, ""},
 
 		// AuditLog — negative
-		{"audit log missing summary criteria and results", "./test-data/bad-audit-log.yaml", "#AuditLog", true, ""},
-		{"audit log evidence source with invalid digest format", "./test-data/bad-audit-log-invalid-digest.yaml", "#AuditLog", true, ""},
-		{"audit result referencing undeclared criteria", "./test-data/bad-audit-log-undeclared-criteria.yaml", "#AuditLog", true, ""},
-		{"audit log evidence with neither payload nor source", "./test-data/bad-audit-log-evidence-neither.yaml", "#AuditLog", true, ""},
-		{"audit log mapping reference url with no scheme", "./test-data/bad-audit-log-url-no-scheme.yaml", "#AuditLog", true, ""},
-		{"audit log mapping reference url with a non-alphabetic scheme", "./test-data/bad-audit-log-url-invalid-scheme.yaml", "#AuditLog", true, ""},
-		{"audit log target uri with no scheme", "./test-data/bad-audit-log-uri-no-scheme.yaml", "#AuditLog", true, ""},
+		{"audit log missing summary policy coverage and results", "./test-data/bad-audit-log.yaml", "#AuditLog", true, ""},
+		{"audit log evidence source with invalid digest format", "./test-data/bad-audit-log-invalid-digest.yaml", "#AuditLog", true, "digest"},
+		{"audit citing an undeclared policy", "./test-data/bad-audit-log-undeclared-policy.yaml", "#AuditLog", true, "_refValidation"},
+		{"audit result citing a coverage entry that does not exist", "./test-data/bad-audit-log-dangling-check-id.yaml", "#AuditLog", true, "_checkValidation"},
+		{"coverage with evidence-fresh but no evidence-present", "./test-data/bad-audit-log-fresh-without-present.yaml", "#AuditLog", true, "evidence-present"},
+		{"audit log evidence with neither payload nor source", "./test-data/bad-audit-log-evidence-neither.yaml", "#AuditLog", true, "evidence.0.source"},
+		{"audit log target uri with no scheme", "./test-data/bad-audit-log-uri-no-scheme.yaml", "#AuditLog", true, "target.uri"},
+		{"audit log mapping reference url with a non-alphabetic scheme", "./test-data/bad-audit-log-url-invalid-scheme.yaml", "#AuditLog", true, ".url: invalid value"},
+		{"audit log mapping reference url with no scheme", "./test-data/bad-audit-log-url-no-scheme.yaml", "#AuditLog", true, ".url: invalid value"},
 
 		// CapabilityCatalog — negative
 		{"capability with invalid group", "./test-data/bad-capability-invalid-group.yaml", "#CapabilityCatalog", true, ""},

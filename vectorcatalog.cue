@@ -18,6 +18,10 @@ import "list"
 	// vectors is a list of attack vectors documented in this catalog
 	vectors?: [#Vector, ...#Vector] @go(Vectors)
 
+	// ---- Validation --------------------------------------------------------
+	// Comments in validation sections stay detached (blank line after), so they
+	// are never published as a field's API description.
+
 	if vectors != _|_ {
 		_uniqueVectorIds: {for i, v in vectors {(v.id): i}}
 		groups: [#Group, ...#Group]
