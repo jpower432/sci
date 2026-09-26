@@ -110,7 +110,7 @@ import "list"
 
 	// retired guidelines must not have recommendations
 	if state == "Retired" {
-		recommendations?: _|_
+		recommendations?: error("a retired guideline recommends nothing: retire the recommendations with it, or leave the guideline in its prior state")
 	}
 }
 

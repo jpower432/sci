@@ -32,12 +32,27 @@ import "list"
 		_uniqueGroupIds: {for i, g in groups {(g.id): i}}
 	}
 
+	// A catalog that extends or imports declares the references it names, and each
+	// reference-id names one of them: the same rule every log applies to its own
+	// pointers, which a catalog had only half of — it required the declarations to
+	// exist without checking that anything matched.
+
+	_catalogRefIds: list.Concat([[metadata.id], [for r in metadata."mapping-references" {r.id}]])
+
 	if extends != _|_ {
 		metadata: "mapping-references": [#MappingReference, ...#MappingReference]
+
+		for i, e in extends {
+			_refValidation: "extends-\(i)": _catalogRefIds & list.Contains(e."reference-id")
+		}
 	}
 
 	if imports != _|_ {
 		metadata: "mapping-references": [#MappingReference, ...#MappingReference]
+
+		for i, m in imports {
+			_refValidation: "imports-\(i)": _catalogRefIds & list.Contains(m."reference-id")
+		}
 	}
 }
 

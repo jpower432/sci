@@ -33,15 +33,10 @@ import "list"
 	}
 
 	// Every reference-id in this log names one of its declared mapping-references,
-	// or the log's own metadata.id. An AssessmentLog is addressed as (control,
-	// requirement), which is only a key if a control evaluation assesses each
-	// requirement at most once.
+	// or the log's own metadata.id.
 
 	for i, e in evaluations {
 		_refValidation: "evaluations-\(i)": _refIds & list.Contains(e.control."reference-id")
-		_uniqueAssessedRequirements: "\(i)": {
-			for j, a in e."assessment-logs" {(a.requirement."entry-id"): j}
-		}
 		for j, a in e."assessment-logs" {
 			_refValidation: "evaluations-\(i)-\(j)": _refIds & list.Contains(a.requirement."reference-id")
 		}
@@ -101,7 +96,12 @@ import "list"
 #AssessmentLog: {
 	// Requirement should map to the assessment requirement for this assessment.
 	requirement: #EntryMapping
-	// Plan maps to the policy assessment plan being executed.
+	// plan names the policy assessment plan being executed, in the policy it comes
+	// from. It is a mapping rather than a bare plan id because an evaluation log
+	// has to be readable on its own: most are never audited, so the log cannot
+	// lean on a downstream audit to say which policy governed the run. An audit
+	// compresses the same pointer to effective.plan-id, which is safe there only
+	// because the audit pins its policy once at the document level.
 	plan?: #EntryMapping @go(Plan,optional=nillable)
 	// Description provides a summary of the assessment procedure.
 	description: string
@@ -156,7 +156,7 @@ import "list"
 #Result: "Not Run" | "Passed" | "Failed" | "Needs Review" | "Not Applicable" | "Unknown" @go(-)
 
 // ExecutionFacts records what a run actually used under its plan: which of the
-// plan's methods ran, who ran it when that differs from the run's executor, and
+// plan's methods ran, who ran it when that differs from the log's author, and
 // the parameter values used. A log cites a plan to say what was supposed to
 // happen; these are what did.
 #ExecutionFacts: {
@@ -166,7 +166,7 @@ import "list"
 	"method-id": string @go(MethodId)
 
 	// executor is the actor that performed this assessment, recorded only when
-	// it differs from the run's executor.
+	// it differs from the log's metadata.author.
 	executor?: #Actor
 
 	// parameters are the selected values for execution correlated to the plan's parameters

@@ -34,12 +34,8 @@ actions:
     steps:
       - github.com/gemaraproj/gemara/enforcement/gate.BlockMerge
     justification:
-      assessments:
+      findings:
         - id: FIND-01
-          result: Failed
           requirement:
             reference-id: security-policy
             entry-id: OSPS-DO-01.01
-          plan:
-            reference-id: security-policy
-            entry-id: AP-DO-01

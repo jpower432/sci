@@ -57,6 +57,26 @@ import "list"
 	// Plan ids are unique: AssessmentLog.plan and AssessmentFinding.plan
 	// address a plan by this id.
 
+	// A policy binds one plan per requirement: two plans governing the same
+	// requirement would leave an evaluation with no way to choose, and the audit's
+	// effective.plan-id with nothing single to name.
+
+	if adherence."assessment-plans" != _|_ {
+		_uniquePlanRequirements: {
+			for i, p in adherence."assessment-plans" {
+				"\(p.requirement."reference-id")/\(p.requirement."entry-id")": i
+			}
+		}
+	}
+
+	// Each plan's requirement names a catalog this policy declares.
+
+	if adherence."assessment-plans" != _|_ {
+		for i, p in adherence."assessment-plans" {
+			_refValidation: "assessment-plans-\(i)-requirement": _refIds & list.Contains(p.requirement."reference-id")
+		}
+	}
+
 	if adherence."assessment-plans" != _|_ {
 		_uniquePlanIds: {for i, p in adherence."assessment-plans" {(p.id): i}}
 	}
@@ -107,14 +127,21 @@ import "list"
 	guidance?: [#GuidanceImport, ...#GuidanceImport]
 }
 
-// ImplementationPlan defines when and how the policy becomes active.
+// ImplementationPlan defines when and how the policy becomes active. Its timelines
+// are communicated rather than enforced: no log references them, and no rule here
+// compares a log's timestamps against them. They carry interpretation a later reader
+// cannot reconstruct — that enforcement was not yet due rather than skipped, and
+// whether an audit's conformance statement falls inside the window the policy was
+// actually in effect. Comparing a log or an audit period against them belongs to a
+// tool, which has both documents in hand.
 #ImplementationPlan: {
 	"notification-process"?: string                 @go(NotificationProcess)
 	"evaluation-timeline":   #ImplementationDetails @go(EvaluationTimeline)
 	"enforcement-timeline":  #ImplementationDetails @go(EnforcementTimeline)
 }
 
-// ImplementationDetails specifies the timeline for policy implementation.
+// ImplementationDetails specifies one timeline for policy implementation: when it
+// starts, when it ends if it does, and what a reader should know about it.
 #ImplementationDetails: {
 	start: #Datetime
 	end?:  #Datetime

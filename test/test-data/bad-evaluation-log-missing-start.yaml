@@ -8,6 +8,10 @@ metadata:
     id: pvtr
     name: PVTR
     type: Software
+  mapping-references:
+  - id: OSPS-B
+    title: Open Source Project Security Baseline
+    version: "2025.1"
 result: Passed
 target:
   id: github-repo

@@ -67,7 +67,10 @@ components:
         justification:
           allOf:
           - $ref: "#/components/schemas/Justification"
-          description: justification links the action to its assessment findings and any applicable exceptions
+          description: |-
+            justification links the action to the findings that prompted it and any
+            applicable exceptions. A Clear action has nothing to justify, so it is
+            absent there and required everywhere else.
         message:
           description: message provides additional context about the action
           type: string
@@ -91,7 +94,6 @@ components:
       - method
       - start
       - steps
-      - justification
       type: object
       x-status: experimental
     Actor:
@@ -172,34 +174,6 @@ components:
       - AuditLog
       type: string
       x-status: stable
-    AssessmentFinding:
-      description: AssessmentFinding maps an enforcement action to its originating assessment data across Layer 2, Layer 3, and Layer 5.
-      properties:
-        id:
-          description: id allows this entry to be referenced by other elements
-          type: string
-        log:
-          allOf:
-          - $ref: "#/components/schemas/EntryMapping"
-          description: log maps to the EvaluationLog entry containing the finding
-        plan:
-          allOf:
-          - $ref: "#/components/schemas/EntryMapping"
-          description: plan maps to the Policy assessment plan that was executed
-        requirement:
-          allOf:
-          - $ref: "#/components/schemas/EntryMapping"
-          description: requirement maps to the Layer 2 assessment requirement that was evaluated
-        result:
-          allOf:
-          - $ref: "#/components/schemas/Result"
-          description: result is the assessment outcome that triggered the enforcement action
-      required:
-      - id
-      - result
-      - log
-      type: object
-      x-status: experimental
     AssessmentLog:
       description: AssessmentLog contains the results of executing a single assessment procedure for a control requirement.
       properties:
@@ -240,7 +214,7 @@ components:
         plan:
           allOf:
           - $ref: "#/components/schemas/EntryMapping"
-          description: Plan maps to the policy assessment plan being executed.
+          description: "plan names the policy assessment plan being executed, in the policy it comes\nfrom. It is a mapping rather than a bare plan id because an evaluation log\nhas to be readable on its own: most are never audited, so the log cannot\nlean on a downstream audit to say which policy governed the run. An audit\ncompresses the same pointer to effective.plan-id, which is safe there only\nbecause the audit pins its policy once at the document level."
         recommendation:
           description: Recommendation provides guidance on how to address a failed assessment.
           type: string
@@ -396,19 +370,15 @@ components:
       - required:
         - metadata
         - summary
+        - opinion
         - policy
-        - coverage
-        - results
+        - verifications
       description: AuditLog records results from an audit performed against a target resource
       properties:
-        coverage:
-          description: |-
-            coverage records, for every requirement the evaluation resolved, what
-            this audit checked and how it came out. It is complete by construction:
-            one entry per effective requirement, including the boring passes.
+        findings:
+          description: "findings are what this audit reports: the called-out determinations, each\nnaming the requirement or the risk it concerns. verifications is the\nsystematic view, one entry per requirement; this is the selective one, and\nthe only one that reasons. It is absent when the audit had nothing to call\nout, which is what a Passed opinion looks like."
           items:
-            $ref: "#/components/schemas/RequirementCoverage"
-          minItems: 1
+            $ref: "#/components/schemas/ComplianceFinding"
           type: array
         metadata:
           description: metadata provides detailed data about this log
@@ -420,6 +390,14 @@ components:
           required:
           - type
           type: object
+        opinion:
+          allOf:
+          - $ref: "#/components/schemas/Opinion"
+          description: |-
+            opinion is that same conclusion in one word, so a consumer of the
+            attestation need not weigh the findings itself. summary carries the prose;
+            this is the machine-readable one. Anything other than Passed is expected to
+            be explained by findings, documented rather than enforced.
         owner:
           allOf:
           - $ref: "#/components/schemas/RACI"
@@ -431,56 +409,15 @@ components:
             policy is the single policy this audit was conducted against, at its
             pinned version. Auditing a baseline means authoring a policy that
             imports it.
-        results:
-          description: results are the auditor's opinions, which are selective by nature.
-          items:
-            $ref: "#/components/schemas/AuditResult"
-          minItems: 1
-          type: array
-        risk-tolerance-met:
-          allOf:
-          - $ref: "#/components/schemas/CheckOutcome"
-          description: |-
-            risk-tolerance-met records the policy-level tolerance check, which is not
-            per-requirement.
         summary:
           description: summary provides the high-level conclusion
           type: string
-      type: object
-      x-status: experimental
-    AuditResult:
-      description: AuditResult records a single result with supporting evidence and recommendations.
-      properties:
-        check-id:
-          description: |-
-            check-id names the coverage entry whose check prompted this result, when
-            one did. A result about the audit as a whole omits it rather than
-            inventing a check to point at.
-          type: string
-        description:
-          description: description explains the result in detail
-          type: string
-        id:
-          description: id uniquely identifies this result
-          type: string
-        recommendations:
-          description: recommendations records corrective actions for this result
+        verifications:
+          description: "verifications records, for every requirement, what was mechanically checked\nand how it came out. It is complete by construction — one entry per\nrequirement, including the boring passes — and carries no reasoning: it is\nthe audit's counterpart of #ControlEvaluation, not of #ComplianceFinding."
           items:
-            $ref: "#/components/schemas/Recommendation"
+            $ref: "#/components/schemas/VerificationLog"
           minItems: 1
           type: array
-        title:
-          description: title describes this result at a glance
-          type: string
-        type:
-          allOf:
-          - $ref: "#/components/schemas/ResultType"
-          description: type classifies the nature of this result
-      required:
-      - id
-      - title
-      - type
-      - description
       type: object
       x-status: experimental
     Capability:
@@ -585,35 +522,36 @@ components:
       - reference-id
       type: object
       x-status: experimental
-    CheckOutcome:
-      description: CheckOutcome is the result of one audit check.
+    ComplianceFinding:
+      allOf:
+      - $ref: "#/components/schemas/Finding"
+      - required:
+        - status
+        - id
+      description: "ComplianceFinding is what an audit reports in its own right: a finding carrying\nthe audit's compliance determination. It is the only record in Gemara that\ndecides compliance, and the audit's counterpart of #ActionResult — the record\ntype this log carries a list of."
       properties:
-        message:
+        id:
+          description: "id uniquely identifies this finding within the audit. It is declared here\nrather than in the #Finding core because a finding reported against a named\ncheck needs no id of its own, while this one is reported in its own right."
           type: string
-        outcome:
-          enum:
-          - Pass
-          - Fail
-          - Not Applicable
-          - Undetermined
-          type: string
-      required:
-      - outcome
+        risk:
+          allOf:
+          - $ref: "#/components/schemas/EntryMapping"
+          description: "risk names the risk this finding concerns, when it concerns one: a residual\nrisk beyond its category's tolerance, for example. A finding names a risk or\na requirement — the requirement comes from the #Finding core."
+        status:
+          allOf:
+          - $ref: "#/components/schemas/ComplianceStatus"
+          description: "status is the audit's compliance determination for what this finding\nconcerns. Only the audit decides whether a requirement is satisfied: an\nevaluation says whether its procedure passed, an enforcement action says\nwhat it did. It carries OCSF's compliance.status."
       type: object
       x-status: experimental
-    CollectionMethod:
-      anyOf:
-      - enum:
-        - EXAMINE
-        - INTERVIEW
-        - TEST
-        - UNKNOWN
-      - {}
-      description: |-
-        CollectionMethod records how evidence was obtained. Values mirror OSCAL's
-        assessment methods.
+    ComplianceStatus:
+      description: "ComplianceStatus is whether the target complies with one requirement. It is the\naudit's conclusion, which an auditor may reach differently from what the\nassessment observed, and it is what projects to OCSF's compliance.status.\nCompliance is stated one requirement at a time: there is no \"compliant with\nexceptions\" here, because weighing exceptions is a judgement about the target as\na whole, which belongs to #Opinion."
+      enum:
+      - Compliant
+      - Not Compliant
+      - Not Applicable
+      - Undetermined
       type: string
-      x-status: stable
+      x-status: experimental
     ConfidenceLevel:
       description: ConfidenceLevel indicates the evaluator's confidence level in an assessment result.
       enum:
@@ -785,6 +723,15 @@ components:
       format: date-time
       type: string
       x-status: stable
+    Determination:
+      description: "Determination is what a named check in a verification found: whether the\ncondition the check names holds. It is deliberately not #Result's vocabulary —\n#Result says whether an assessment procedure passed when it ran — and\ndeliberately not #ComplianceStatus: a check asserts a condition, while\ncompliance is what an audit concludes from the checks and the evidence\ntogether. Undetermined is the word #Disposition already uses for \"could not be\ntold\"."
+      enum:
+      - Satisfied
+      - Not Satisfied
+      - Not Applicable
+      - Undetermined
+      type: string
+      x-status: experimental
     Digest:
       description: "Digest is a cryptographic hash of a full octet stream; format: algorithm:encoded\n(e.g. sha256:<64 lowercase hex>). sha256 is the MUST-support floor for every\nconforming verifier; sha512 and blake3 are MAY. Registered algorithms are\nadditionally checked for that algorithm's encoding and length; any other\nalgorithm is checked for grammar only, per the OCI rule that unrecognized\nalgorithms complying with the grammar pass.\n\nThe hash covers the full octet stream retrieved from download-url exactly\nas delivered. A verifier reports exactly one of three outcomes per citation\n— verified, integrity-failure, or unverifiable (no digest, no download-url, retrieval\nfailed, or the algorithm is unregistered/unimplemented).\nAbsence of digest means no integrity claim was made, not that the content is\nknown unchanged."
       oneOf:
@@ -832,13 +779,45 @@ components:
       type: object
       x-status: experimental
     Disposition:
-      description: Disposition enumerates the possible enforcement outcomes.
+      description: "Disposition is what an enforcement gate did. It rolls up from an action to the\nlog by the precedence Enforced > Tolerated > Undetermined > Clear: a log where\nanything was enforced is Enforced, and Clear only survives when every action\nwas. The strongest action dominates because a disposition records what the\nenforcement layer did; how much that should worry anyone is the audit's\nquestion, answered there by determinations, severities and lifecycles.\n\nA disposition is not a finding's lifecycle. Blocking a merge is Enforced while\nthe finding it blocked stays Open, since the gate prevented harm without fixing\nanything; a remediation is also Enforced and does leave its finding Resolved.\nThe one correspondence that always holds: a Tolerated action's findings are\nWaived, because accepting something without action is what waiving it means."
       enum:
       - Undetermined
       - Enforced
       - Tolerated
       - Clear
       type: string
+      x-status: experimental
+    EffectiveRequirement:
+      description: "EffectiveRequirement is what a policy required of one requirement, as resolved\nat audit time: the text as it applied, the applicability that selected it, the\nconstraints the policy attached, and the plan bound to it. It is copied into\nthe audit on purpose. An audit is a point-in-time attestation, and a pointer\nalone stops saying what was audited once the catalog moves, retires the\nrequirement, or the policy's constraints change."
+      properties:
+        applicability:
+          description: applicability names the groups under which this requirement was selected.
+          items:
+            type: string
+          minItems: 1
+          type: array
+        constraints:
+          description: constraints are the prescriptive additions the policy attached to it.
+          items:
+            properties:
+              id:
+                type: string
+              text:
+                type: string
+            required:
+            - id
+            - text
+            type: object
+          type: array
+        plan-id:
+          description: plan-id names the assessment plan bound to this requirement.
+          type: string
+        text:
+          description: text is the requirement as it applied, after the policy's constraints.
+          type: string
+      required:
+      - text
+      type: object
       x-status: experimental
     Email:
       description: Email represents a validated email address pattern
@@ -860,13 +839,15 @@ components:
             
             (Enforced by the CUE schema; not by this OpenAPI projection.)
           items:
-            $ref: "#/components/schemas/ActionResult"
+            allOf:
+            - $ref: "#/components/schemas/ActionResult"
+            type: object
           minItems: 1
           type: array
         disposition:
           allOf:
           - $ref: "#/components/schemas/Disposition"
-          description: disposition is the aggregate enforcement disposition across all actions in this log
+          description: "disposition is the aggregate across this log's actions, by the precedence\ndocumented on #Disposition."
         metadata:
           description: metadata provides detailed data about this log
           properties:
@@ -906,12 +887,9 @@ components:
           - $ref: "#/components/schemas/EntityType"
           description: type specifies the type of entity interacting in the workflow
         uri:
-          description: |-
-            uri is a general URI for the entity information.
-            Any URI scheme is accepted (e.g. https, file, oci, s3, arn) so entities
-            hosted outside http(s) can be referenced.
-          pattern: "^[a-zA-Z][a-zA-Z0-9+.-]*:[^\\s]+$"
-          type: string
+          allOf:
+          - $ref: "#/components/schemas/URL"
+          description: "uri is a general URI for the entity information. Any URI scheme is accepted\n(e.g. https, file, oci, s3, arn) so entities hosted outside http(s) can be\nreferenced. It is the named #URL type rather than a second copy of the same\npattern, so the two cannot drift apart."
         version:
           description: version is the version of the entity (for tools; if applicable)
           type: string
@@ -1006,17 +984,18 @@ components:
         collector:
           allOf:
           - $ref: "#/components/schemas/Actor"
-          description: collector is the party that gathered it into this log.
+          description: |-
+            collector is the party that gathered this evidence into the log, recorded
+            only when it differs from the log's metadata.author. Third-party evidence
+            has a real distinction to draw — a scanner produced it, an auditor pulled it
+            in — but where the log's author gathered it, saying so again would be a
+            second copy of the same fact.
         description:
           description: description explains what this evidence represents
           type: string
         id:
           description: id uniquely identifies this evidence
           type: string
-        method:
-          allOf:
-          - $ref: "#/components/schemas/CollectionMethod"
-          description: method describes how the evidence was collected.
         originator:
           allOf:
           - $ref: "#/components/schemas/Actor"
@@ -1124,14 +1103,14 @@ components:
       type: string
       x-status: stable
     ExecutionFacts:
-      description: "ExecutionFacts records what a run actually used under its plan: which of the\nplan's methods ran, who ran it when that differs from the run's executor, and\nthe parameter values used. A log cites a plan to say what was supposed to\nhappen; these are what did."
+      description: "ExecutionFacts records what a run actually used under its plan: which of the\nplan's methods ran, who ran it when that differs from the log's author, and\nthe parameter values used. A log cites a plan to say what was supposed to\nhappen; these are what did."
       properties:
         executor:
           allOf:
           - $ref: "#/components/schemas/Actor"
           description: |-
             executor is the actor that performed this assessment, recorded only when
-            it differs from the run's executor.
+            it differs from the log's metadata.author.
         method-id:
           description: |-
             method-id names the accepted method from the cited plan that this
@@ -1165,6 +1144,50 @@ components:
       - description
       - reason
       type: object
+      x-status: experimental
+    Finding:
+      description: "Finding records something an evaluation, an enforcement action or an audit\nfound, together with what became of it. A finding is not inherently negative —\nISO 19011 defines an audit finding as the result of evaluating collected\nevidence against the audit criteria, indicating conformity as readily as\nnonconformity —\nand it is not a compliance determination: whether a requirement is satisfied is\ndecided at the audit, which layers that determination on top of this (see\n#ComplianceFinding). Here a finding carries its lifecycle and its materiality.\n\nThe shape is the one OCSF's Compliance Finding expects, so a finding projects\nwithout rearranging: lifecycle carries status_id, description and severity\ncarry finding_info.desc and severity_id, and recommendations carry remediation.\ncompliance.status comes from the audit's determination, not from here.\nThere is no id here: a finding reported against a named check is identified by\nthat check, and a finding that is referenced declares its own id where it lives.\nfinding_info.title has no field here on purpose — title is catalog vocabulary\nin Gemara, naming a defined entry, and no other log record carries one. A\ntranslation takes the title from the requirement the finding concerns."
+      properties:
+        description:
+          description: "description explains what was found. It is optional because a routine\nconclusion needs no prose: a requirement recorded Compliant says enough by\nsaying so. An override, or anything a reader would question, explains itself."
+          type: string
+        id:
+          description: |-
+            id identifies this finding where something references it. A finding
+            reported against a named check needs none, so it is optional here and
+            required where it is addressed.
+          type: string
+        lifecycle:
+          allOf:
+          - $ref: "#/components/schemas/FindingLifecycle"
+          description: "lifecycle is what became of this finding: still outstanding, dealt with, or\nwaived because a subject that cannot conform was granted an exception. It\nis deliberately not #Disposition, which says what an enforcement gate did."
+        log:
+          allOf:
+          - $ref: "#/components/schemas/EntryMapping"
+          description: "log names the evaluation log entry this finding came from, when it came\nfrom one rather than from an auditor reading evidence directly. There is no\nplan field beside it: the entry it points at names its own plan, and a second\ncopy here could only disagree with it."
+        recommendations:
+          description: recommendations record the corrective actions for this finding.
+          items:
+            $ref: "#/components/schemas/Recommendation"
+          minItems: 1
+          type: array
+        requirement:
+          allOf:
+          - $ref: "#/components/schemas/EntryMapping"
+          description: requirement names the assessment requirement this finding concerns.
+        severity:
+          allOf:
+          - $ref: "#/components/schemas/Severity"
+          description: "severity states how material the finding is, on the same scale the risk\ncatalog uses. It is optional here because not every finding rates one: an\naudit finding that records conformity has no materiality to state. It is\nrequired where a finding is negative by construction — anything an audit\ndetermines Not Compliant, and every finding in an enforcement\njustification."
+      type: object
+      x-status: experimental
+    FindingLifecycle:
+      description: "FindingLifecycle is what became of a finding. Open is outstanding, Resolved\nwas dealt with, and Waived means a subject that cannot conform was granted an\nexception, so the finding stands and enforcement stands down. It maps to OCSF's\nfinding status_id.\n\nIt is independent of #Disposition, which says what an enforcement gate did: a\nblocked merge is Enforced with its finding still Open. The exception is that a\nTolerated action's findings are Waived. Both relationships are documented rather\nthan enforced, as #Result's roll-up precedence is."
+      enum:
+      - Open
+      - Resolved
+      - Waived
+      type: string
       x-status: experimental
     Group:
       description: Group represents a classification or grouping that can be used in different contexts with semantic meaning derived from its usage
@@ -1331,7 +1354,7 @@ components:
       type: object
       x-status: experimental
     ImplementationDetails:
-      description: ImplementationDetails specifies the timeline for policy implementation.
+      description: "ImplementationDetails specifies one timeline for policy implementation: when it\nstarts, when it ends if it does, and what a reader should know about it."
       properties:
         end:
           $ref: "#/components/schemas/Datetime"
@@ -1345,7 +1368,7 @@ components:
       type: object
       x-status: experimental
     ImplementationPlan:
-      description: ImplementationPlan defines when and how the policy becomes active.
+      description: "ImplementationPlan defines when and how the policy becomes active. Its timelines\nare communicated rather than enforced: no log references them, and no rule here\ncompares a log's timestamps against them. They carry interpretation a later reader\ncannot reconstruct — that enforcement was not yet due rather than skipped, and\nwhether an audit's conformance statement falls inside the window the policy was\nactually in effect. Comparing a log or an audit period against them belongs to a\ntool, which has both documents in hand."
       properties:
         enforcement-timeline:
           $ref: "#/components/schemas/ImplementationDetails"
@@ -1381,20 +1404,35 @@ components:
     Justification:
       description: Justification provides the assessment data and exception references that justify an enforcement action.
       properties:
-        assessments:
-          description: assessments links the action to one or more Assessment Findings
-          items:
-            $ref: "#/components/schemas/AssessmentFinding"
-          minItems: 1
-          type: array
         exceptions:
-          description: exceptions references approved Policy exceptions that authorize the action
+          description: |-
+            exceptions references the approved exceptions that authorise this action:
+            a subject that cannot conform has been granted one, so evaluation still
+            fails and enforcement stands down. Gemara does not model an exception, so
+            these name external artifacts through the log's mapping-references.
           items:
             $ref: "#/components/schemas/ArtifactMapping"
           minItems: 1
           type: array
-      required:
-      - assessments
+        findings:
+          description: "findings links the action to the findings that justify it. Each carries an\nid, so an action or a later log can reference one unambiguously; a log\nreference, because an enforcement action reacts to an evaluation, so the\nfinding it acts on came from one; and a severity, because a finding a gate\nacted on is negative by nature. Unlike an audit finding, which may record\nconformity as readily as nonconformity, there is nothing to enforce against\ngood news, and a waived Critical is not a waived Low. This is the grading of\nnonconformities that certification bodies work to under ISO/IEC 17021-1,\nwhich #Severity carries."
+          items:
+            allOf:
+            - $ref: "#/components/schemas/Finding"
+            - required:
+              - id
+              - log
+              - severity
+            properties:
+              id:
+                type: string
+              log:
+                $ref: "#/components/schemas/EntryMapping"
+              severity:
+                $ref: "#/components/schemas/Severity"
+            type: object
+          minItems: 1
+          type: array
       type: object
       x-status: experimental
     Lexicon:
@@ -1698,6 +1736,49 @@ components:
       - Gate
       type: string
       x-status: experimental
+    MethodVerification:
+      description: MethodVerification records how one evaluation method fared against its plan.
+      properties:
+        allowed:
+          allOf:
+          - $ref: "#/components/schemas/Determination"
+          description: "allowed records whether the plan permits this method. It is required: a\nmethod entry can always answer it, and an entry that names a method without\nsaying whether the plan accepts it has verified nothing."
+        cadence-met:
+          allOf:
+          - $ref: "#/components/schemas/Determination"
+          description: |-
+            cadence-met records whether this method ran within the requirement's
+            frequency-days. It is required because every plan states a frequency, so
+            there is always a cadence to have met; a method that ran without the plan
+            allowing it has none to meet, which is Not Applicable. It is recorded per
+            method rather than per requirement so that a lagging method is named; the
+            requirement's answer is the outcome above.
+        executor-matched:
+          allOf:
+          - $ref: "#/components/schemas/Determination"
+          description: |-
+            executor-matched records whether the executor matched the plan's, compared
+            by authoritative identifier rather than by internal short name.
+        method-id:
+          description: method-id names the accepted method this entry reports on.
+          type: string
+        parameters-matched:
+          allOf:
+          - $ref: "#/components/schemas/Determination"
+          description: |-
+            parameters-matched records whether the recorded parameter values are the
+            ones the plan declares, within their accepted values.
+        used:
+          allOf:
+          - $ref: "#/components/schemas/Determination"
+          description: "used records whether this method was actually used. It is required for the\nsame reason as allowed: whether a method ran is always answerable, and a\nrequired method that did not run is the failure this list exists to surface."
+      required:
+      - method-id
+      - allowed
+      - used
+      - cadence-met
+      type: object
+      x-status: experimental
     MitigatedRisk:
       description: MitigatedRisk represents a risk addressed by the policy
       properties:
@@ -1744,6 +1825,15 @@ components:
           type: array
       type: object
       x-status: stable
+    Opinion:
+      description: "Opinion is the audit's conclusion about the target as a whole: ISO 19011's audit\nconclusion, reached after weighing all of the findings against what the audit set\nout to establish. It carries the\naudit profession's four opinions: unqualified (Passed), qualified (Passed with\nConditions), adverse (Failed), and a disclaimer of opinion (Undetermined), when\nthe auditor could not obtain enough to conclude. It borrows #Result's tense\nbecause it answers the same shape of question at the scale of a whole audit.\n\nIt is a judgement, not a roll-up of verifications: whether requirements that\nwere not met are material enough to sink the audit is the auditor's call, and no\nprecedence over per-requirement outcomes can compute it. That is why it is\nstated rather than derived."
+      enum:
+      - Passed
+      - Passed with Conditions
+      - Failed
+      - Undetermined
+      type: string
+      x-status: experimental
     Parameter:
       description: Parameter defines a configurable parameter for assessment or enforcement activities.
       properties:
@@ -1776,6 +1866,26 @@ components:
       - value
       type: object
       x-status: stable
+    PlanVerification:
+      description: "PlanVerification records whether the plan bound to a requirement was followed.\nMethod-specific checks sit per method, because a plan may require several\nevaluation methods and each produces its own assessment: a single outcome per\nrequirement could not say which method fell short."
+      properties:
+        bound:
+          allOf:
+          - $ref: "#/components/schemas/Determination"
+          description: |-
+            bound records whether the assessment ran under the plan the policy binds to
+            this requirement.
+        methods:
+          description: "methods records one entry per method involved: those the plan requires, and\nany that ran without the plan allowing them. At least one, because a plan\ndeclares at least one accepted method, so a plan verification that\nenumerates none has verified nothing about the methods."
+          items:
+            $ref: "#/components/schemas/MethodVerification"
+          minItems: 1
+          type: array
+      required:
+      - bound
+      - methods
+      type: object
+      x-status: experimental
     Policy:
       description: Policy represents a policy document with metadata, contacts, scope, imports, implementation plan, risks, and adherence requirements.
       properties:
@@ -1916,7 +2026,7 @@ components:
       type: object
       x-status: experimental
     Recommendation:
-      description: Recommendation provides a corrective action for an audit result
+      description: Recommendation provides a corrective action for a finding.
       properties:
         id:
           description: id uniquely identifies this recommendation
@@ -1945,95 +2055,6 @@ components:
       - no-match
       - relates-to
       type: string
-      x-status: experimental
-    RequirementCoverage:
-      description: |-
-        RequirementCoverage records what an audit checked for one requirement. Each
-        check is a named field so that a check never made is visible as a missing
-        field rather than an absent list entry.
-      properties:
-        assessment-present:
-          allOf:
-          - $ref: "#/components/schemas/CheckOutcome"
-          description: "assessment-present records whether the requirement was assessed at all.\nIt is required: it is what makes coverage complete rather than selective."
-        assessments:
-          description: assessments are the assessments this audit read, if any.
-          items:
-            $ref: "#/components/schemas/EvidenceMapping"
-          minItems: 1
-          type: array
-        evidence:
-          description: evidence records the data sources that support this result
-          items:
-            allOf:
-            - $ref: "#/components/schemas/Evidence"
-            type: object
-          minItems: 1
-          type: array
-        evidence-fresh:
-          allOf:
-          - $ref: "#/components/schemas/CheckOutcome"
-          description: |-
-            evidence-fresh records whether that evidence was collected within the
-            plan's valid-for-days.
-        evidence-present:
-          allOf:
-          - $ref: "#/components/schemas/CheckOutcome"
-          description: |-
-            evidence-present records whether the requirement's assessments carry at
-            least one evidence entry.
-        executor-matched:
-          allOf:
-          - $ref: "#/components/schemas/CheckOutcome"
-          description: |-
-            executor-matched records whether the executor matched the plan's, compared
-            by authoritative identifier rather than by internal short name.
-        frequency-met:
-          allOf:
-          - $ref: "#/components/schemas/CheckOutcome"
-          description: |-
-            frequency-met records whether each required method ran within the
-            requirement's frequency-days.
-        id:
-          type: string
-        method-allowed:
-          allOf:
-          - $ref: "#/components/schemas/CheckOutcome"
-          description: method-allowed records whether the method that ran is one the plan allows.
-        parameters-matched:
-          allOf:
-          - $ref: "#/components/schemas/CheckOutcome"
-          description: |-
-            parameters-matched records whether the recorded parameter values are the
-            ones the plan declares, within their accepted values.
-        plan-bound:
-          allOf:
-          - $ref: "#/components/schemas/CheckOutcome"
-          description: |-
-            plan-bound records whether the assessment ran under the plan the policy
-            binds to this requirement.
-        required-methods:
-          description: required-methods records one outcome per method the plan requires.
-          items:
-            properties:
-              method-id:
-                type: string
-              outcome:
-                $ref: "#/components/schemas/CheckOutcome"
-            required:
-            - method-id
-            - outcome
-            type: object
-          type: array
-        requirement:
-          allOf:
-          - $ref: "#/components/schemas/EntryMapping"
-          description: requirement names an entry of the evaluation log's effective-requirements.
-      required:
-      - id
-      - requirement
-      - assessment-present
-      type: object
       x-status: experimental
     Resource:
       allOf:
@@ -2064,15 +2085,6 @@ components:
       - Unknown
       type: string
       x-status: stable
-    ResultType:
-      description: ResultType classifies the nature of an audit result
-      enum:
-      - Gap
-      - Finding
-      - Observation
-      - Strength
-      type: string
-      x-status: experimental
     Risk:
       description: A Risk represents the potential for negative impact resulting from one or more threats.
       properties:
@@ -2377,6 +2389,60 @@ components:
             $ref: "#/components/schemas/Vector"
           minItems: 1
           type: array
+      type: object
+      x-status: experimental
+    VerificationLog:
+      description: "VerificationLog records what an audit mechanically checked for one requirement,\nand how it came out. It is the audit's counterpart of #AssessmentLog: a record\nof a check that ran, carrying an outcome and no reasoning. Each check is a named\nfield so that a check never made is visible as a missing field rather than as an\nabsent list entry."
+      properties:
+        assessments:
+          description: assessments are the assessments this audit read, if any.
+          items:
+            $ref: "#/components/schemas/EvidenceMapping"
+          minItems: 1
+          type: array
+        effective:
+          allOf:
+          - $ref: "#/components/schemas/EffectiveRequirement"
+          description: |-
+            effective is what the policy actually required of it, resolved at audit
+            time, so the record says what was audited without fetching the catalog.
+        evidence:
+          description: evidence records the data sources that support this result
+          items:
+            allOf:
+            - $ref: "#/components/schemas/Evidence"
+            type: object
+          minItems: 1
+          type: array
+        evidence-fresh:
+          allOf:
+          - $ref: "#/components/schemas/Determination"
+          description: "evidence-fresh records whether that evidence is current: collected within\nthe plan's valid-for-days where a plan sets one, and within the auditor's\njudgement where none does."
+        evidence-present:
+          allOf:
+          - $ref: "#/components/schemas/Determination"
+          description: "evidence-present records whether this requirement is backed by evidence at\nall. It is required: it is the question verifications exists to answer, and\nanswering it for every requirement is what makes verifications complete rather\nthan selective."
+        outcome:
+          allOf:
+          - $ref: "#/components/schemas/ComplianceStatus"
+          description: "outcome is whether the target complies with this requirement. It is stated\nrather than left to be recomputed from the checks below or from the\nfindings: giving every requirement an answer is what this layer is for.\nA check that came out Not Satisfied is expected to show here, since a\nrequirement that is unevidenced, stale or unverified against its plan\ncannot be determined Satisfied. An outcome a reader would question is\nexplained by a finding naming this requirement, because nothing recorded\nhere reasons. Both relationships are documented rather than enforced, as\n#Result's roll-up precedence is."
+        plan:
+          allOf:
+          - $ref: "#/components/schemas/PlanVerification"
+          description: |-
+            plan records whether the plan behind this requirement was followed. It is
+            absent when no plan backed the requirement, which is how a verification says
+            the requirement was evidenced without one, and required when effective
+            names a plan-id.
+        requirement:
+          allOf:
+          - $ref: "#/components/schemas/EntryMapping"
+          description: "requirement names the assessment requirement this entry determines, and is\nalso this entry's identity: one entry per requirement, so a finding names\nthe requirement rather than a minted id."
+      required:
+      - outcome
+      - requirement
+      - effective
+      - evidence-present
       type: object
       x-status: experimental
 info:

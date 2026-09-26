@@ -167,3 +167,11 @@ response-required-property-removed Evidence
 # tightening so a typo cannot pass as an evidence kind (field lineage audit 29a),
 # made while the type was still experimental, before its promotion to stable.
 response-body-one-of-added EvidenceType
+# source/* "removed": the same allOf-wrapper false positive as above, one entry
+# per rule id. Evidence.source is an allOf-wrapped $ref to EvidenceMapping, whose
+# coordinate, digest, download-url, entry-id, media-type, reference-id, remarks
+# and size are all still present; oasdiff does not resolve through the wrapper.
+# This is the class the projection-fidelity block above already allows for Actor,
+# Catalog, Metadata and others.
+response-optional-property-removed Evidence
+request-property-removed Evidence

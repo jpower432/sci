@@ -1,9 +1,9 @@
 metadata:
-  id: audit-log-001
+  id: audit-log-unnamed-evidence
   type: AuditLog
   gemara-version: "1.1.0"
   version: "1.0.0"
-  description: "Q1 2026 Gemara Audit"
+  description: "Invalid audit log: evidence-present is Satisfied but no evidence is named"
   author:
     id: lead-auditor
     name: "Jane Auditor"
@@ -70,15 +70,6 @@ verifications:
         - Maturity Level 1
     outcome: Compliant
     evidence-present: Satisfied
-    evidence-fresh: Satisfied
-    evidence:
-      - id: EV-AC-01
-        type: EvaluationLog
-        description: "PVTR evaluation results for access control"
-        collected-at: "2025-08-22T16:00:00Z"
-        source:
-          reference-id: eval-log
-          entry-id: "assessment-ac-01"
 
   - requirement:
       reference-id: OSPS
@@ -115,7 +106,6 @@ verifications:
         source:
           reference-id: eval-log
           entry-id: "assessment-do-01"
-          coordinate: "$.results[0].checks[2]"
           digest: "sha256:c4d5e6f7a8b9012cdef34567890abcdef1234567890abcdef1234567890abc12"
 
   - requirement:

@@ -57,6 +57,7 @@ func TestSchemaValidation(t *testing.T) {
 		{"valid OSPS baseline", "./test-data/good-osps.yml", "#ControlCatalog", false, ""},
 		{"valid lifecycle catalog", "./test-data/good-lifecycle.yaml", "#ControlCatalog", false, ""},
 		{"valid nested control catalog", "./test-data/nested-good-ccc.yaml", "#ControlCatalog", false, ""},
+		{"control catalog extending a declared reference", "./test-data/good-control-catalog-extends.yaml", "#ControlCatalog", false, ""},
 
 		// GuidanceCatalog — positive
 		{"valid AI governance framework", "./test-data/good-aigf.yaml", "#GuidanceCatalog", false, ""},
@@ -77,7 +78,7 @@ func TestSchemaValidation(t *testing.T) {
 		{"valid risk catalog", "./test-data/good-risk-catalog.yaml", "#RiskCatalog", false, ""},
 
 		// RiskCatalog — negative
-		{"risk catalog with duplicate rank", "./test-data/bad-risk-catalog-duplicate-rank.yaml", "#RiskCatalog", true, ""},
+		{"risk catalog with duplicate rank", "./test-data/bad-risk-catalog-duplicate-rank.yaml", "#RiskCatalog", true, "_uniqueRiskRanks"},
 
 		// Policy — positive
 		{"valid policy", "./test-data/good-policy.yaml", "#Policy", false, ""},
@@ -87,78 +88,91 @@ func TestSchemaValidation(t *testing.T) {
 		{"policy with duplicate assessment plan ids", "./test-data/bad-policy-duplicate-plan-id.yaml", "#Policy", true, "_uniquePlanIds"},
 		{"policy with method id colliding across sites", "./test-data/bad-policy-duplicate-method-id.yaml", "#Policy", true, "_uniqueMethodIds"},
 		{"policy with duplicate parameter ids", "./test-data/bad-policy-duplicate-parameter-id.yaml", "#Policy", true, "_uniqueParameterIds"},
+		{"policy binding two plans to one requirement", "./test-data/bad-policy-duplicate-plan-requirement.yaml", "#Policy", true, "_uniquePlanRequirements"},
+		{"policy plan naming an undeclared requirement catalog", "./test-data/bad-policy-plan-undeclared-requirement.yaml", "#Policy", true, "assessment-plans-0-requirement"},
 
 		// ControlCatalog — negative
-		{"invalid YAML", "./test-data/bad.yaml", "#ControlCatalog", true, ""},
-		{"invalid JSON", "./test-data/bad.json", "#ControlCatalog", true, ""},
-		{"controls without groups", "./test-data/bad-no-groups.yaml", "#ControlCatalog", true, ""},
-		{"control catalog without a version", "./test-data/bad-control-catalog-missing-version.yaml", "#ControlCatalog", true, ""},
-		{"control with duplicate assessment requirement ids", "./test-data/bad-control-catalog-duplicate-requirement-id.yaml", "#ControlCatalog", true, ""},
+		{"invalid YAML", "./test-data/bad.yaml", "#ControlCatalog", true, "metadata: conflicting values"},
+		{"invalid JSON", "./test-data/bad.json", "#ControlCatalog", true, "field not allowed"},
+		{"controls without groups", "./test-data/bad-no-groups.yaml", "#ControlCatalog", true, "_groupValidation"},
+		{"control catalog without a version", "./test-data/bad-control-catalog-missing-version.yaml", "#ControlCatalog", true, "metadata.version"},
+		{"control with duplicate assessment requirement ids", "./test-data/bad-control-catalog-duplicate-requirement-id.yaml", "#ControlCatalog", true, "_uniqueRequirementIds"},
+		{"control catalog extending an undeclared reference", "./test-data/bad-control-catalog-undeclared-extends.yaml", "#ControlCatalog", true, "_refValidation"},
 
 		// MappingDocument — positive
 		{"valid mapping document", "./test-data/good-mapping-document.yaml", "#MappingDocument", false, ""},
 		{"valid AIGF NIST 800-53 mapping", "./test-data/good-aigf-nist-mapping.yaml", "#MappingDocument", false, ""},
 
 		// MappingDocument — negative
-		{"invalid mapping document without mapping-references", "./test-data/bad-mapping-document.yaml", "#MappingDocument", true, ""},
-		{"mapping missing targets for non-no-match relationship", "./test-data/bad-mapping-no-target.yaml", "#MappingDocument", true, ""},
+		{"invalid mapping document without mapping-references", "./test-data/bad-mapping-document.yaml", "#MappingDocument", true, "\"mapping-references\".0.id"},
+		{"mapping missing targets for non-no-match relationship", "./test-data/bad-mapping-no-target.yaml", "#MappingDocument", true, "targets.0.\"entry-id\""},
 
 		// Lexicon — positive
 		{"valid lexicon", "./test-data/good-lexicon.yaml", "#Lexicon", false, ""},
 
 		// Lexicon — negative
-		{"lexicon with duplicate term ids", "./test-data/bad-lexicon-duplicate-term-id.yaml", "#Lexicon", true, ""},
+		{"lexicon with duplicate term ids", "./test-data/bad-lexicon-duplicate-term-id.yaml", "#Lexicon", true, "_uniqueTermIds"},
 
 		// GuidanceCatalog — negative
-		{"retired guideline with recommendations", "./test-data/bad-lifecycle.yaml", "#GuidanceCatalog", true, ""},
+		{"retired guideline with recommendations", "./test-data/bad-lifecycle.yaml", "#GuidanceCatalog", true, "a retired guideline recommends nothing"},
 
 		// EvaluationLog — positive
 		{"valid PVTR baseline scan", "./test-data/pvtr-baseline-scan.yaml", "#EvaluationLog", false, ""},
 		{"assessments that never ran omit start", "./test-data/good-evaluation-log-unstarted.yaml", "#EvaluationLog", false, ""},
 
 		// EvaluationLog — negative
-		{"executed assessment missing start", "./test-data/bad-evaluation-log-missing-start.yaml", "#EvaluationLog", true, ""},
-		{"evaluation log citing an undeclared reference", "./test-data/bad-evaluation-log-undeclared-reference.yaml", "#EvaluationLog", true, ""},
+		{"executed assessment missing start", "./test-data/bad-evaluation-log-missing-start.yaml", "#EvaluationLog", true, "\"assessment-logs\".0.start"},
+		{"evaluation log citing an undeclared reference", "./test-data/bad-evaluation-log-undeclared-reference.yaml", "#EvaluationLog", true, "_refValidation"},
 		{"evidence with an inline payload and a download-url", "./test-data/bad-evaluation-log-payload-with-download-url.yaml", "#EvaluationLog", true, "inline payload cannot also have a source download-url"},
-		{"log evaluating the same control twice", "./test-data/bad-evaluation-log-duplicate-control.yaml", "#EvaluationLog", true, ""},
-		{"control evaluation assessing the same requirement twice", "./test-data/bad-evaluation-log-duplicate-requirement.yaml", "#EvaluationLog", true, ""},
+		{"log evaluating the same control twice", "./test-data/bad-evaluation-log-duplicate-control.yaml", "#EvaluationLog", true, "_uniqueEvaluatedControls"},
+		{"control evaluation assessing the same requirement twice", "./test-data/bad-evaluation-log-duplicate-requirement.yaml", "#EvaluationLog", true, "_uniqueAssessments"},
 
 		// EnforcementLog — positive
 		{"valid enforcement log", "./test-data/good-enforcement-log.yaml", "#EnforcementLog", false, ""},
 
 		// EnforcementLog — negative
-		{"enforcement action with invalid disposition", "./test-data/bad-enforcement-log.yaml", "#EnforcementLog", true, ""},
-		{"enforcement action missing log reference", "./test-data/bad-enforcement-missing-log.yaml", "#EnforcementLog", true, ""},
-		{"clear disposition with failed assessment", "./test-data/bad-enforcement-clear-failed.yaml", "#EnforcementLog", true, ""},
-		{"enforcement log with duplicate action ids", "./test-data/bad-enforcement-duplicate-action-id.yaml", "#EnforcementLog", true, ""},
-		{"enforcement log with duplicate finding ids across actions", "./test-data/bad-enforcement-duplicate-finding-id.yaml", "#EnforcementLog", true, ""},
+		{"enforcement action with invalid disposition", "./test-data/bad-enforcement-log.yaml", "#EnforcementLog", true, "disposition"},
+		{"enforcement action missing log reference", "./test-data/bad-enforcement-missing-log.yaml", "#EnforcementLog", true, "log"},
+		{"clear action carrying a justification", "./test-data/bad-enforcement-clear-failed.yaml", "#EnforcementLog", true, "nothing to justify"},
+		{"enforced action whose justification justifies nothing", "./test-data/bad-enforcement-empty-justification.yaml", "#EnforcementLog", true, "justifies itself"},
+		{"enforcement finding the gate never rated", "./test-data/bad-enforcement-finding-missing-severity.yaml", "#EnforcementLog", true, "findings.0.severity"},
+		{"enforcement log with duplicate action ids", "./test-data/bad-enforcement-duplicate-action-id.yaml", "#EnforcementLog", true, "_uniqueActionIds"},
+		{"enforcement log with duplicate finding ids across actions", "./test-data/bad-enforcement-duplicate-finding-id.yaml", "#EnforcementLog", true, "_uniqueFindingIds"},
 
 		// AuditLog — positive
 		{"valid audit log", "./test-data/good-audit-log.yaml", "#AuditLog", false, ""},
 		{"audit log evidence mapping with both coordinate and entry-id", "./test-data/good-audit-log-coordinate-and-entry-id.yaml", "#AuditLog", false, ""},
+		{"audit that passed with nothing to call out", "./test-data/good-audit-log-clean.yaml", "#AuditLog", false, ""},
 
 		// AuditLog — negative
-		{"audit log missing summary policy coverage and results", "./test-data/bad-audit-log.yaml", "#AuditLog", true, ""},
+		{"audit log missing summary policy coverage and results", "./test-data/bad-audit-log.yaml", "#AuditLog", true, "summary: incomplete value"},
 		{"audit log evidence source with invalid digest format", "./test-data/bad-audit-log-invalid-digest.yaml", "#AuditLog", true, "digest"},
 		{"audit citing an undeclared policy", "./test-data/bad-audit-log-undeclared-policy.yaml", "#AuditLog", true, "_refValidation"},
-		{"audit result citing a coverage entry that does not exist", "./test-data/bad-audit-log-dangling-check-id.yaml", "#AuditLog", true, "_checkValidation"},
-		{"coverage with evidence-fresh but no evidence-present", "./test-data/bad-audit-log-fresh-without-present.yaml", "#AuditLog", true, "evidence-present"},
+		{"audit finding naming a requirement with no verification entry", "./test-data/bad-audit-log-finding-unknown-requirement.yaml", "#AuditLog", true, "_requirementValidation"},
+		{"audit finding citing an undeclared risk reference", "./test-data/bad-audit-log-dangling-risk.yaml", "#AuditLog", true, "_refValidation"},
+		{"verification entry without evidence-present", "./test-data/bad-audit-log-verification-missing-evidence-present.yaml", "#AuditLog", true, "evidence-present"},
+		{"not compliant finding stating no severity", "./test-data/bad-audit-log-not-compliant-missing-severity.yaml", "#AuditLog", true, "findings.0.severity"},
+		{"named plan with no record of how it was followed", "./test-data/bad-audit-log-plan-id-without-verification.yaml", "#AuditLog", true, "plan.bound"},
+		{"plan verification naming no plan-id", "./test-data/bad-audit-log-plan-verification-without-plan-id.yaml", "#AuditLog", true, "names the plan it verified against"},
+		{"method entry not saying whether the method was used", "./test-data/bad-audit-log-method-missing-used.yaml", "#AuditLog", true, "methods.0.used"},
+		{"evidence-present satisfied while naming no evidence", "./test-data/bad-audit-log-evidence-present-without-evidence.yaml", "#AuditLog", true, "evidence-present"},
+		{"plan verification enumerating no methods", "./test-data/bad-audit-log-plan-no-methods.yaml", "#AuditLog", true, "plan.methods"},
 		{"audit log evidence with neither payload nor source", "./test-data/bad-audit-log-evidence-neither.yaml", "#AuditLog", true, "evidence.0.source"},
 		{"audit log target uri with no scheme", "./test-data/bad-audit-log-uri-no-scheme.yaml", "#AuditLog", true, "target.uri"},
 		{"audit log mapping reference url with a non-alphabetic scheme", "./test-data/bad-audit-log-url-invalid-scheme.yaml", "#AuditLog", true, ".url: invalid value"},
 		{"audit log mapping reference url with no scheme", "./test-data/bad-audit-log-url-no-scheme.yaml", "#AuditLog", true, ".url: invalid value"},
 
 		// CapabilityCatalog — negative
-		{"capability with invalid group", "./test-data/bad-capability-invalid-group.yaml", "#CapabilityCatalog", true, ""},
+		{"capability with invalid group", "./test-data/bad-capability-invalid-group.yaml", "#CapabilityCatalog", true, "_groupValidation"},
 
 		// ThreatCatalog — negative
-		{"threat with invalid group", "./test-data/bad-threat-invalid-group.yaml", "#ThreatCatalog", true, ""},
+		{"threat with invalid group", "./test-data/bad-threat-invalid-group.yaml", "#ThreatCatalog", true, "_groupValidation"},
 
 		// PrincipleCatalog — negative
-		{"principle with invalid group", "./test-data/bad-principle-invalid-group.yaml", "#PrincipleCatalog", true, ""},
+		{"principle with invalid group", "./test-data/bad-principle-invalid-group.yaml", "#PrincipleCatalog", true, "_groupValidation"},
 
 		// ControlCatalog — negative (group validation)
-		{"control with invalid group", "./test-data/bad-control-invalid-group.yaml", "#ControlCatalog", true, ""},
+		{"control with invalid group", "./test-data/bad-control-invalid-group.yaml", "#ControlCatalog", true, "_groupValidation"},
 
 		// ControlCatalog — edge cases
 		{"empty nested catalog", "./test-data/nested-empty.yaml", "#ControlCatalog", false, ""},

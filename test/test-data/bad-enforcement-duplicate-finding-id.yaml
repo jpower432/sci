@@ -29,9 +29,8 @@ actions:
     steps:
       - github.com/gemaraproj/gemara/enforcement/gate.BlockMerge
     justification:
-      assessments:
+      findings:
         - id: FIND-01
-          result: Failed
           log:
             reference-id: eval-log
             entry-id: OSPS-DO-01
@@ -48,9 +47,8 @@ actions:
     steps:
       - github.com/gemaraproj/gemara/enforcement/remediate.EnablePrivateVulnReporting
     justification:
-      assessments:
+      findings:
         - id: FIND-01
-          result: Failed
           log:
             reference-id: eval-log
             entry-id: OSPS-DO-02

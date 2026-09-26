@@ -1,5 +1,5 @@
 metadata:
-  id: "enforcement-log-001"
+  id: "enforcement-log-unrated-finding"
   type: EnforcementLog
   gemara-version: "1.1.0"
   version: "1.0.0"
@@ -52,7 +52,6 @@ actions:
       findings:
         - id: FIND-DO-01
           description: "No user guide is published or referenced in the Security Insights data."
-          severity: Medium
           requirement:
             reference-id: OSPS
             entry-id: OSPS-DO-01.01

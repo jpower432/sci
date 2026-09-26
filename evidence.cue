@@ -25,11 +25,12 @@ package gemara
 	// originator is the party that produced the evidence content.
 	originator?: #Actor
 
-	// collector is the party that gathered it into this log.
+	// collector is the party that gathered this evidence into the log, recorded
+	// only when it differs from the log's metadata.author. Third-party evidence
+	// has a real distinction to draw — a scanner produced it, an auditor pulled it
+	// in — but where the log's author gathered it, saying so again would be a
+	// second copy of the same fact.
 	collector?: #Actor
-
-	// method describes how the evidence was collected.
-	method?: #CollectionMethod
 
 	// payload is the raw evidence data collected inline
 	payload?: _ @go(Payload,type=any)
@@ -46,10 +47,6 @@ package gemara
 // recommended values include artifact types already known to Gemara (e.g.
 // EvaluationLog, EnforcementLog) plus categories for common evidence forms.
 #EvidenceType: #ArtifactType | #URL @go(-)
-
-// CollectionMethod records how evidence was obtained. Values mirror OSCAL's
-// assessment methods.
-#CollectionMethod: "EXAMINE" | "INTERVIEW" | "TEST" | "UNKNOWN" | string @go(-)
 
 // EvidenceMapping identifies the source from which evidence was collected.
 // reference-id names the MappingReference; coordinate and entry-id are reader
