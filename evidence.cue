@@ -85,6 +85,21 @@ package gemara
 
 	// remarks is prose regarding this evidence reference
 	remarks?: string
+
+	// ---- Validation --------------------------------------------------------
+
+	// A download-url says a verifier can fetch this content, so it comes with the
+	// digest of what was fetched: whoever retrieved the bytes could hash them, and
+	// an address without a digest says where the artifact is without saying what it
+	// was. reference-id and coordinate already cover "here is where to look"
+	// without claiming retrievability. Written as the contrapositive so the
+	// condition reads a field whose name is an identifier, and so the message can
+	// say what to do. Note that == _|_ is true of an invalid digest as well as an
+	// absent one, so a malformed digest reports here too.
+
+	if digest == _|_ {
+		"download-url"?: error("a download-url comes with the digest of what was fetched: add digest, or cite this source by reference-id and coordinate instead")
+	}
 }
 
 // ---- Validation ------------------------------------------------------------

@@ -3,7 +3,7 @@ metadata:
   type: EvaluationLog
   gemara-version: "1.1.0"
   version: 1.0.0
-  description: PVTR baseline scan evaluation results
+  description: Evaluation log whose evidence source gives a download-url with no digest
   author:
     id: pvtr
     name: PVTR
@@ -49,10 +49,6 @@ evaluations:
         reference-id: github-api
         coordinate: "/orgs/revanite-io/settings"
         download-url: "https://api.github.com/orgs/revanite-io"
-        digest: "sha256:b1c2d3e4f5a67890abcdef1234567890abcdef1234567890abcdef1234567890"
-      payload:
-        login: revanite-io
-        two_factor_requirement_enabled: true
       description: Organization settings showing org-wide MFA enforcement
   control:
     reference-id: OSPS-B

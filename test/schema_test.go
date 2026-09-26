@@ -124,6 +124,7 @@ func TestSchemaValidation(t *testing.T) {
 		{"executed assessment missing start", "./test-data/bad-evaluation-log-missing-start.yaml", "#EvaluationLog", true, "\"assessment-logs\".0.start"},
 		{"evaluation log citing an undeclared reference", "./test-data/bad-evaluation-log-undeclared-reference.yaml", "#EvaluationLog", true, "_refValidation"},
 		{"evidence with an inline payload and a download-url", "./test-data/bad-evaluation-log-payload-with-download-url.yaml", "#EvaluationLog", true, "inline payload cannot also have a source download-url"},
+		{"evidence source with a download-url and no digest", "./test-data/bad-evaluation-log-download-url-without-digest.yaml", "#EvaluationLog", true, "comes with the digest of what was fetched"},
 		{"log evaluating the same control twice", "./test-data/bad-evaluation-log-duplicate-control.yaml", "#EvaluationLog", true, "_uniqueEvaluatedControls"},
 		{"control evaluation assessing the same requirement twice", "./test-data/bad-evaluation-log-duplicate-requirement.yaml", "#EvaluationLog", true, "_uniqueAssessments"},
 
