@@ -74,6 +74,11 @@ func TestSchemaValidation(t *testing.T) {
 		{"valid AI agent capability catalog", "../examples/ai-agent/ai-agent-capability-catalog.yaml", "#CapabilityCatalog", false, ""},
 		{"valid ATR categories to capabilities mapping", "../examples/ai-agent/atr-categories-to-capabilities-mapping.yaml", "#MappingDocument", false, ""},
 
+		// A complete audit at the scale of a real baseline, with the policy it was
+		// conducted against (examples/osps-level-2)
+		{"OSPS Level 2 adherence policy", "../examples/osps-level-2/policy.yaml", "#Policy", false, ""},
+		{"complete audit of the OSPS baseline", "../examples/osps-level-2/audit-log.yaml", "#AuditLog", false, ""},
+
 		// RiskCatalog — positive
 		{"valid risk catalog", "./test-data/good-risk-catalog.yaml", "#RiskCatalog", false, ""},
 
