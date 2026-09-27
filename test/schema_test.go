@@ -79,6 +79,7 @@ func TestSchemaValidation(t *testing.T) {
 		{"OSPS Level 2 adherence policy", "../examples/osps-level-2/policy.yaml", "#Policy", false, ""},
 		{"scan behind the OSPS baseline audit", "../examples/osps-level-2/evaluation-log.yaml", "#EvaluationLog", false, ""},
 		{"complete audit of the OSPS baseline", "../examples/osps-level-2/audit-log.yaml", "#AuditLog", false, ""},
+		{"gate actions taken after the OSPS scan", "../examples/osps-level-2/enforcement-log.yaml", "#EnforcementLog", false, ""},
 
 		// RiskCatalog — positive
 		{"valid risk catalog", "./test-data/good-risk-catalog.yaml", "#RiskCatalog", false, ""},

@@ -1,0 +1,179 @@
+metadata:
+  id: OSPS-L2-GATE-2026-03-29
+  type: EnforcementLog
+  gemara-version: 1.1.0
+  version: 1.0.0
+  description: Release gate actions taken on gemaraproj/gemara after the 2026-03-28 baseline scan.
+  author:
+    id: release-gate
+    name: gemara-release-gate
+    type: Software
+  mapping-references:
+  - id: OSPS-L2-POLICY
+    title: OpenSSF Baseline Adherence Policy — Maturity Level 2
+    version: '2026.1'
+  - id: OSPS-B
+    title: Open Source Project Security Baseline
+    version: 1.0.0
+    url: https://baseline.openssf.org
+  - id: eval-log
+    title: OSPS Level 2 Baseline Scan
+    version: 1.0.0
+    url: https://artifacts.example.com/eval-logs/OSPS-L2-SCAN-2026-03-28.yaml
+  - id: exception-register
+    title: Example Org Exception Register
+    version: '2026.1'
+    url: https://grc.example.com/exceptions
+target:
+  id: gemara-repo
+  name: gemaraproj/gemara
+  type: Software
+  uri: https://github.com/gemaraproj/gemara
+  environment: production
+disposition: Enforced
+actions:
+- id: ACT-OSPS-DO-01.01
+  disposition: Enforced
+  method:
+    reference-id: OSPS-L2-POLICY
+    entry-id: EM-BLOCK-RELEASE
+  message: 'Release blocked: OSPS-DO-01.01 is not met.'
+  start: '2026-03-29T09:00:00Z'
+  end: '2026-03-29T09:00:01Z'
+  steps:
+  - github.com/gemaraproj/gemara/enforcement/gate.BlockRelease
+  justification:
+    findings:
+    - id: FIND-OSPS-DO-01.01
+      lifecycle: Open
+      severity: Medium
+      description: No user guide is published or linked from the repository.
+      requirement:
+        reference-id: OSPS-B
+        entry-id: OSPS-DO-01.01
+      log:
+        reference-id: eval-log
+        entry-id: OSPS-DO-01.01
+- id: ACT-OSPS-QA-02.01
+  disposition: Enforced
+  method:
+    reference-id: OSPS-L2-POLICY
+    entry-id: EM-BLOCK-RELEASE
+  message: 'Release blocked: OSPS-QA-02.01 is not met.'
+  start: '2026-03-29T09:01:00Z'
+  end: '2026-03-29T09:01:01Z'
+  steps:
+  - github.com/gemaraproj/gemara/enforcement/gate.BlockRelease
+  justification:
+    findings:
+    - id: FIND-OSPS-QA-02.01
+      lifecycle: Open
+      severity: Medium
+      description: Dependency manifests are published for the main module only.
+      requirement:
+        reference-id: OSPS-B
+        entry-id: OSPS-QA-02.01
+      log:
+        reference-id: eval-log
+        entry-id: OSPS-QA-02.01
+- id: ACT-OSPS-VM-02.01
+  disposition: Enforced
+  method:
+    reference-id: OSPS-L2-POLICY
+    entry-id: EM-BLOCK-RELEASE
+  message: 'Release blocked: OSPS-VM-02.01 is not met.'
+  start: '2026-03-29T09:02:00Z'
+  end: '2026-03-29T09:02:01Z'
+  steps:
+  - github.com/gemaraproj/gemara/enforcement/gate.BlockRelease
+  justification:
+    findings:
+    - id: FIND-OSPS-VM-02.01
+      lifecycle: Open
+      severity: High
+      description: No documented process exists for accepting vulnerability reports.
+      requirement:
+        reference-id: OSPS-B
+        entry-id: OSPS-VM-02.01
+      log:
+        reference-id: eval-log
+        entry-id: OSPS-VM-02.01
+- id: ACT-OSPS-BR-03.01
+  disposition: Enforced
+  method:
+    reference-id: OSPS-L2-POLICY
+    entry-id: EM-BLOCK-RELEASE
+  message: 'Release blocked: OSPS-BR-03.01 is not met.'
+  start: '2026-03-29T09:03:00Z'
+  end: '2026-03-29T09:03:01Z'
+  steps:
+  - github.com/gemaraproj/gemara/enforcement/gate.BlockRelease
+  justification:
+    findings:
+    - id: FIND-OSPS-BR-03.01
+      lifecycle: Open
+      severity: Low
+      description: Release pipelines run on a self-hosted runner with no pinned image digest.
+      requirement:
+        reference-id: OSPS-B
+        entry-id: OSPS-BR-03.01
+      log:
+        reference-id: eval-log
+        entry-id: OSPS-BR-03.01
+- id: ACT-OSPS-DO-02.01
+  disposition: Enforced
+  method:
+    reference-id: OSPS-L2-POLICY
+    entry-id: EM-ENABLE-REPORTING
+  message: Private vulnerability reporting enabled on the repository.
+  start: '2026-03-29T09:05:00Z'
+  end: '2026-03-29T09:05:04Z'
+  steps:
+  - github.com/gemaraproj/gemara/enforcement/remediate.EnablePrivateVulnReporting
+  justification:
+    findings:
+    - id: FIND-OSPS-DO-02.01
+      lifecycle: Resolved
+      severity: High
+      description: No private channel for reporting suspected vulnerabilities is documented.
+      requirement:
+        reference-id: OSPS-B
+        entry-id: OSPS-DO-02.01
+      log:
+        reference-id: eval-log
+        entry-id: OSPS-DO-02.01
+- id: ACT-OSPS-GV-02.01
+  disposition: Tolerated
+  method:
+    reference-id: OSPS-L2-POLICY
+    entry-id: EM-BLOCK-RELEASE
+  message: 'Waived under EXC-2026-014: governance documentation is tracked in the parent org handbook.'
+  start: '2026-03-29T09:06:00Z'
+  end: '2026-03-29T09:06:00Z'
+  steps:
+  - github.com/gemaraproj/gemara/enforcement/waive.RecordException
+  justification:
+    findings:
+    - id: FIND-OSPS-GV-02.01
+      lifecycle: Waived
+      severity: Medium
+      description: Roles and responsibilities for the project are not documented.
+      requirement:
+        reference-id: OSPS-B
+        entry-id: OSPS-GV-02.01
+      log:
+        reference-id: eval-log
+        entry-id: OSPS-GV-02.01
+    exceptions:
+    - reference-id: exception-register
+      remarks: EXC-2026-014, granted 2026-02-10, expires 2026-08-10.
+- id: ACT-RERUN
+  disposition: Clear
+  method:
+    reference-id: OSPS-L2-POLICY
+    entry-id: EM-BLOCK-RELEASE
+  message: 'Re-run after remediation: no unmet required requirement remained on this commit.'
+  start: '2026-03-29T11:00:00Z'
+  end: '2026-03-29T11:00:02Z'
+  steps:
+  - github.com/gemaraproj/gemara/enforcement/gate.BlockRelease

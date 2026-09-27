@@ -155,7 +155,16 @@ check that its determinations reflect what the audit actually had.
 ### 2.4 Enforcement log against the evaluation log it reacted to
 
 11. **Findings resolve.** Each justification finding's `log` entry exists in the log
-    it names and concerns the requirement the finding claims. Note that the
+    it names and concerns the requirement the finding claims. A finding cites the
+    requirement's evaluation rather than one assessment of it, which is why
+    `#EntryMapping` needs no coordinate where a citation of evidence does: a finding
+    is about the requirement, while `assessments` claims which assessments were read.
+    A gate acts on a failure, so an action other than `Clear` over an assessment the
+    scan reports as `Passed` is either the wrong citation or an enforcement that
+    should not have run.
+
+    An action's `method` must also name an `#AcceptedMethod` the policy declares under
+    `enforcement-methods` — the same rule as 2, on the enforcement side. Note that the
     enforcement log itself is not expected to validate this: enforcement records what
     a gate did, and checking policy semantics is the audit's role. A tool that reads
     both documents can and should check it anyway.

@@ -37,18 +37,18 @@ evaluations:
     reference-id: OSPS-B
     entry-id: OSPS-AC-01
   assessment-logs:
-  - requirement: &id001
+  - requirement:
       reference-id: OSPS-B
       entry-id: OSPS-AC-01.01
     description: When a user attempts to access a sensitive resource in the project's version control
       system, the system MUST require t
     result: Passed
     message: Requirement satisfied.
-    applicability: &id002
+    applicability:
     - Maturity1
     - Maturity2
     - Maturity3
-    steps: &id003
+    steps:
     - github.com/revanite-io/pvtr-github-repo/evaluation_plans/osps/access_control.OSPS_AC_01_01
     steps-executed: 1
     start: '2026-03-28T04:10:00Z'
@@ -65,13 +65,19 @@ evaluations:
       parameters:
       - id: P-OSPS-AC-01.01-window
         value: '90'
-  - requirement: *id001
+  - requirement:
+      reference-id: OSPS-B
+      entry-id: OSPS-AC-01.01
     description: When a user attempts to access a sensitive resource in the project's version control
       system, the system MUST require t
     result: Passed
     message: Requirement satisfied.
-    applicability: *id002
-    steps: *id003
+    applicability:
+    - Maturity1
+    - Maturity2
+    - Maturity3
+    steps:
+    - github.com/revanite-io/pvtr-github-repo/evaluation_plans/osps/access_control.OSPS_AC_01_01
     steps-executed: 1
     start: '2026-03-28T04:10:00Z'
     end: '2026-03-28T04:10:00Z'
@@ -152,18 +158,18 @@ evaluations:
         id: pvtr
         name: pvtr-github-repo
         type: Software
-  - requirement: &id004
+  - requirement:
       reference-id: OSPS-B
       entry-id: OSPS-AC-03.02
     description: When an attempt is made to delete the project's primary branch, the version control
       system MUST treat this as a sensit
     result: Passed
     message: Requirement satisfied.
-    applicability: &id005
+    applicability:
     - Maturity1
     - Maturity2
     - Maturity3
-    steps: &id006
+    steps:
     - github.com/revanite-io/pvtr-github-repo/evaluation_plans/osps/access_control.OSPS_AC_03_02
     steps-executed: 1
     start: '2026-03-28T04:12:00Z'
@@ -177,13 +183,19 @@ evaluations:
         id: pvtr
         name: pvtr-github-repo
         type: Software
-  - requirement: *id004
+  - requirement:
+      reference-id: OSPS-B
+      entry-id: OSPS-AC-03.02
     description: When an attempt is made to delete the project's primary branch, the version control
       system MUST treat this as a sensit
     result: Passed
     message: Requirement satisfied.
-    applicability: *id005
-    steps: *id006
+    applicability:
+    - Maturity1
+    - Maturity2
+    - Maturity3
+    steps:
+    - github.com/revanite-io/pvtr-github-repo/evaluation_plans/osps/access_control.OSPS_AC_03_02
     steps-executed: 1
     start: '2026-03-28T04:12:00Z'
     end: '2026-03-28T04:12:00Z'
@@ -266,18 +278,18 @@ evaluations:
       parameters:
       - id: P-OSPS-BR-01.01-window
         value: '90'
-  - requirement: &id007
+  - requirement:
       reference-id: OSPS-B
       entry-id: OSPS-BR-01.02
     description: When a CI/CD pipeline uses a branch name in its functionality, that name value MUST
       be sanitized and validated prior t
     result: Passed
     message: Requirement satisfied.
-    applicability: &id008
+    applicability:
     - Maturity1
     - Maturity2
     - Maturity3
-    steps: &id009
+    steps:
     - github.com/revanite-io/pvtr-github-repo/evaluation_plans/osps/build_and_release.OSPS_BR_01_02
     steps-executed: 1
     start: '2026-03-28T04:14:00Z'
@@ -291,13 +303,19 @@ evaluations:
         id: pvtr
         name: pvtr-github-repo
         type: Software
-  - requirement: *id007
+  - requirement:
+      reference-id: OSPS-B
+      entry-id: OSPS-BR-01.02
     description: When a CI/CD pipeline uses a branch name in its functionality, that name value MUST
       be sanitized and validated prior t
     result: Passed
     message: Requirement satisfied.
-    applicability: *id008
-    steps: *id009
+    applicability:
+    - Maturity1
+    - Maturity2
+    - Maturity3
+    steps:
+    - github.com/revanite-io/pvtr-github-repo/evaluation_plans/osps/build_and_release.OSPS_BR_01_02
     steps-executed: 1
     start: '2026-03-28T04:14:00Z'
     end: '2026-03-28T04:14:00Z'
@@ -375,18 +393,18 @@ evaluations:
         id: pvtr
         name: pvtr-github-repo
         type: Software
-  - requirement: &id010
+  - requirement:
       reference-id: OSPS-B
       entry-id: OSPS-BR-03.02
     description: When the project lists a URI as an official distribution channel, that URI MUST be
       exclusively delivered using encrypt
     result: Passed
     message: Requirement satisfied.
-    applicability: &id011
+    applicability:
     - Maturity1
     - Maturity2
     - Maturity3
-    steps: &id012
+    steps:
     - github.com/revanite-io/pvtr-github-repo/evaluation_plans/osps/build_and_release.OSPS_BR_03_02
     steps-executed: 1
     start: '2026-03-28T04:16:00Z'
@@ -400,13 +418,19 @@ evaluations:
         id: pvtr
         name: pvtr-github-repo
         type: Software
-  - requirement: *id010
+  - requirement:
+      reference-id: OSPS-B
+      entry-id: OSPS-BR-03.02
     description: When the project lists a URI as an official distribution channel, that URI MUST be
       exclusively delivered using encrypt
     result: Passed
     message: Requirement satisfied.
-    applicability: *id011
-    steps: *id012
+    applicability:
+    - Maturity1
+    - Maturity2
+    - Maturity3
+    steps:
+    - github.com/revanite-io/pvtr-github-repo/evaluation_plans/osps/build_and_release.OSPS_BR_03_02
     steps-executed: 1
     start: '2026-03-28T04:16:00Z'
     end: '2026-03-28T04:16:00Z'

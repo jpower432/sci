@@ -26,6 +26,7 @@ func TestChainConformance(t *testing.T) {
 	policy := loadYAML(t, "../examples/osps-level-2/policy.yaml")
 	evalLog := loadYAML(t, "../examples/osps-level-2/evaluation-log.yaml")
 	audit := loadYAML(t, "../examples/osps-level-2/audit-log.yaml")
+	enforcement := loadYAML(t, "../examples/osps-level-2/enforcement-log.yaml")
 
 	// The catalog's requirements, and the subset the policy governs.
 	catalogReqs := map[string]cue.Value{}
@@ -326,6 +327,90 @@ func TestChainConformance(t *testing.T) {
 			if strAt(v, "outcome") == "Compliant" && contains(checks, "Not Satisfied") {
 				t.Errorf("%s is Compliant with a check that came out Not Satisfied", rid)
 			}
+		}
+	})
+
+	t.Run("rule 11: an enforcement action's findings resolve into the scan", func(t *testing.T) {
+		checked := 0
+		for _, a := range listAt(enforcement, "actions") {
+			for _, f := range listAt(a, "justification.findings") {
+				checked++
+				entry := strAt(f, `log."entry-id"`)
+				as, ok := assessments[entry]
+				if !ok {
+					t.Errorf("action %s: finding %s cites evaluation entry %q, which the scan does not contain",
+						strAt(a, "id"), strAt(f, "id"), entry)
+					continue
+				}
+				// A finding cites the requirement's evaluation, not one assessment of it,
+				// which is why #EntryMapping needs no coordinate where a citation of
+				// evidence does. What it must not do is name a different requirement.
+				if r := strAt(f, `requirement."entry-id"`); r != "" && r != entry {
+					t.Errorf("action %s: finding %s concerns %s and cites the evaluation of %s",
+						strAt(a, "id"), strAt(f, "id"), r, entry)
+				}
+				// A gate acts on a failure. An action against an assessment that passed
+				// is either the wrong citation or an enforcement that should not have run.
+				passed := true
+				for _, x := range as {
+					if strAt(x, "result") != "Passed" {
+						passed = false
+					}
+				}
+				if passed && strAt(a, "disposition") != "Clear" {
+					t.Errorf("action %s is %s over %s, which the scan reports as Passed",
+						strAt(a, "id"), strAt(a, "disposition"), entry)
+				}
+			}
+		}
+		if checked == 0 {
+			t.Error("no enforcement action carries a finding; rule 11 passed vacuously")
+		}
+	})
+
+	t.Run("an enforcement action's method is one the policy declares", func(t *testing.T) {
+		declared := map[string]bool{}
+		for _, m := range listAt(policy, `adherence."enforcement-methods"`) {
+			declared[strAt(m, "id")] = true
+		}
+		if len(declared) == 0 {
+			t.Fatal("the policy declares no enforcement methods")
+		}
+		for _, a := range listAt(enforcement, "actions") {
+			if mid := strAt(a, `method."entry-id"`); !declared[mid] {
+				t.Errorf("action %s enforced with method %s, which the policy does not declare",
+					strAt(a, "id"), mid)
+			}
+		}
+	})
+
+	t.Run("a Tolerated action's findings are Waived", func(t *testing.T) {
+		checked := 0
+		for _, a := range listAt(enforcement, "actions") {
+			if strAt(a, "disposition") != "Tolerated" {
+				continue
+			}
+			checked++
+			for _, f := range listAt(a, "justification.findings") {
+				if got := strAt(f, "lifecycle"); got != "Waived" {
+					t.Errorf("action %s is Tolerated and its finding %s is %s, not Waived",
+						strAt(a, "id"), strAt(f, "id"), got)
+				}
+			}
+		}
+		if checked == 0 {
+			t.Error("no action is Tolerated; the correspondence passed vacuously")
+		}
+	})
+
+	t.Run("the gate's aggregate follows Disposition precedence", func(t *testing.T) {
+		order := []string{"Enforced", "Tolerated", "Undetermined", "Clear"}
+		var got []string
+		for _, a := range listAt(enforcement, "actions") {
+			got = append(got, strAt(a, "disposition"))
+		}
+		if have, want := strAt(enforcement, "disposition"), strongest(order, got); have != want {
+			t.Errorf("the log reports %s where its actions roll up to %s", have, want)
 		}
 	})
 

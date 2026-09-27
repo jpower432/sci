@@ -291,5 +291,10 @@ adherence:
     mode: Automated
     required: true
     description: Release gate for repositories failing a required requirement.
+  - id: EM-ENABLE-REPORTING
+    type: Remediation
+    mode: Automated
+    required: false
+    description: Turns on private vulnerability reporting where the platform supports it.
   non-compliance: A repository failing a Maturity Level 2 requirement after the enforcement date cannot
     cut a release until the finding is resolved or an exception is granted.
