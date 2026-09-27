@@ -8,7 +8,12 @@ metadata:
     id: pvtr
     name: PVTR
     type: Software
-result: Needs Review
+  mapping-references:
+    - id: OSPS-B
+      title: Open Source Project Security Baseline
+      version: "2025.02"
+      url: https://baseline.openssf.org/versions/2025-02-25.html
+result: Unknown
 target:
   id: github-repo
   name: GitHub Repository
@@ -18,7 +23,7 @@ evaluations:
   control:
     reference-id: OSPS-B
     entry-id: OSPS-AC-01
-  result: Needs Review
+  result: Unknown
   message: Assessments did not execute
   assessment-logs:
   # Not Run: no start time is recorded because the procedure never began

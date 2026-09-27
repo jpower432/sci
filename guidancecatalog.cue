@@ -25,6 +25,10 @@ import "list"
 	// exemptions provides information about situations where this guidance is not applicable
 	exemptions?: [#Exemption, ...#Exemption] @go(Exemptions)
 
+	// ---- Validation --------------------------------------------------------
+	// Comments in validation sections stay detached (blank line after), so they
+	// are never published as a field's API description.
+
 	if guidelines != _|_ {
 		_uniqueGuidelineIds: {for i, g in guidelines {(g.id): i}}
 		groups: [#Group, ...#Group]
@@ -106,7 +110,7 @@ import "list"
 
 	// retired guidelines must not have recommendations
 	if state == "Retired" {
-		recommendations?: _|_
+		recommendations?: error("a retired guideline recommends nothing: retire the recommendations with it, or leave the guideline in its prior state")
 	}
 }
 

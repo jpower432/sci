@@ -16,6 +16,10 @@ import "list"
 	// capabilities is a list of capabilities defined by this catalog
 	capabilities?: [#Capability, ...#Capability] @go(Capabilities)
 
+	// ---- Validation --------------------------------------------------------
+	// Comments in validation sections stay detached (blank line after), so they
+	// are never published as a field's API description.
+
 	if capabilities != _|_ {
 		_uniqueCapabilityIds: {for i, c in capabilities {(c.id): i}}
 		groups: [#Group, ...#Group]

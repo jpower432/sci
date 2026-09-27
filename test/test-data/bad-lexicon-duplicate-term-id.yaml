@@ -3,6 +3,7 @@ metadata:
   id: bad-lexicon-dup
   type: Lexicon
   gemara-version: "1.1.0"
+  version: "1.0.0"
   description: Term ids must be unique within the lexicon.
   author:
     id: gemara-example

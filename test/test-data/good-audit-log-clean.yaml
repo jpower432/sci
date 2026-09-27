@@ -1,0 +1,58 @@
+metadata:
+  id: audit-log-clean-001
+  type: AuditLog
+  gemara-version: "1.1.0"
+  version: "1.0.0"
+  description: "Q2 2026 Gemara Audit — no findings"
+  author:
+    id: lead-auditor
+    name: "Jane Auditor"
+    type: Human
+  mapping-references:
+    - id: security-policy
+      title: "Information Security Policy"
+      version: "2.1.0"
+    - id: OSPS
+      title: "Open Source Project Security Baseline"
+      version: "2025.1"
+      url: "https://baseline.openssf.org"
+    - id: eval-log
+      title: "PVTR Evaluation Log"
+      version: "2026-05-01"
+      url: "https://artifacts.example.com/eval-logs/pvtr-baseline-scan.yaml"
+
+target:
+  id: gemara-repo
+  name: "gemaraproj/gemara"
+  type: Software
+  uri: "https://github.com/gemaraproj/gemara"
+  environment: production
+
+summary: "Every requirement in scope was evidenced and met. Nothing is called out."
+
+opinion: Passed
+
+policy:
+  reference-id: security-policy
+  remarks: "Organizational policy establishing the audit's scope; it imports the OSPS baseline."
+
+verifications:
+  - requirement:
+      reference-id: OSPS
+      entry-id: OSPS-AC-01
+    effective:
+      text: "When a user attempts to access a sensitive resource in the project's version
+        control system, the system MUST require multi-factor authentication."
+      applicability:
+        - Maturity Level 1
+    outcome: Compliant
+    evidence-present: Satisfied
+    evidence-fresh: Satisfied
+    evidence:
+      - id: EV-AC-01
+        type: EvaluationLog
+        description: "PVTR evaluation results for access control"
+        collected-at: "2026-05-01T09:12:00Z"
+        source:
+          reference-id: eval-log
+          entry-id: "assessment-ac-01"

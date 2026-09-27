@@ -16,6 +16,10 @@ import "list"
 	// controls is a list of unique controls defined by this catalog
 	controls?: [#Control, ...#Control] @gemara(projectable=false) @go(Controls)
 
+	// ---- Validation --------------------------------------------------------
+	// Comments in validation sections stay detached (blank line after), so they
+	// are never published as a field's API description.
+
 	if controls != _|_ {
 		_uniqueControlIds: {for i, c in controls {(c.id): i}}
 		groups: [#Group, ...#Group]
@@ -26,6 +30,14 @@ import "list"
 		// Unify the valid ID list with a list.Contains constraint to require each entry's value exists
 		for i, c in controls {
 			_groupValidation: "\(i)": _validGroupIds & list.Contains(c.group)
+
+			// Requirement ids must be unique within their control: AssessmentLog.requirement
+			// and AssessmentFinding.requirement address a requirement by this id, so a
+			// duplicate makes that reference unresolvable.
+			_uniqueRequirementIds: "\(i)": {
+				for j, ar in c."assessment-requirements" {(ar.id): j}
+			}
+
 			for j, ar in c."assessment-requirements" {
 				for k, a in ar.applicability {
 					_applicabilityValidation: "\(i)-\(j)-\(k)": _validApplicabilityIds & list.Contains(a)

@@ -35,8 +35,9 @@ import "time"
 	// gemara-version declares which version of the Gemara specification this artifact conforms to
 	"gemara-version": string @go(GemaraVersion) @yaml("gemara-version")
 
-	// version is the version identifier of this artifact
-	version?: string
+	// version is the version identifier of this artifact; it MUST be present so
+	// that a MappingReference pinning this artifact has a value to match.
+	version: string
 
 	// date is the publication or effective date of this artifact
 	date?: #Datetime @go(Date)
@@ -58,6 +59,10 @@ import "time"
 
 	// lexicon is a URI pointing to a controlled vocabulary or glossary relevant to this artifact
 	lexicon?: #ArtifactMapping @go(Lexicon,optional=nillable)
+
+	// ---- Validation --------------------------------------------------------
+	// Comments in validation sections stay detached (blank line after), so they
+	// are never published as a field's API description.
 
 	if MR != _|_ {
 		_uniqueRefIds: {for i, r in MR {(r.id): i}}

@@ -1,0 +1,39 @@
+metadata:
+  id: BAD-DUP-REQ
+  type: ControlCatalog
+  gemara-version: "1.1.0"
+  version: "1.0.0"
+  description: Assessment requirement ids must be unique within their control, so an
+    EntryMapping naming a requirement resolves to one entry.
+  author:
+    id: gemara-example
+    name: Gemara Example Author
+    type: Human
+  applicability-groups:
+    - id: Maturity Level 1
+      title: Maturity Level 1
+      description: Baseline expectations.
+    - id: Maturity Level 2
+      title: Maturity Level 2
+      description: Expectations beyond the baseline.
+title: Catalog with duplicate assessment requirement ids
+groups:
+  - id: access-control
+    title: Access Control
+    description: Controls governing access to the target.
+controls:
+  - id: EX.C01
+    group: access-control
+    title: Require Multi-Factor Authentication
+    objective: Accounts with write access must authenticate with a second factor.
+    assessment-requirements:
+      - id: EX.C01.R01
+        text: The organization MUST require MFA for all accounts with write access.
+        applicability:
+          - Maturity Level 1
+      # Same id as above: AssessmentLog.requirement and AssessmentFinding.requirement
+      # both address a requirement by this id.
+      - id: EX.C01.R01
+        text: The organization MUST require hardware-backed MFA for administrators.
+        applicability:
+          - Maturity Level 2

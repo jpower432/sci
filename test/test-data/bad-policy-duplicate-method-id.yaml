@@ -1,0 +1,55 @@
+metadata:
+  id: BAD-DUP-METHOD
+  type: Policy
+  gemara-version: "1.1.0"
+  version: "1.0.0"
+  description: Accepted method ids share one id space across evaluation-methods,
+    enforcement-methods, and every plan's evaluation-methods, because ActionResult.method
+    carries no way to say which of the three it means.
+  author:
+    id: security-team
+    name: Security Team
+    type: Human
+  mapping-references:
+    - id: "ISO-27001"
+      title: "ISO/IEC 27001"
+      version: "2022"
+      description: "Information security management systems"
+title: Policy with an accepted method id colliding across sites
+contacts:
+  responsible:
+    - name: IT Director
+  accountable:
+    - name: Chief Information Security Officer
+scope:
+  in:
+    technologies:
+      - Web Applications
+imports:
+  guidance:
+    - reference-id: ISO-27001
+adherence:
+  evaluation-methods:
+    - id: M-01
+      type: Behavioral
+      mode: Automated
+      description: Automated compliance scanning.
+  assessment-plans:
+    - id: AP-01
+      requirement:
+        reference-id: ISO-27001
+        entry-id: EX.C01.R01
+      frequency-days: 90
+      evaluation-methods:
+        # Same id as the top-level evaluation method above. A per-list uniqueness
+        # check would miss this; ActionResult.method still cannot tell them apart.
+        - id: M-01
+          type: Intent
+          mode: Manual
+          description: Manual review of the scanner configuration.
+  enforcement-methods:
+    - id: EM-01
+      type: Gate
+      mode: Automated
+      description: Pre-deployment compliance gate.
+  non-compliance: Non-compliant systems are quarantined pending remediation.

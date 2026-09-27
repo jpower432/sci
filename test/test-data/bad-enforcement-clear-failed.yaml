@@ -27,7 +27,8 @@ target:
   uri: "https://github.com/gemaraproj/gemara"
 
 actions:
-  - disposition: Clear
+  - id: ACT-01
+    disposition: Clear
     method:
       reference-id: security-policy
       entry-id: EM-PASS-01
@@ -36,11 +37,8 @@ actions:
     steps:
       - github.com/gemaraproj/gemara/enforcement/allow.PassThrough
     justification:
-      assessments:
-        - result: Failed
-          plan:
-            reference-id: security-policy
-            entry-id: AP-AC-01
+      findings:
+        - id: FIND-01
           log:
             reference-id: eval-log
             entry-id: OSPS-AC-01
