@@ -70,11 +70,11 @@ package gemara
 	// Embedded information about how evidence can be retrieved.
 	// download-url is the address this content can be retrieved from is it not
 	// available from the MappingReference.url.
-	DU="download-url"?: #URL @go(DownloadUrl)
+	DU="download-url"?: #URL @go(DownloadUrl,type=string)
 
 	// digest is a cryptographic hash of the full octet stream retrieved from
 	// download-url. See #Digest for what a verifier must do with it.
-	digest?: #Digest
+	digest?: #Digest @go(Digest,type=string)
 
 	// size is the length, in bytes, of the octet stream at download-url.
 	size?: int & >=0

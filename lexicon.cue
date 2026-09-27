@@ -49,5 +49,5 @@ package gemara
 	citation: string
 
 	// url points to supporting material when available
-	url?: #URL
+	url?: #URL @go(Url,type=string)
 }

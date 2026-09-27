@@ -23,7 +23,7 @@ package gemara
 	// url is the path where the artifact may be retrieved; preferably responds with Gemara-compatible YAML/JSON.
 	// Any URI scheme is accepted (e.g. https, file, oci, s3, arn) so evidence can be
 	// addressed wherever it actually lives.
-	url?: #URL
+	url?: #URL @go(Url,type=string)
 }
 
 // ArtifactMapping represents a mapping to an external artifact or artifact entry
@@ -57,7 +57,12 @@ package gemara
 }
 
 // URL validates an absolute URI with any scheme (e.g. https, file, oci, s3).
-#URL: =~"^[a-zA-Z][a-zA-Z0-9+.-]*:[^\\s]+$"
+#URL: =~"^[a-zA-Z][a-zA-Z0-9+.-]*:[^\\s]+$" @go(-)
+
+// Every field constrained by #Digest pins its Go projection to string, as the fields
+// constrained by #URL do, because a named Go type here buys no validation — Go has no
+// constructor to enforce the pattern — and would cost every consumer a conversion at
+// every use site. The constraint is the value of the definition; the Go name is not.
 
 // Digest is a cryptographic hash of a full octet stream; format: algorithm:encoded
 // (e.g. sha256:<64 lowercase hex>). sha256 is the MUST-support floor for every
@@ -86,4 +91,4 @@ package gemara
 // whose Go and OpenAPI projections every consumer reads.
 #Digest: (=~"^[a-z0-9]+(?:[+._-][a-z0-9]+)*:[a-zA-Z0-9=_-]+$" &
 	(=~"^(?:sha256:[a-f0-9]{64}|sha512:[a-f0-9]{128}|blake3:[a-f0-9]{64})$" |
-	!~"^(?:sha256|sha512|blake3):"))
+	!~"^(?:sha256|sha512|blake3):")) @go(-)

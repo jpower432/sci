@@ -27,7 +27,7 @@ package gemara
 	// (e.g. https, file, oci, s3, arn) so entities hosted outside http(s) can be
 	// referenced. It is the named #URL type rather than a second copy of the same
 	// pattern, so the two cannot drift apart.
-	uri?: #URL
+	uri?: #URL @go(Uri,type=string)
 }
 
 // Actor represents an entity (human or tool) that performs actions in evaluations
