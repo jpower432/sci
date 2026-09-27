@@ -2421,7 +2421,7 @@ components:
         evidence-present:
           allOf:
           - $ref: "#/components/schemas/Determination"
-          description: "evidence-present records whether this requirement is backed by evidence at\nall. It is required: it is the question verifications exists to answer, and\nanswering it for every requirement is what makes verifications complete rather\nthan selective."
+          description: "evidence-present records whether this requirement is backed by evidence at\nall: the question verifications exist to answer, and answering it for every\nrequirement is what makes them complete rather than selective. It may be\nomitted only where there was no evidence question to ask, which is a\nrequirement the policy puts out of scope — and omitting it then obliges an\noutcome of Not Applicable, so the omission cannot hide an entry that was\nsimply left unanswered."
         outcome:
           allOf:
           - $ref: "#/components/schemas/ComplianceStatus"
@@ -2442,7 +2442,6 @@ components:
       - outcome
       - requirement
       - effective
-      - evidence-present
       type: object
       x-status: experimental
 info:

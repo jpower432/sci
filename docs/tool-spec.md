@@ -71,8 +71,10 @@ justification carries an `id`, the evaluation log entry it came from, and a
 `severity`.
 
 **Audit.** The audit cites exactly one policy and states an `opinion`. Every
-verification entry states an `outcome`, the requirement it concerns, the
-`effective` requirement as resolved, and `evidence-present`. An entry that claims
+verification entry states an `outcome`, the requirement it concerns and the
+`effective` requirement as resolved. It also states `evidence-present`, unless the
+outcome is `Not Applicable` — an out-of-scope requirement has no evidence question to
+answer, and omitting the field obliges that outcome. An entry that claims
 `evidence-present: Satisfied` names evidence or assessments. `effective.plan-id` and
 the `plan` verification oblige each other, and a plan verification enumerates at
 least one method, each of which answers `allowed`, `used` and `cadence-met`. A
@@ -128,6 +130,12 @@ document reports the check as **unperformed**, not as passed.
     against the plan's `evidence-requirements.valid-for-days` where a plan sets one.
     Where none does, the auditor's basis for the judgement should be stated in a
     finding; a tool cannot compute it and must not assume a default.
+
+**Prefer the `assessments` rail where it applies.** An audit reading Gemara
+evaluation logs should cite entries through `assessments` rather than restating them
+as inline `#Evidence`. A pointer is three lines where an evidence block is nine, and
+at the scale of a real baseline that is the difference between a document a reviewer
+reads and one they skim. Inline evidence is for what the audit collected itself.
 
 An audit may be built on evidence that is not a Gemara document at all. That is a
 supported case, not a degradation: the entry answers `evidence-present`,

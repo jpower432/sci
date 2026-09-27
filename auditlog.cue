@@ -255,10 +255,13 @@ import "list"
 	evidence?: [#Evidence, ...#Evidence] @go(Evidence)
 
 	// evidence-present records whether this requirement is backed by evidence at
-	// all. It is required: it is the question verifications exists to answer, and
-	// answering it for every requirement is what makes verifications complete rather
-	// than selective.
-	"evidence-present": #Determination @go(EvidencePresent)
+	// all: the question verifications exist to answer, and answering it for every
+	// requirement is what makes them complete rather than selective. It may be
+	// omitted only where there was no evidence question to ask, which is a
+	// requirement the policy puts out of scope — and omitting it then obliges an
+	// outcome of Not Applicable, so the omission cannot hide an entry that was
+	// simply left unanswered.
+	EP="evidence-present"?: #Determination @go(EvidencePresent)
 
 	// evidence-fresh records whether that evidence is current: collected within
 	// the plan's valid-for-days where a plan sets one, and within the auditor's
@@ -282,6 +285,14 @@ import "list"
 
 	if effective."plan-id" == _|_ {plan?: error("a plan verification names the plan it verified against: set effective.plan-id, or drop the plan block")}
 
+	// Omitting evidence-present says there was no evidence question to ask, which is
+	// true only of a requirement the audit determined Not Applicable. Everything the
+	// audit actually examined answers it.
+
+	if EP == _|_ {
+		outcome: "Not Applicable"
+	}
+
 	// An entry that names nothing cannot claim coverage. Stated as the
 	// contrapositive — no evidence and no assessments means evidence-present is not
 	// Satisfied — because conditioning on the absence of optional fields is
@@ -289,10 +300,12 @@ import "list"
 	// definition unevaluable and reports the wrong field when one is missing.
 	// Note that == _|_ is true of an invalid value as well as an absent one, so an
 	// entry whose evidence fails its own rules also reports here; the entry has no
-	// valid evidence either way.
+	// valid evidence either way. The constraint is optional so that it narrows the
+	// value when one is given without forcing the field back into existence for an
+	// out-of-scope requirement that omits it.
 
 	if evidence == _|_ if assessments == _|_ {
-		"evidence-present": "Not Satisfied" | "Not Applicable" | "Undetermined"
+		"evidence-present"?: "Not Satisfied" | "Not Applicable" | "Undetermined"
 	}
 
 	// Each evidence entry carries a payload, a source, or both.

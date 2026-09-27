@@ -411,7 +411,6 @@ verifications:
     applicability:
     - Maturity3
   outcome: Not Applicable
-  evidence-present: Not Applicable
 - requirement:
     reference-id: OSPS-B
     entry-id: OSPS-DO-04.01
@@ -421,7 +420,6 @@ verifications:
     applicability:
     - Maturity3
   outcome: Not Applicable
-  evidence-present: Not Applicable
 - requirement:
     reference-id: OSPS-B
     entry-id: OSPS-DO-05.01
@@ -431,7 +429,6 @@ verifications:
     applicability:
     - Maturity3
   outcome: Not Applicable
-  evidence-present: Not Applicable
 - requirement:
     reference-id: OSPS-B
     entry-id: OSPS-DO-06.01
@@ -533,7 +530,6 @@ verifications:
     applicability:
     - Maturity3
   outcome: Not Applicable
-  evidence-present: Not Applicable
 - requirement:
     reference-id: OSPS-B
     entry-id: OSPS-LE-01.01
@@ -667,7 +663,6 @@ verifications:
     applicability:
     - Maturity3
   outcome: Not Applicable
-  evidence-present: Not Applicable
 - requirement:
     reference-id: OSPS-B
     entry-id: OSPS-QA-03.01
@@ -708,7 +703,6 @@ verifications:
     applicability:
     - Maturity3
   outcome: Not Applicable
-  evidence-present: Not Applicable
 - requirement:
     reference-id: OSPS-B
     entry-id: OSPS-QA-05.01
@@ -747,7 +741,6 @@ verifications:
     applicability:
     - Maturity3
   outcome: Not Applicable
-  evidence-present: Not Applicable
 - requirement:
     reference-id: OSPS-B
     entry-id: OSPS-QA-06.03
@@ -758,7 +751,6 @@ verifications:
     applicability:
     - Maturity3
   outcome: Not Applicable
-  evidence-present: Not Applicable
 - requirement:
     reference-id: OSPS-B
     entry-id: OSPS-QA-07.01
@@ -768,7 +760,6 @@ verifications:
     applicability:
     - Maturity3
   outcome: Not Applicable
-  evidence-present: Not Applicable
 - requirement:
     reference-id: OSPS-B
     entry-id: OSPS-SA-01.01
@@ -824,7 +815,6 @@ verifications:
     applicability:
     - Maturity3
   outcome: Not Applicable
-  evidence-present: Not Applicable
 - requirement:
     reference-id: OSPS-B
     entry-id: OSPS-VM-01.01
@@ -892,7 +882,6 @@ verifications:
     applicability:
     - Maturity3
   outcome: Not Applicable
-  evidence-present: Not Applicable
 - requirement:
     reference-id: OSPS-B
     entry-id: OSPS-VM-05.01
@@ -902,7 +891,6 @@ verifications:
     applicability:
     - Maturity3
   outcome: Not Applicable
-  evidence-present: Not Applicable
 - requirement:
     reference-id: OSPS-B
     entry-id: OSPS-VM-05.02
@@ -912,7 +900,6 @@ verifications:
     applicability:
     - Maturity3
   outcome: Not Applicable
-  evidence-present: Not Applicable
 - requirement:
     reference-id: OSPS-B
     entry-id: OSPS-VM-05.03
@@ -923,7 +910,6 @@ verifications:
     applicability:
     - Maturity3
   outcome: Not Applicable
-  evidence-present: Not Applicable
 - requirement:
     reference-id: OSPS-B
     entry-id: OSPS-VM-06.01
@@ -933,7 +919,6 @@ verifications:
     applicability:
     - Maturity3
   outcome: Not Applicable
-  evidence-present: Not Applicable
 - requirement:
     reference-id: OSPS-B
     entry-id: OSPS-VM-06.02
@@ -944,7 +929,6 @@ verifications:
     applicability:
     - Maturity3
   outcome: Not Applicable
-  evidence-present: Not Applicable
 findings:
 - id: AF-OSPS-DO-01.01
   status: Not Compliant

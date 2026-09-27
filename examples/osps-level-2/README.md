@@ -18,7 +18,9 @@ the size of the catalog it audits.
 
 The determination mix is deliberately realistic: 32 `Compliant`, 6 `Not Compliant`,
 2 `Undetermined`, and 16 `Not Applicable` where the requirement applies only at a
-maturity level this policy does not adopt.
+maturity level this policy does not adopt. Those 16 omit `evidence-present`, because a
+requirement out of scope has no evidence question to answer; omitting it obliges the
+outcome to be `Not Applicable`, so it cannot hide an entry left unanswered.
 
 Three cases are worth reading in particular:
 

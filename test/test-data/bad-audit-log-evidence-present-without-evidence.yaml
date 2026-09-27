@@ -68,7 +68,7 @@ verifications:
         control system, the system MUST require multi-factor authentication."
       applicability:
         - Maturity Level 1
-    outcome: Compliant
+    outcome: Not Applicable
     evidence-present: Satisfied
 
   - requirement:
