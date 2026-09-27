@@ -56,7 +56,7 @@ summary: "Access control and quality controls are strong. Documentation controls
 opinion: Failed
 
 policy:
-  reference-id: security-policy
+  reference-id: NOT-DECLARED-ANYWHERE
   remarks: "Organizational policy establishing the audit's scope; it imports the OSPS baseline."
 
 verifications:
@@ -115,7 +115,6 @@ verifications:
         source:
           reference-id: eval-log
           entry-id: "assessment-do-01"
-          coordinate: "$.results[0].checks[2]"
           digest: "sha256:c4d5e6f7a8b9012cdef34567890abcdef1234567890abcdef1234567890abc12"
 
   - requirement:

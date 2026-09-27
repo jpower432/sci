@@ -115,7 +115,6 @@ verifications:
         source:
           reference-id: eval-log
           entry-id: "assessment-do-01"
-          coordinate: "$.results[0].checks[2]"
           digest: "sha256:c4d5e6f7a8b9012cdef34567890abcdef1234567890abcdef1234567890abc12"
 
   - requirement:
@@ -197,7 +196,7 @@ findings:
     severity: Critical
     description: "Residual risk RISK-002 remains above the maximum severity its category tolerates."
     risk:
-      reference-id: risk-catalog
+      reference-id: NOT-DECLARED-ANYWHERE
       entry-id: RISK-002
     recommendations:
       - id: REC-03

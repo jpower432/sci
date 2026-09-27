@@ -69,7 +69,6 @@ verifications:
       applicability:
         - Maturity Level 1
     outcome: Compliant
-    evidence-present: Satisfied
     evidence-fresh: Satisfied
     evidence:
       - id: EV-AC-01
@@ -115,7 +114,6 @@ verifications:
         source:
           reference-id: eval-log
           entry-id: "assessment-do-01"
-          coordinate: "$.results[0].checks[2]"
           digest: "sha256:c4d5e6f7a8b9012cdef34567890abcdef1234567890abcdef1234567890abc12"
 
   - requirement:
