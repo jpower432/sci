@@ -97,6 +97,19 @@ func TestGoTypeAttributesNameRealDefinitions(t *testing.T) {
 	}
 }
 
+// valueTypedOptionalStructs are optional struct-valued fields that project as a Go
+// value rather than a pointer. encoding/json ignores omitempty on a struct, so each
+// one emits {} when absent — and {} fails validation wherever the struct has a
+// required field, which every one of these does. They predate the chain redesign and
+// are listed so the class cannot grow silently: fixing them means value to pointer,
+// which is itself a source-breaking change for consumers, so it belongs in its own
+// change rather than being smuggled into this one.
+var valueTypedOptionalStructs = map[string]bool{
+	"Actor.Contact": true, "Resource.Owner": true,
+	"Policy.ImplementationPlan": true, "Policy.Risks": true,
+	"Scope.Out": true, "AcceptedRisk.Scope": true, "Risk.Owner": true,
+}
+
 // TestGoProjection generates the Go types and checks the projection consumers compile
 // against. The OpenAPI projection is gated heavily — golden file, schema count,
 // oasdiff against v1 — and the Go projection was gated not at all, which is how three
@@ -158,6 +171,29 @@ func TestGoProjection(t *testing.T) {
 	for _, m := range regexp.MustCompile(`\n\t(\w+) any`).FindAllStringSubmatch(generated, -1) {
 		if !pinnedAny[m[1]] {
 			t.Errorf("field %s projects as any without @go(type=any) in the schema", m[1])
+		}
+	}
+
+	// An optional struct-valued field must project as a pointer, or it cannot be
+	// omitted: encoding/json writes {} and the document fails its own schema.
+	structTypes := map[string]bool{}
+	for _, m := range regexp.MustCompile(`\ntype (\w+) struct`).FindAllStringSubmatch(generated, -1) {
+		structTypes[m[1]] = true
+	}
+	owner := ""
+	for _, line := range strings.Split(generated, "\n") {
+		if m := regexp.MustCompile(`^type (\w+) struct`).FindStringSubmatch(line); m != nil {
+			owner = m[1]
+		}
+		m := regexp.MustCompile("^\\t(\\w+) (\\w+) `json:\"[^\"]+,omitempty\"").FindStringSubmatch(line)
+		if m == nil || !structTypes[m[2]] {
+			continue
+		}
+		if field := owner + "." + m[1]; !valueTypedOptionalStructs[field] {
+			t.Errorf("%s is an optional %s and projects as a value, so it cannot be omitted:\n"+
+				"\tencoding/json ignores omitempty on a struct, so a producer emits {} and the document fails validation —\n"+
+				"\tadd optional=nillable to its @go attribute",
+				field, m[2])
 		}
 	}
 

@@ -210,7 +210,7 @@ import "list"
 	// evidence-requirements states what evidence this requirement needs and how
 	// long a collected item stays usable. It declares no evidence types: an
 	// expectation belongs to a policy and a requirement.
-	"evidence-requirements"?: #EvidenceRequirements @go(EvidenceRequirements)
+	"evidence-requirements"?: #EvidenceRequirements @go(EvidenceRequirements,optional=nillable)
 
 	parameters?: [#Parameter, ...#Parameter]
 
@@ -240,7 +240,7 @@ import "list"
 	mode:         #ModeType
 	required:     *false | bool @gemara(default=false)
 	description?: string
-	executor?:    #Actor
+	executor?:    #Actor @go(Executor,optional=nillable)
 }
 
 #ModeType:              "Manual" | "Automated"                           @go(-)

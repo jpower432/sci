@@ -71,7 +71,7 @@ package gemara
 	// justification links the action to the findings that prompted it and any
 	// applicable exceptions. A Clear action has nothing to justify, so it is
 	// absent there and required everywhere else.
-	justification?: #Justification @go(Justification)
+	justification?: #Justification @go(Justification,optional=nillable)
 }
 
 // EnforcementStep is a reference to the code that performed an enforcement action

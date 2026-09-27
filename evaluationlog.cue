@@ -108,7 +108,7 @@ import "list"
 
 	// execution records what this run used under its plan. A cited plan obliges
 	// the record; without a plan there is nothing to record against.
-	execution?: #ExecutionFacts
+	execution?: #ExecutionFacts @go(Execution,optional=nillable)
 
 	// Result is the aggregate outcome of the assessment procedure, by the precedence documented on #Result.
 	result: #Result
@@ -167,7 +167,7 @@ import "list"
 
 	// executor is the actor that performed this assessment, recorded only when
 	// it differs from the log's metadata.author.
-	executor?: #Actor
+	executor?: #Actor @go(Executor,optional=nillable)
 
 	// parameters are the selected values for execution correlated to the plan's parameters
 	parameters?: [#ParameterValue, ...#ParameterValue]

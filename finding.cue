@@ -47,7 +47,7 @@ package gemara
 	id?: string
 
 	// requirement names the assessment requirement this finding concerns.
-	requirement?: #EntryMapping
+	requirement?: #EntryMapping @go(Requirement,optional=nillable)
 
 	// log names the evaluation log entry this finding came from, when it came
 	// from one rather than from an auditor reading evidence directly. There is no

@@ -45,7 +45,7 @@ import "list"
 	metadata: type: "AuditLog"
 
 	// owner defines the RACI roles responsible for managing the audit
-	owner?: #RACI @go(Owner)
+	owner?: #RACI @go(Owner,optional=nillable)
 
 	// summary provides the high-level conclusion
 	summary: string
@@ -219,7 +219,7 @@ import "list"
 	// risk names the risk this finding concerns, when it concerns one: a residual
 	// risk beyond its category's tolerance, for example. A finding names a risk or
 	// a requirement — the requirement comes from the #Finding core.
-	risk?: #EntryMapping
+	risk?: #EntryMapping @go(Risk,optional=nillable)
 }
 
 // VerificationLog records what an audit mechanically checked for one requirement,
@@ -272,7 +272,7 @@ import "list"
 	// absent when no plan backed the requirement, which is how a verification says
 	// the requirement was evidenced without one, and required when effective
 	// names a plan-id.
-	plan?: #PlanVerification
+	plan?: #PlanVerification @go(Plan,optional=nillable)
 
 	// ---- Validation --------------------------------------------------------
 

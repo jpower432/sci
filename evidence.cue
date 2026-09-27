@@ -23,21 +23,21 @@ package gemara
 	"collected-at": #Datetime @go(CollectedAt)
 
 	// originator is the party that produced the evidence content.
-	originator?: #Actor
+	originator?: #Actor @go(Originator,optional=nillable)
 
 	// collector is the party that gathered this evidence into the log, recorded
 	// only when it differs from the log's metadata.author. Third-party evidence
 	// has a real distinction to draw — a scanner produced it, an auditor pulled it
 	// in — but where the log's author gathered it, saying so again would be a
 	// second copy of the same fact.
-	collector?: #Actor
+	collector?: #Actor @go(Collector,optional=nillable)
 
 	// payload is the raw evidence data collected inline
 	payload?: _ @go(Payload,type=any)
 
 	// source identifies the artifact or system from which this evidence was collected and
 	// retrieval information.
-	source?: #EvidenceMapping @go(Source)
+	source?: #EvidenceMapping @go(Source,optional=nillable)
 
 	// description explains what this evidence represents
 	description?: string
