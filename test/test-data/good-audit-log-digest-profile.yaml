@@ -1,9 +1,9 @@
 metadata:
-  id: audit-log-001
+  id: audit-log-digest-profile
   type: AuditLog
   gemara-version: "1.1.0"
   version: "1.0.0"
-  description: "Q1 2026 Gemara Audit"
+  description: "Audit log exercising the digest profile: registered and open algorithms"
   author:
     id: lead-auditor
     name: "Jane Auditor"
@@ -81,7 +81,11 @@ results:
         source:
           reference-id: eval-log
           entry-id: "assessment-do-01"
-          digest: "sha256:c4d5e6f7a8b9012cdef34567890abcdef1234567890abcdef1234567890abc12"
+          download-url: "https://artifacts.example.com/eval-logs/pvtr-baseline-scan.yaml"
+          # sha256: the MUST-support floor, checked for its own length and encoding
+          digest: "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+          size: 20480
+          media-type: application/yaml
     recommendations:
       - id: REC-01
         text: "Add user guide references to the Security Insights file and publish basic user documentation."
@@ -100,6 +104,10 @@ results:
         type: EnforcementLog
         description: "Enforcement actions taken for documentation failures"
         collected-at: "2025-08-22T16:05:00Z"
+        source:
+          reference-id: enforcement-log
+          # sha512: registered, so also checked for length
+          digest: "sha512:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
     recommendations:
       - id: REC-02
         text: "Formalize the private vulnerability reporting process and document it in SECURITY.md."
@@ -120,4 +128,7 @@ results:
         source:
           reference-id: github-api
           coordinate: "/repos/gemaraproj/gemara/dependency-graph/sbom"
-          digest: "sha256:a1b2c3d4e5f67890abcdef1234567890abcdef1234567890abcdef1234567890"
+          # An algorithm this profile does not register: checked for grammar only, so
+          # the algorithm set extends without the field becoming a closed enum. A
+          # verifier that cannot compute it reports unverifiable, never valid.
+          digest: "sha3-512:d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0"

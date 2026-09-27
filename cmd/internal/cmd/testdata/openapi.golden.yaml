@@ -722,6 +722,18 @@ components:
       format: date-time
       type: string
       x-status: stable
+    Digest:
+      description: "Digest is a cryptographic hash of a full octet stream; format: algorithm:encoded\n(e.g. sha256:<64 lowercase hex>). sha256 is the MUST-support floor for every\nconforming verifier; sha512 and blake3 are MAY. Registered algorithms are\nadditionally checked for that algorithm's encoding and length; any other algorithm\nis checked for grammar only, per the OCI rule that unrecognized algorithms\ncomplying with the grammar pass. That is how the algorithm set extends without\nthis field becoming a closed enum.\n\nThe hash covers the full octet stream as delivered — never a canonical\nre-serialization, and never a sub-resource selected by coordinate or entry-id,\nwhich are reader hints rather than inputs to the hash. A verifier reports exactly\none of three outcomes per citation: verified, integrity-failure, or unverifiable\n(retrieval failed, or the algorithm is unregistered or unimplemented). None of\nthem may be reported as valid. Absence of digest means no integrity claim was\nmade, not that the content is known unchanged.\n\nIt is one digest rather than a set of them. The algorithm travels in the value, so\nadopting a new one needs no schema change, and the MUST-support floor means the\ndigest a citation carries is one every conforming verifier can check — which is\nall that ISO 19011's requirement that audit evidence be verifiable asks for. A set\nwould buy only simultaneous publication for verifiers of differing capability,\nwhich the floor already removes, at the cost of a rule this schema cannot enforce:\na set holding one matching and one mismatching digest has two defensible readings,\nand CUE cannot hash. Handing a subject or materials list to an in-toto verifier\nwould need that type's DigestSet; the place for it then is a content descriptor\nprimitive, not a wider #Digest, whose projections every consumer reads."
+      oneOf:
+      - allOf:
+        - pattern: ^[a-z0-9]+(?:[+._-][a-z0-9]+)*:[a-zA-Z0-9=_-]+$
+        - pattern: ^(?:sha256:[a-f0-9]{64}|sha512:[a-f0-9]{128}|blake3:[a-f0-9]{64})$
+      - allOf:
+        - pattern: ^[a-z0-9]+(?:[+._-][a-z0-9]+)*:[a-zA-Z0-9=_-]+$
+        - not:
+            pattern: "^(?:sha256|sha512|blake3):"
+      type: string
+      x-status: stable
     Dimensions:
       description: Dimensions specify the applicability criteria for a policy
       properties:
@@ -834,12 +846,9 @@ components:
           - $ref: "#/components/schemas/EntityType"
           description: type specifies the type of entity interacting in the workflow
         uri:
-          description: |-
-            uri is a general URI for the entity information.
-            Any URI scheme is accepted (e.g. https, file, oci, s3, arn) so entities
-            hosted outside http(s) can be referenced.
-          pattern: "^[a-zA-Z][a-zA-Z0-9+.-]*:[^\\s]+$"
-          type: string
+          allOf:
+          - $ref: "#/components/schemas/URL"
+          description: "uri is a general URI for the entity information. Any URI scheme is accepted\n(e.g. https, file, oci, s3, arn) so entities hosted outside http(s) can be\nreferenced. It is the named #URL type rather than a second copy of the same\npattern, so the two cannot drift apart."
         version:
           description: version is the version of the entity (for tools; if applicable)
           type: string
@@ -966,16 +975,27 @@ components:
           description: |-
             coordinate is the precise location within the stream identified by reference-id
             (e.g. an API path, file path, or JSON path expression). May be combined with
-            entry-id to identify a sub-location within that entry's output.
+            entry-id to identify a sub-location within that entry's output. It is a reader
+            hint, not an address a verifier resolves, and not an input to digest.
           type: string
         digest:
-          description: "digest is a cryptographic hash of the observed content at collection time; format: algorithm:encoded (e.g. sha256:abc123...)"
-          pattern: ^[a-z0-9]+(?:[+._-][a-z0-9]+)*:[a-zA-Z0-9=_-]+$
-          type: string
-        entry-id:
+          allOf:
+          - $ref: "#/components/schemas/Digest"
+          description: "digest is a cryptographic hash of the full octet stream this citation refers to,\nas delivered. See #Digest for what a verifier must do with it, and for why\nabsence is not assurance."
+        download-url:
+          allOf:
+          - $ref: "#/components/schemas/URL"
           description: |-
-            entry-id identifies a specific entry within a referenced Gemara artifact.
-            May be combined with coordinate to identify a sub-location within that entry's output.
+            download-url is the address this content can be retrieved from, where that is
+            not the url of the mapping-reference named by reference-id.
+        entry-id:
+          description: "entry-id identifies a specific entry within a referenced Gemara artifact. May be\ncombined with coordinate. Like coordinate, it is a reader hint rather than an\ninput to digest: the hash covers the whole stream, not the entry selected from it."
+          type: string
+        media-type:
+          description: |-
+            media-type is the IANA media type of that content, e.g. application/json,
+            text/yaml.
+          pattern: "^[a-zA-Z0-9][a-zA-Z0-9!#$&.+^_-]*/[a-zA-Z0-9][a-zA-Z0-9!#$&.+^_-]*$"
           type: string
         reference-id:
           description: reference-id ties this evidence to a mapping-reference in the artifact's metadata
@@ -983,6 +1003,10 @@ components:
         remarks:
           description: remarks is prose regarding this evidence reference
           type: string
+        size:
+          description: size is the length, in bytes, of that octet stream.
+          minimum: 0.0
+          type: integer
       required:
       - reference-id
       type: object
@@ -1437,7 +1461,6 @@ components:
       type: object
       x-status: experimental
     MappingReference:
-      description: MappingReference represents a reference to an external document with full metadata.
       properties:
         description:
           description: description is prose regarding the artifact's purpose or content
@@ -2074,6 +2097,13 @@ components:
           description: entry-type identifies the type of atomic unit entries in this direction
       type: object
       x-status: experimental
+    URL:
+      description: |-
+        URL is a URI with a scheme. Any scheme is accepted (e.g. https, file, oci, s3,
+        arn), so content hosted outside http(s) can be addressed.
+      pattern: "^[a-zA-Z][a-zA-Z0-9+.-]*:[^\\s]+$"
+      type: string
+      x-status: stable
     Vector:
       description: A Vector represents a method, pathway, or technique through which a threat may be realized or an attack may be carried out.
       properties:

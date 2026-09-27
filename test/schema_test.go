@@ -123,6 +123,7 @@ func TestSchemaValidation(t *testing.T) {
 		// AuditLog — positive
 		{"valid audit log", "./test-data/good-audit-log.yaml", "#AuditLog", false, ""},
 		{"audit log evidence mapping with both coordinate and entry-id", "./test-data/good-audit-log-coordinate-and-entry-id.yaml", "#AuditLog", false, ""},
+		{"digests across the registered and open algorithm profile", "./test-data/good-audit-log-digest-profile.yaml", "#AuditLog", false, ""},
 
 		// AuditLog — negative
 		{"audit log missing summary criteria and results", "./test-data/bad-audit-log.yaml", "#AuditLog", true, ""},
