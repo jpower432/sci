@@ -57,7 +57,7 @@ package gemara
 }
 
 // URL validates an absolute URI with any scheme (e.g. https, file, oci, s3).
-#URL: =~"^[a-zA-Z][a-zA-Z0-9+.-]*:[^\\s]+$" @go(-)
+#URL: =~"^[a-zA-Z][a-zA-Z0-9+.-]*:[^\\s]+$"
 
 // Digest is a cryptographic hash of a full octet stream; format: algorithm:encoded
 // (e.g. sha256:<64 lowercase hex>). sha256 is the MUST-support floor for every
@@ -86,4 +86,4 @@ package gemara
 // whose Go and OpenAPI projections every consumer reads.
 #Digest: (=~"^[a-z0-9]+(?:[+._-][a-z0-9]+)*:[a-zA-Z0-9=_-]+$" &
 	(=~"^(?:sha256:[a-f0-9]{64}|sha512:[a-f0-9]{128}|blake3:[a-f0-9]{64})$" |
-	!~"^(?:sha256|sha512|blake3):")) @go(-)
+	!~"^(?:sha256|sha512|blake3):"))

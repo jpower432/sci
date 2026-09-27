@@ -280,10 +280,15 @@ import "list"
 	// plan was followed obliges the plan-id it was verified against. This is the
 	// obligation #AssessmentLog puts on plan and execution, at the checking end of
 	// the same chain.
+	//
+	// Both directions are stated positively, on the field each requires. Forbidding
+	// a field instead — plan?: error(...) where no plan-id is named — puts bottom in
+	// that field's type, and the Go projection degrades it to `any` with a TODO,
+	// which takes the field away from every consumer to catch an authoring mistake.
 
 	if effective."plan-id" != _|_ {plan: #PlanVerification}
 
-	if effective."plan-id" == _|_ {plan?: error("a plan verification names the plan it verified against: set effective.plan-id, or drop the plan block")}
+	if plan != _|_ {effective: "plan-id": string}
 
 	// Omitting evidence-present says there was no evidence question to ask, which is
 	// true only of a requirement the audit determined Not Applicable. Everything the

@@ -131,7 +131,7 @@ func TestSchemaValidation(t *testing.T) {
 		{"executed assessment missing start", "./test-data/bad-evaluation-log-missing-start.yaml", "#EvaluationLog", true, "\"assessment-logs\".0.start"},
 		{"evaluation log citing an undeclared reference", "./test-data/bad-evaluation-log-undeclared-reference.yaml", "#EvaluationLog", true, "_refValidation"},
 		{"evidence with an inline payload and a download-url", "./test-data/bad-evaluation-log-payload-with-download-url.yaml", "#EvaluationLog", true, "inline payload cannot also have a source download-url"},
-		{"evidence source with a download-url and no digest", "./test-data/bad-evaluation-log-download-url-without-digest.yaml", "#EvaluationLog", true, "comes with the digest of what was fetched"},
+		{"evidence source with a download-url and no digest", "./test-data/bad-evaluation-log-download-url-without-digest.yaml", "#EvaluationLog", true, "source.digest"},
 		{"log evaluating the same control twice", "./test-data/bad-evaluation-log-duplicate-control.yaml", "#EvaluationLog", true, "_uniqueEvaluatedControls"},
 		{"control evaluation assessing the same requirement twice", "./test-data/bad-evaluation-log-duplicate-requirement.yaml", "#EvaluationLog", true, "_uniqueAssessments"},
 
@@ -161,7 +161,7 @@ func TestSchemaValidation(t *testing.T) {
 		{"verification entry omitting evidence-present for a requirement it audited", "./test-data/bad-audit-log-verification-missing-evidence-present.yaml", "#AuditLog", true, "verifications.0.outcome"},
 		{"not compliant finding stating no severity", "./test-data/bad-audit-log-not-compliant-missing-severity.yaml", "#AuditLog", true, "findings.0.severity"},
 		{"named plan with no record of how it was followed", "./test-data/bad-audit-log-plan-id-without-verification.yaml", "#AuditLog", true, "plan.bound"},
-		{"plan verification naming no plan-id", "./test-data/bad-audit-log-plan-verification-without-plan-id.yaml", "#AuditLog", true, "names the plan it verified against"},
+		{"plan verification naming no plan-id", "./test-data/bad-audit-log-plan-verification-without-plan-id.yaml", "#AuditLog", true, "effective.\"plan-id\""},
 		{"method entry not saying whether the method was used", "./test-data/bad-audit-log-method-missing-used.yaml", "#AuditLog", true, "methods.0.used"},
 		{"entry claiming evidence is present while naming none", "./test-data/bad-audit-log-evidence-present-without-evidence.yaml", "#AuditLog", true, "verifications.0.\"evidence-present\""},
 		{"plan verification enumerating no methods", "./test-data/bad-audit-log-plan-no-methods.yaml", "#AuditLog", true, "plan.methods"},

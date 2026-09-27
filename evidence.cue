@@ -70,7 +70,7 @@ package gemara
 	// Embedded information about how evidence can be retrieved.
 	// download-url is the address this content can be retrieved from is it not
 	// available from the MappingReference.url.
-	"download-url"?: #URL @go(DownloadUrl)
+	DU="download-url"?: #URL @go(DownloadUrl)
 
 	// digest is a cryptographic hash of the full octet stream retrieved from
 	// download-url. See #Digest for what a verifier must do with it.
@@ -92,13 +92,14 @@ package gemara
 	// digest of what was fetched: whoever retrieved the bytes could hash them, and
 	// an address without a digest says where the artifact is without saying what it
 	// was. reference-id and coordinate already cover "here is where to look"
-	// without claiming retrievability. Written as the contrapositive so the
-	// condition reads a field whose name is an identifier, and so the message can
-	// say what to do. Note that == _|_ is true of an invalid digest as well as an
-	// absent one, so a malformed digest reports here too.
+	// without claiming retrievability.
+	//
+	// Stated on digest, the field it requires, rather than on download-url, the one
+	// it would forbid: an error() on download-url puts bottom in that field's type,
+	// and the Go projection degrades the field to `any` for every consumer.
 
-	if digest == _|_ {
-		"download-url"?: error("a download-url comes with the digest of what was fetched: add digest, or cite this source by reference-id and coordinate instead")
+	if DU != _|_ {
+		digest: #Digest
 	}
 }
 

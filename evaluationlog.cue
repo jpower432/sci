@@ -140,7 +140,7 @@ import "list"
 
 	if plan != _|_ {execution: #ExecutionFacts}
 
-	if plan == _|_ {execution?: _|_}
+	if execution != _|_ {plan: #EntryMapping}
 
 	// Each evidence entry carries a payload, a source, or both.
 
