@@ -77,6 +77,7 @@ func TestSchemaValidation(t *testing.T) {
 		// A complete audit at the scale of a real baseline, with the policy it was
 		// conducted against (examples/osps-level-2)
 		{"OSPS Level 2 adherence policy", "../examples/osps-level-2/policy.yaml", "#Policy", false, ""},
+		{"scan behind the OSPS baseline audit", "../examples/osps-level-2/evaluation-log.yaml", "#EvaluationLog", false, ""},
 		{"complete audit of the OSPS baseline", "../examples/osps-level-2/audit-log.yaml", "#AuditLog", false, ""},
 
 		// RiskCatalog — positive

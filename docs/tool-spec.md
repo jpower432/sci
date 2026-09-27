@@ -126,6 +126,14 @@ document reports the check as **unperformed**, not as passed.
 9. **Assessment pointers resolve.** Each `assessments` entry resolves to an entry
    that exists in the log it names, and that entry concerns the same requirement as
    the verification entry citing it.
+
+   An `#AssessmentLog` carries no id, so a citation resolves by the requirement its
+   `entry-id` names. That is enough while a requirement has one assessment, and
+   ambiguous the moment a plan requires two methods, because the same requirement
+   then has two. Until assessment entries are addressable, such a citation must carry
+   a `coordinate` identifying the assessment — `execution.method-id=<id>` is the
+   convention `examples/osps-level-2` uses — and a tool should reject a citation into
+   a requirement with several assessments that names no coordinate.
 10. **Freshness.** `evidence-fresh` must be consistent with evidence `collected-at`
     against the plan's `evidence-requirements.valid-for-days` where a plan sets one.
     Where none does, the auditor's basis for the judgement should be stated in a
@@ -276,7 +284,16 @@ paraphrase.
 | `#Evidence.type` | in-toto `predicateType` | an evidence type names the shape of what was collected |
 | `#Policy` | OSCAL profile | a policy selects, constrains and parametrizes catalog content; it never rewrites it |
 
-## 7. Open items
+## 7. Conformance checking
+
+`test/conformance_test.go` in the schema repo implements the rules above that need no
+clock, against the complete chain in `examples/osps-level-2`. It is worth reading
+before implementing your own: each rule is a few lines, and each one of them has been
+shown to fail when the example is mutated to break it. Cadence and freshness are left
+out deliberately, since a test that reads the wall clock either rots or passes for the
+wrong reason.
+
+## 8. Open items
 
 - **A digest is one value, not a set.** The rationale is recorded on `#Digest`. The
   trigger that would reopen it is handing a subject or materials list to an in-toto

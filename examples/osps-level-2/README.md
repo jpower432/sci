@@ -7,7 +7,13 @@ covers every requirement of an actual baseline, rather than four hand-picked one
 - `policy.yaml` — an adherence policy adopting the
   [OpenSSF Project Security Baseline](https://baseline.openssf.org) at Maturity
   Level 2, binding assessment plans to twelve requirements and excluding three.
-- `audit-log.yaml` — the audit conducted against it.
+- `evaluation-log.yaml` — the scan that evaluated it: 32 control evaluations over 44
+  assessments, four requirements being assessed twice because their plan requires two
+  methods.
+- `audit-log.yaml` — the audit conducted against both.
+
+Together they are a complete chain, which is what lets
+`test/conformance_test.go` check the cross-document rules that CUE cannot.
 
 ## What it demonstrates
 
@@ -47,3 +53,7 @@ catalog, and a tool must implement them:
 3. **Plan and method resolution** — every `effective.plan-id` names a plan in the
    cited policy governing that requirement, and every `method-id` is one that plan
    accepts.
+4. **Citations resolve** — every `assessments` entry names an assessment the scan
+   actually contains. An assessment log has no id of its own, so the citation
+   resolves by requirement, and where a plan requires two methods the requirement
+   alone is ambiguous: those citations carry a `coordinate` naming the method.

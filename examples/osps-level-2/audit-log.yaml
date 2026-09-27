@@ -17,9 +17,9 @@ metadata:
     version: 1.0.0
     url: https://baseline.openssf.org
   - id: eval-log
-    title: Baseline Scanner Evaluation Log
-    version: '2026-03-28'
-    url: https://artifacts.example.com/eval-logs/2026-03-28.yaml
+    title: OSPS Level 2 Baseline Scan
+    version: 1.0.0
+    url: https://artifacts.example.com/eval-logs/OSPS-L2-SCAN-2026-03-28.yaml
 target:
   id: gemara-repo
   name: gemaraproj/gemara
@@ -59,6 +59,10 @@ verifications:
   assessments:
   - reference-id: eval-log
     entry-id: OSPS-AC-01.01
+    coordinate: execution.method-id=EM-OSPS-AC-01.01-probe
+  - reference-id: eval-log
+    entry-id: OSPS-AC-01.01
+    coordinate: execution.method-id=EM-OSPS-AC-01.01-review
   plan:
     bound: Satisfied
     methods:
@@ -139,6 +143,10 @@ verifications:
   assessments:
   - reference-id: eval-log
     entry-id: OSPS-AC-03.02
+    coordinate: execution.method-id=EM-OSPS-AC-03.02-probe
+  - reference-id: eval-log
+    entry-id: OSPS-AC-03.02
+    coordinate: execution.method-id=EM-OSPS-AC-03.02-review
   plan:
     bound: Satisfied
     methods:
@@ -218,6 +226,10 @@ verifications:
   assessments:
   - reference-id: eval-log
     entry-id: OSPS-BR-01.02
+    coordinate: execution.method-id=EM-OSPS-BR-01.02-probe
+  - reference-id: eval-log
+    entry-id: OSPS-BR-01.02
+    coordinate: execution.method-id=EM-OSPS-BR-01.02-review
   plan:
     bound: Satisfied
     methods:
@@ -294,6 +306,10 @@ verifications:
   assessments:
   - reference-id: eval-log
     entry-id: OSPS-BR-03.02
+    coordinate: execution.method-id=EM-OSPS-BR-03.02-probe
+  - reference-id: eval-log
+    entry-id: OSPS-BR-03.02
+    coordinate: execution.method-id=EM-OSPS-BR-03.02-review
   plan:
     bound: Satisfied
     methods:
