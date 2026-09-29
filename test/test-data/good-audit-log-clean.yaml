@@ -18,8 +18,20 @@ metadata:
       url: "https://baseline.openssf.org"
     - id: eval-log
       title: "PVTR Evaluation Log"
-      version: "2026-05-01"
+      version: "2025-08-22"
       url: "https://artifacts.example.com/eval-logs/pvtr-baseline-scan.yaml"
+    - id: enforcement-log
+      title: "Example Enforcement Log"
+      version: "2025-08-22"
+      url: "https://artifacts.example.com/enforcement-logs/enforcement-log-001.yaml"
+    - id: github-api
+      title: "GitHub Dependency Graph API"
+      version: "2026"
+      url: "https://docs.github.com/en/rest/dependency-graph"
+    - id: risk-catalog
+      title: "Organizational Risk Catalog"
+      version: "2026.1"
+      url: "https://artifacts.example.com/risk-catalog.yaml"
 
 target:
   id: gemara-repo
@@ -28,15 +40,24 @@ target:
   uri: "https://github.com/gemaraproj/gemara"
   environment: production
 
-summary: "Every requirement in scope was evidenced and met. Nothing is called out."
-
-opinion: Passed
+owner:
+  responsible:
+    - name: "Jane Auditor"
+      affiliation: "External Audit Firm"
+  accountable:
+    - name: "Project Lead"
+      affiliation: "OpenSSF"
 
 policy:
   reference-id: security-policy
-  remarks: "Organizational policy establishing the audit's scope; it imports the OSPS baseline."
+  remarks: "Organizational policy establishing the audit's criteria; it imports the OSPS baseline."
+
+objectives:
+  - "Establish whether the target meets the requirements the policy binds to it."
+  - "Establish whether the evidence behind each determination was obtained as the policy requires."
 
 verifications:
+  # No plan is bound, so there is nothing to have conformed to.
   - requirement:
       reference-id: OSPS
       entry-id: OSPS-AC-01
@@ -45,14 +66,84 @@ verifications:
         control system, the system MUST require multi-factor authentication."
       applicability:
         - Maturity Level 1
-    outcome: Compliant
-    evidence-present: Satisfied
-    evidence-fresh: Satisfied
+    plan-conformance: Not Applicable
+    outcome: Satisfied
+    assessments:
+      - reference-id: eval-log
+        entry-id: OSPS-AC-01.01
+
+  # A plan is bound and was not followed: the probe ran outside its cadence.
+  - requirement:
+      reference-id: OSPS
+      entry-id: OSPS-DO-01
+    effective:
+      text: "The project MUST publish user documentation describing how to install and
+        use the software."
+      applicability:
+        - Maturity Level 1
+      constraints:
+        - id: c-annual-review
+          text: "Review the published user documentation at least annually."
+      plan-id: plan-doc-review
+    plan-conformance: Satisfied
+    outcome: Satisfied
+    assessments:
+      - reference-id: eval-log
+        entry-id: OSPS-DO-01.01
     evidence:
-      - id: EV-AC-01
+      - id: EV-DO-01
         type: EvaluationLog
-        description: "PVTR evaluation results for access control"
-        collected-at: "2026-05-01T09:12:00Z"
+        description: "PVTR evaluation results for documentation controls"
+        collected-at: "2025-08-22T16:02:00Z"
         source:
           reference-id: eval-log
-          entry-id: "assessment-ac-01"
+          entry-id: "assessment-do-01"
+          digest: "sha256:c4d5e6f7a8b9012cdef34567890abcdef1234567890abcdef1234567890abc12"
+
+  - requirement:
+      reference-id: OSPS
+      entry-id: OSPS-DO-02
+    effective:
+      text: "The project MUST provide a private channel for reporting suspected
+        vulnerabilities."
+      applicability:
+        - Maturity Level 1
+    plan-conformance: Not Applicable
+    outcome: Satisfied
+    evidence:
+      - id: EV-DO-02
+        type: EnforcementLog
+        description: "Enforcement actions taken for documentation failures"
+        collected-at: "2025-08-22T16:05:00Z"
+        source:
+          reference-id: enforcement-log
+
+  # Evidence that does not describe itself, so the entry says what established the outcome.
+  - requirement:
+      reference-id: OSPS
+      entry-id: OSPS-QA-02
+    effective:
+      text: "The project MUST publish dependency manifests enumerating its direct
+        dependencies."
+      applicability:
+        - Maturity Level 2
+    plan-conformance: Not Applicable
+    outcome: Satisfied
+    basis: "The SBOM endpoint returned a manifest enumerating all 41 direct dependencies,
+      each with a resolved version."
+    evidence:
+      - id: EV-QA-01
+        type: urn:gemara:evidence:api-response
+        description: "Dependency manifests from the GitHub dependency graph SBOM endpoint"
+        collected-at: "2026-02-10T15:05:00Z"
+        source:
+          reference-id: github-api
+          coordinate: "/repos/gemaraproj/gemara/dependency-graph/sbom"
+          digest: "sha256:a1b2c3d4e5f67890abcdef1234567890abcdef1234567890abcdef1234567890"
+
+opinion: Passed
+
+summary: "Every requirement the policy governs was satisfied and the evidence behind each
+  was obtained as the policy requires, so there is nothing to call out. The audit examined
+  evidence collected between August 2025 and February 2026; conditions may have changed
+  since."

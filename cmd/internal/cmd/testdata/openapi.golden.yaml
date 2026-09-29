@@ -350,14 +350,15 @@ components:
       - $ref: "#/components/schemas/Log"
       - required:
         - metadata
-        - summary
-        - opinion
         - policy
+        - objectives
         - verifications
-      description: AuditLog records results from an audit performed against a target resource
+        - opinion
+        - summary
+      description: "AuditLog records an audit: what it examined the target against, what it\nestablished for each requirement, what it reports, and what it concludes. The\nfields follow the order the work happens in — criteria, then verification, then\nsynthesis, then decision — which is also ISO 19011's sequence: collecting and\nverifying information, generating findings, determining conclusions."
       properties:
         findings:
-          description: "findings are what this audit reports: the called-out determinations, each\nnaming the requirement or the risk it concerns. verifications is the\nsystematic view, one entry per requirement; this is the selective one, and\nthe only one that reasons. It is absent when the audit had nothing to call\nout, which is what a Passed opinion looks like."
+          description: "findings are what this audit reports: the synthesis over those verifications,\neach naming the requirement or the risk it concerns and carrying the\ncompliance judgement that the verification layer deliberately does not make.\nIt is absent when the audit had nothing to call out, which is what a Passed\nopinion looks like."
           items:
             $ref: "#/components/schemas/ComplianceFinding"
           type: array
@@ -371,14 +372,18 @@ components:
           required:
           - type
           type: object
+        objectives:
+          description: "objectives are what this audit set out to establish. They are stated because\nthe conclusion has to speak to them: an opinion is an answer to a question,\nand without the question recorded a later reader cannot tell whether the audit\nachieved what it was for, or judge the scope it settled for."
+          items:
+            type: string
+          minItems: 1
+          type: array
         opinion:
           allOf:
           - $ref: "#/components/schemas/Opinion"
           description: |-
-            opinion is that same conclusion in one word, so a consumer of the
-            attestation need not weigh the findings itself. summary carries the prose;
-            this is the machine-readable one. Anything other than Passed is expected to
-            be explained by findings, documented rather than enforced.
+            opinion is the audit's conclusion in one word, so a consumer of the
+            attestation need not weigh the findings itself.
         owner:
           allOf:
           - $ref: "#/components/schemas/RACI"
@@ -386,12 +391,16 @@ components:
         policy:
           allOf:
           - $ref: "#/components/schemas/ArtifactMapping"
-          description: "policy is this audit's criteria in ISO 19011's sense: the single versioned\nartifact the evidence was compared against. It is one policy rather than a\nlist because the policy is also what defines scope — selection, exclusions\nand applicability — and the audit's completeness claim has nothing to be\ncomplete against without a governed set. Auditing a baseline means authoring\na policy that imports it; auditing against several criteria means one policy\nthat imports them all.\n\nThis does not hide the criteria's content: the underlying catalogs stay named\nin metadata.mapping-references, and each verification carries the requirement\nas resolved, so a reader sees what was required without fetching the policy.\nIt does mean the bare plan-id and method-id references elsewhere in this file\nare legal only while the criteria is singular — with one policy pinned here,\nnothing else needs a qualifier."
+          description: "policy is this audit's criteria in ISO 19011's sense: the single versioned\nartifact the evidence was compared against. It is one policy rather than a\nlist because the policy is also what defines scope — selection, exclusions\nand applicability — and the audit's completeness claim has nothing to be\ncomplete against without a governed set. Auditing a baseline means authoring\na policy that imports it; auditing against several criteria means one policy\nthat imports them all, and importing guidance into a policy makes it binding.\n\nThis does not hide the criteria's content: the underlying catalogs stay named\nin metadata.mapping-references, and each verification carries the requirement\nas resolved, so a reader sees what was required without fetching the policy.\nIt does mean the bare plan-id references elsewhere in this file are legal only\nwhile the criteria is singular — with one policy pinned here, nothing else\nneeds a qualifier."
         summary:
-          description: summary provides the high-level conclusion
+          description: "summary is that conclusion in prose, including anything the opinion cannot\ncarry: what the objectives established, trends across the findings, and the\nuncertainty any audit of a moment carries."
           type: string
         verifications:
-          description: "verifications records, for every requirement, what was mechanically checked\nand how it came out. It is complete by construction — one entry per\nrequirement, including the boring passes — and carries no reasoning: it is\nthe audit's counterpart of #ControlEvaluation, not of #ComplianceFinding."
+          description: |-
+            verifications records, for every requirement the policy governs, what was
+            examined and what it established. It is complete by construction — one entry
+            per requirement, including the boring passes — and carries determinations
+            rather than judgements.
           items:
             $ref: "#/components/schemas/VerificationLog"
           minItems: 1
@@ -756,6 +765,20 @@ components:
       - Clear
       type: string
       x-status: experimental
+    EffectiveConstraint:
+      description: "EffectiveConstraint is one prescriptive addition a policy attached to a\nrequirement, as it applied. It is a named type rather than an inline struct so\nthat consumers can name it: an anonymous struct projects into Go as an anonymous\nstruct, which nothing can take as an argument or build a literal of without\nrepeating the definition. It carries no target-id, unlike the policy's\n#Constraint, because the constraint is already attached to the requirement it\ntargets."
+      properties:
+        id:
+          description: id identifies this constraint within the policy that attached it.
+          type: string
+        text:
+          description: text is the constraint as it applied to the requirement.
+          type: string
+      required:
+      - id
+      - text
+      type: object
+      x-status: experimental
     EffectiveRequirement:
       description: "EffectiveRequirement is what a policy required of one requirement, as resolved\nat audit time: the text as it applied, the applicability that selected it, the\nconstraints the policy attached, and the plan bound to it. It is copied into\nthe audit on purpose. An audit is a point-in-time attestation, and a pointer\nalone stops saying what was audited once the catalog moves, retires the\nrequirement, or the policy's constraints change."
       properties:
@@ -768,15 +791,7 @@ components:
         constraints:
           description: constraints are the prescriptive additions the policy attached to it.
           items:
-            properties:
-              id:
-                type: string
-              text:
-                type: string
-            required:
-            - id
-            - text
-            type: object
+            $ref: "#/components/schemas/EffectiveConstraint"
           type: array
         plan-id:
           description: plan-id names the assessment plan bound to this requirement.
@@ -1638,49 +1653,6 @@ components:
       - Gate
       type: string
       x-status: experimental
-    MethodVerification:
-      description: MethodVerification records how one evaluation method fared against its plan.
-      properties:
-        allowed:
-          allOf:
-          - $ref: "#/components/schemas/Determination"
-          description: "allowed records whether the plan permits this method. It is required: a\nmethod entry can always answer it, and an entry that names a method without\nsaying whether the plan accepts it has verified nothing."
-        cadence-met:
-          allOf:
-          - $ref: "#/components/schemas/Determination"
-          description: |-
-            cadence-met records whether this method ran within the requirement's
-            frequency-days. It is required because every plan states a frequency, so
-            there is always a cadence to have met; a method that ran without the plan
-            allowing it has none to meet, which is Not Applicable. It is recorded per
-            method rather than per requirement so that a lagging method is named; the
-            requirement's answer is the outcome above.
-        executor-matched:
-          allOf:
-          - $ref: "#/components/schemas/Determination"
-          description: |-
-            executor-matched records whether the executor matched the plan's, compared
-            by authoritative identifier rather than by internal short name.
-        method-id:
-          description: method-id names the accepted method this entry reports on.
-          type: string
-        parameters-matched:
-          allOf:
-          - $ref: "#/components/schemas/Determination"
-          description: |-
-            parameters-matched records whether the recorded parameter values are the
-            ones the plan declares, within their accepted values.
-        used:
-          allOf:
-          - $ref: "#/components/schemas/Determination"
-          description: "used records whether this method was actually used. It is required for the\nsame reason as allowed: whether a method ran is always answerable, and a\nrequired method that did not run is the failure this list exists to surface."
-      required:
-      - method-id
-      - allowed
-      - used
-      - cadence-met
-      type: object
-      x-status: experimental
     MitigatedRisk:
       description: MitigatedRisk represents a risk addressed by the policy
       properties:
@@ -1754,26 +1726,6 @@ components:
       - id
       - label
       - description
-      type: object
-      x-status: experimental
-    PlanVerification:
-      description: "PlanVerification records whether the plan bound to a requirement was followed.\nMethod-specific checks sit per method, because a plan may require several\nevaluation methods and each produces its own assessment: a single outcome per\nrequirement could not say which method fell short."
-      properties:
-        bound:
-          allOf:
-          - $ref: "#/components/schemas/Determination"
-          description: |-
-            bound records whether the assessment ran under the plan the policy binds to
-            this requirement.
-        methods:
-          description: "methods records one entry per method involved: those the plan requires, and\nany that ran without the plan allowing them. At least one, because a plan\ndeclares at least one accepted method, so a plan verification that\nenumerates none has verified nothing about the methods."
-          items:
-            $ref: "#/components/schemas/MethodVerification"
-          minItems: 1
-          type: array
-      required:
-      - bound
-      - methods
       type: object
       x-status: experimental
     Policy:
@@ -2271,7 +2223,7 @@ components:
       type: object
       x-status: experimental
     VerificationLog:
-      description: "VerificationLog records what an audit mechanically checked for one requirement,\nand how it came out. It is the audit's counterpart of #AssessmentLog: a record\nof a check that ran, carrying an outcome and no reasoning. Each check is a named\nfield so that a check never made is visible as a missing field rather than as an\nabsent list entry."
+      description: "VerificationLog records what an audit established for one requirement: what it\nexamined, whether the evidence was obtained the way the policy required, and\nwhether the requirement was satisfied by it. It is the audit's counterpart of\n#AssessmentLog — a record of checking, carrying determinations and no judgement.\n\nIts vocabulary is deliberately #Determination rather than #ComplianceStatus.\nConformance is about satisfaction, which is mechanical; compliance is a judgement,\nand judgement belongs to the findings that synthesise these entries. A reader who\nwants to know what was met reads here; a reader who wants to know what it means\nreads a finding."
       properties:
         assessments:
           description: assessments are the assessments this audit read, if any.
@@ -2279,48 +2231,47 @@ components:
             $ref: "#/components/schemas/EvidenceMapping"
           minItems: 1
           type: array
+        basis:
+          description: "basis is what in the evidence established that outcome. It is for evidence\nthat does not say so itself: an assessment carries its own result, so a\ncitation of one needs no restating, while a PDF or an API response leaves the\nreader with an artifact and a conclusion and nothing between them."
+          type: string
         effective:
           allOf:
           - $ref: "#/components/schemas/EffectiveRequirement"
           description: |-
-            effective is what the policy actually required of it, resolved at audit
-            time, so the record says what was audited without fetching the catalog.
+            effective is what the policy actually required of it, resolved at audit time,
+            so the record says what was audited without fetching the catalog. Importing
+            guidance into a policy makes it binding, so an effective requirement may have
+            come from a control catalog, from guidance, or from another policy.
         evidence:
-          description: evidence records the data sources that support this result
+          description: evidence records the data sources that support this determination.
           items:
             allOf:
             - $ref: "#/components/schemas/Evidence"
             type: object
           minItems: 1
           type: array
-        evidence-fresh:
-          allOf:
-          - $ref: "#/components/schemas/Determination"
-          description: "evidence-fresh records whether that evidence is current: collected within\nthe plan's valid-for-days where a plan sets one, and within the auditor's\njudgement where none does."
-        evidence-present:
-          allOf:
-          - $ref: "#/components/schemas/Determination"
-          description: "evidence-present records whether this requirement is backed by evidence at\nall: the question verifications exist to answer, and answering it for every\nrequirement is what makes them complete rather than selective. It may be\nomitted only where there was no evidence question to ask, which is a\nrequirement the policy puts out of scope — and omitting it then obliges an\noutcome of Not Applicable, so the omission cannot hide an entry that was\nsimply left unanswered."
         outcome:
           allOf:
-          - $ref: "#/components/schemas/ComplianceStatus"
-          description: "outcome is whether the target complies with this requirement. It is stated\nrather than left to be recomputed from the checks below or from the\nfindings: giving every requirement an answer is what this layer is for.\nA check that came out Not Satisfied is expected to show here, since a\nrequirement that is unevidenced, stale or unverified against its plan\ncannot be determined Satisfied. An outcome a reader would question is\nexplained by a finding naming this requirement, because nothing recorded\nhere reasons. Both relationships are documented rather than enforced, as\n#Result's roll-up precedence is."
-        plan:
-          allOf:
-          - $ref: "#/components/schemas/PlanVerification"
+          - $ref: "#/components/schemas/Determination"
           description: |-
-            plan records whether the plan behind this requirement was followed. It is
-            absent when no plan backed the requirement, which is how a verification says
-            the requirement was evidenced without one, and required when effective
-            names a plan-id.
+            outcome is whether the evidence satisfied the requirement. It is stated for
+            every governed requirement, complete by construction, so that a requirement
+            checked and met is distinguishable from one never checked — which is the
+            property an audit exists to establish. What it means for compliance is a
+            finding's business, not this entry's.
+        plan-conformance:
+          allOf:
+          - $ref: "#/components/schemas/Determination"
+          description: "plan-conformance records whether the evidence was obtained the way the policy\nrequired: under the plan bound to this requirement, by one of its accepted\nmethods, by the executor it names, within its cadence. It is one determination\nrather than a field per dimension, because the policy grows dimensions and a\nrecord that mirrored them would have to grow with it — and because the detail\nof a shortfall is a judgement, which belongs in a finding. Not Applicable where\nthe policy binds no plan to this requirement."
         requirement:
           allOf:
           - $ref: "#/components/schemas/EntryMapping"
-          description: "requirement names the assessment requirement this entry determines, and is\nalso this entry's identity: one entry per requirement, so a finding names\nthe requirement rather than a minted id."
+          description: "requirement names the assessment requirement this entry determines, and is\nalso this entry's identity: one entry per requirement, so a finding names the\nrequirement rather than a minted id."
       required:
-      - outcome
       - requirement
       - effective
+      - plan-conformance
+      - outcome
       type: object
       x-status: experimental
 info:

@@ -39,9 +39,6 @@ target:
   type: Software
   uri: "https://github.com/gemaraproj/gemara"
   environment: production
-  owner:
-    name: "Gemara Maintainers"
-    affiliation: "OpenSSF"
 
 owner:
   responsible:
@@ -51,15 +48,16 @@ owner:
     - name: "Project Lead"
       affiliation: "OpenSSF"
 
-summary: "Access control and quality controls are strong. Documentation controls have gaps requiring remediation."
-
-opinion: Failed
-
 policy:
   reference-id: NOT-DECLARED-ANYWHERE
-  remarks: "Organizational policy establishing the audit's scope; it imports the OSPS baseline."
+  remarks: "Organizational policy establishing the audit's criteria; it imports the OSPS baseline."
+
+objectives:
+  - "Establish whether the target meets the requirements the policy binds to it."
+  - "Establish whether the evidence behind each determination was obtained as the policy requires."
 
 verifications:
+  # No plan is bound, so there is nothing to have conformed to.
   - requirement:
       reference-id: OSPS
       entry-id: OSPS-AC-01
@@ -68,18 +66,13 @@ verifications:
         control system, the system MUST require multi-factor authentication."
       applicability:
         - Maturity Level 1
-    outcome: Compliant
-    evidence-present: Satisfied
-    evidence-fresh: Satisfied
-    evidence:
-      - id: EV-AC-01
-        type: EvaluationLog
-        description: "PVTR evaluation results for access control"
-        collected-at: "2025-08-22T16:00:00Z"
-        source:
-          reference-id: eval-log
-          entry-id: "assessment-ac-01"
+    plan-conformance: Not Applicable
+    outcome: Satisfied
+    assessments:
+      - reference-id: eval-log
+        entry-id: OSPS-AC-01.01
 
+  # A plan is bound and was not followed: the probe ran outside its cadence.
   - requirement:
       reference-id: OSPS
       entry-id: OSPS-DO-01
@@ -92,21 +85,11 @@ verifications:
         - id: c-annual-review
           text: "Review the published user documentation at least annually."
       plan-id: plan-doc-review
-    outcome: Not Compliant
-    evidence-present: Satisfied
-    evidence-fresh: Satisfied
-    plan:
-      bound: Satisfied
-      methods:
-        - method-id: m-intent
-          allowed: Satisfied
-          used: Satisfied
-          executor-matched: Satisfied
-          cadence-met: Satisfied
-        - method-id: m-behavioral
-          allowed: Satisfied
-          used: Not Satisfied
-          cadence-met: Not Satisfied
+    plan-conformance: Not Satisfied
+    outcome: Not Satisfied
+    assessments:
+      - reference-id: eval-log
+        entry-id: OSPS-DO-01.01
     evidence:
       - id: EV-DO-01
         type: EvaluationLog
@@ -125,8 +108,8 @@ verifications:
         vulnerabilities."
       applicability:
         - Maturity Level 1
-    outcome: Not Compliant
-    evidence-present: Satisfied
+    plan-conformance: Not Applicable
+    outcome: Not Satisfied
     evidence:
       - id: EV-DO-02
         type: EnforcementLog
@@ -135,6 +118,7 @@ verifications:
         source:
           reference-id: enforcement-log
 
+  # Evidence that does not describe itself, so the entry says what established the outcome.
   - requirement:
       reference-id: OSPS
       entry-id: OSPS-QA-02
@@ -143,8 +127,10 @@ verifications:
         dependencies."
       applicability:
         - Maturity Level 2
-    outcome: Compliant
-    evidence-present: Satisfied
+    plan-conformance: Not Applicable
+    outcome: Satisfied
+    basis: "The SBOM endpoint returned a manifest enumerating all 41 direct dependencies,
+      each with a resolved version."
     evidence:
       - id: EV-QA-01
         type: urn:gemara:evidence:api-response
@@ -159,7 +145,9 @@ findings:
   - id: AR-DO-01
     status: Not Compliant
     severity: Medium
-    description: "No user guide is published or referenced in the Security Insights data."
+    lifecycle: Open
+    description: "No user guide is published or referenced in the Security Insights data,
+      and the review the plan requires ran outside its cadence."
     requirement:
       reference-id: OSPS
       entry-id: OSPS-DO-01
@@ -168,21 +156,10 @@ findings:
         text: "Add user guide references to the Security Insights file and publish basic user documentation."
         required: true
 
-  - id: AR-DO-03
-    status: Not Compliant
-    severity: Low
-    description: "The behavioral probe the plan requires did not run in this period, so
-      the documentation review rests on the intent method alone."
-    requirement:
-      reference-id: OSPS
-      entry-id: OSPS-DO-01
-    recommendations:
-      - id: REC-04
-        text: "Restore the behavioral probe to the documentation review pipeline."
-
   - id: AR-DO-02
     status: Not Compliant
     severity: High
+    lifecycle: Open
     description: "Private vulnerability reporting was not enabled prior to enforcement remediation."
     requirement:
       reference-id: OSPS
@@ -191,9 +168,20 @@ findings:
       - id: REC-02
         text: "Formalize the private vulnerability reporting process and document it in SECURITY.md."
 
+  # A finding may record conformity: ISO 19011 findings indicate conformity or nonconformity.
+  - id: AR-AC-01
+    status: Compliant
+    lifecycle: Resolved
+    description: "Multi-factor authentication is enforced organization-wide rather than per
+      repository, which satisfies this requirement for every repository in scope."
+    requirement:
+      reference-id: OSPS
+      entry-id: OSPS-AC-01
+
   - id: AR-RISK-01
     status: Not Compliant
     severity: Critical
+    lifecycle: Open
     description: "Residual risk RISK-002 remains above the maximum severity its category tolerates."
     risk:
       reference-id: risk-catalog
@@ -201,3 +189,10 @@ findings:
     recommendations:
       - id: REC-03
         text: "Add a compensating control or record a documented risk acceptance."
+
+opinion: Failed
+
+summary: "Access control and quality requirements are satisfied. Two documentation
+  requirements are not, one of them on evidence obtained outside the plan's cadence, and a
+  residual risk remains above tolerance. The audit examined evidence collected between
+  August 2025 and February 2026; conditions may have changed since."

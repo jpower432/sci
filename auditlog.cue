@@ -39,7 +39,11 @@ import "list"
 // stated rather than derived.
 #Opinion: "Passed" | "Passed with Conditions" | "Failed" | "Undetermined" @go(-)
 
-// AuditLog records results from an audit performed against a target resource
+// AuditLog records an audit: what it examined the target against, what it
+// established for each requirement, what it reports, and what it concludes. The
+// fields follow the order the work happens in — criteria, then verification, then
+// synthesis, then decision — which is also ISO 19011's sequence: collecting and
+// verifying information, generating findings, determining conclusions.
 #AuditLog: {
 	#Log
 	metadata: type: "AuditLog"
@@ -47,43 +51,49 @@ import "list"
 	// owner defines the RACI roles responsible for managing the audit
 	owner?: #RACI @go(Owner,optional=nillable)
 
-	// summary provides the high-level conclusion
-	summary: string
-
-	// opinion is that same conclusion in one word, so a consumer of the
-	// attestation need not weigh the findings itself. summary carries the prose;
-	// this is the machine-readable one. Anything other than Passed is expected to
-	// be explained by findings, documented rather than enforced.
-	opinion: #Opinion
-
 	// policy is this audit's criteria in ISO 19011's sense: the single versioned
 	// artifact the evidence was compared against. It is one policy rather than a
 	// list because the policy is also what defines scope — selection, exclusions
 	// and applicability — and the audit's completeness claim has nothing to be
 	// complete against without a governed set. Auditing a baseline means authoring
 	// a policy that imports it; auditing against several criteria means one policy
-	// that imports them all.
+	// that imports them all, and importing guidance into a policy makes it binding.
 	//
 	// This does not hide the criteria's content: the underlying catalogs stay named
 	// in metadata.mapping-references, and each verification carries the requirement
 	// as resolved, so a reader sees what was required without fetching the policy.
-	// It does mean the bare plan-id and method-id references elsewhere in this file
-	// are legal only while the criteria is singular — with one policy pinned here,
-	// nothing else needs a qualifier.
+	// It does mean the bare plan-id references elsewhere in this file are legal only
+	// while the criteria is singular — with one policy pinned here, nothing else
+	// needs a qualifier.
 	policy: #ArtifactMapping
 
-	// verifications records, for every requirement, what was mechanically checked
-	// and how it came out. It is complete by construction — one entry per
-	// requirement, including the boring passes — and carries no reasoning: it is
-	// the audit's counterpart of #ControlEvaluation, not of #ComplianceFinding.
+	// objectives are what this audit set out to establish. They are stated because
+	// the conclusion has to speak to them: an opinion is an answer to a question,
+	// and without the question recorded a later reader cannot tell whether the audit
+	// achieved what it was for, or judge the scope it settled for.
+	objectives: [string, ...string]
+
+	// verifications records, for every requirement the policy governs, what was
+	// examined and what it established. It is complete by construction — one entry
+	// per requirement, including the boring passes — and carries determinations
+	// rather than judgements.
 	verifications: [#VerificationLog, ...#VerificationLog]
 
-	// findings are what this audit reports: the called-out determinations, each
-	// naming the requirement or the risk it concerns. verifications is the
-	// systematic view, one entry per requirement; this is the selective one, and
-	// the only one that reasons. It is absent when the audit had nothing to call
-	// out, which is what a Passed opinion looks like.
+	// findings are what this audit reports: the synthesis over those verifications,
+	// each naming the requirement or the risk it concerns and carrying the
+	// compliance judgement that the verification layer deliberately does not make.
+	// It is absent when the audit had nothing to call out, which is what a Passed
+	// opinion looks like.
 	findings?: [...#ComplianceFinding] @go(Findings,type=[]*ComplianceFinding)
+
+	// opinion is the audit's conclusion in one word, so a consumer of the
+	// attestation need not weigh the findings itself.
+	opinion: #Opinion
+
+	// summary is that conclusion in prose, including anything the opinion cannot
+	// carry: what the objectives established, trends across the findings, and the
+	// uncertainty any audit of a moment carries.
+	summary: string
 
 	// ---- Validation --------------------------------------------------------
 	// Comments in validation sections stay detached (blank line after), so they
@@ -129,6 +139,26 @@ import "list"
 		}
 	}
 
+	// A requirement the evidence did not satisfy must be synthesised. Without a
+	// finding naming it, the record says the requirement was not met and never says
+	// what that means — non-compliance, or a gap the auditor accepted — which is
+	// exactly the judgement the verification layer defers to this one.
+
+	_findingRequirements: [
+		if findings != _|_
+		for f in findings if f.requirement != _|_ {"\(f.requirement."reference-id")/\(f.requirement."entry-id")"},
+	]
+
+	// Written as an assignment rather than a conditional: an incomplete value is
+	// tolerated on the right of an assignment and fatal in an if clause, and
+	// outcome is a disjunction until the data makes it concrete. A conditional
+	// here leaves #AuditLog itself unevaluable.
+
+	for i, v in verifications {
+		_synthesisValidation: "\(i)": true & (v.outcome != "Not Satisfied" ||
+			list.Contains(_findingRequirements, "\(v.requirement."reference-id")/\(v.requirement."entry-id")"))
+	}
+
 	// A finding names either a requirement this audit verified, or a risk. Naming a
 	// requirement with no verification entry would report on something the audit
 	// never checked.
@@ -139,54 +169,6 @@ import "list"
 			_requirementValidation: "\(i)": _verifiedRequirements & list.Contains("\(f.requirement."reference-id")/\(f.requirement."entry-id")")
 		}
 	}
-}
-
-// PlanVerification records whether the plan bound to a requirement was followed.
-// Method-specific checks sit per method, because a plan may require several
-// evaluation methods and each produces its own assessment: a single outcome per
-// requirement could not say which method fell short.
-#PlanVerification: {
-	// bound records whether the assessment ran under the plan the policy binds to
-	// this requirement.
-	bound: #Determination
-
-	// methods records one entry per method involved: those the plan requires, and
-	// any that ran without the plan allowing them. At least one, because a plan
-	// declares at least one accepted method, so a plan verification that
-	// enumerates none has verified nothing about the methods.
-	methods: [#MethodVerification, ...#MethodVerification]
-}
-
-// MethodVerification records how one evaluation method fared against its plan.
-#MethodVerification: {
-	// method-id names the accepted method this entry reports on.
-	"method-id": string @go(MethodId)
-
-	// allowed records whether the plan permits this method. It is required: a
-	// method entry can always answer it, and an entry that names a method without
-	// saying whether the plan accepts it has verified nothing.
-	allowed: #Determination
-
-	// used records whether this method was actually used. It is required for the
-	// same reason as allowed: whether a method ran is always answerable, and a
-	// required method that did not run is the failure this list exists to surface.
-	used: #Determination
-
-	// executor-matched records whether the executor matched the plan's, compared
-	// by authoritative identifier rather than by internal short name.
-	"executor-matched"?: #Determination @go(ExecutorMatched)
-
-	// parameters-matched records whether the recorded parameter values are the
-	// ones the plan declares, within their accepted values.
-	"parameters-matched"?: #Determination @go(ParametersMatched)
-
-	// cadence-met records whether this method ran within the requirement's
-	// frequency-days. It is required because every plan states a frequency, so
-	// there is always a cadence to have met; a method that ran without the plan
-	// allowing it has none to meet, which is Not Applicable. It is recorded per
-	// method rather than per requirement so that a lagging method is named; the
-	// requirement's answer is the outcome above.
-	"cadence-met": #Determination @go(CadenceMet)
 }
 
 // EffectiveRequirement is what a policy required of one requirement, as resolved
@@ -203,10 +185,25 @@ import "list"
 	applicability?: [string, ...string]
 
 	// constraints are the prescriptive additions the policy attached to it.
-	constraints?: [...{id: string, text: string}]
+	constraints?: [...#EffectiveConstraint]
 
 	// plan-id names the assessment plan bound to this requirement.
 	"plan-id"?: string @go(PlanId)
+}
+
+// EffectiveConstraint is one prescriptive addition a policy attached to a
+// requirement, as it applied. It is a named type rather than an inline struct so
+// that consumers can name it: an anonymous struct projects into Go as an anonymous
+// struct, which nothing can take as an argument or build a literal of without
+// repeating the definition. It carries no target-id, unlike the policy's
+// #Constraint, because the constraint is already attached to the requirement it
+// targets.
+#EffectiveConstraint: {
+	// id identifies this constraint within the policy that attached it.
+	id: string
+
+	// text is the constraint as it applied to the requirement.
+	text: string
 }
 
 // ComplianceFinding is what an audit reports in its own right: a finding carrying
@@ -233,95 +230,64 @@ import "list"
 	risk?: #EntryMapping @go(Risk,optional=nillable)
 }
 
-// VerificationLog records what an audit mechanically checked for one requirement,
-// and how it came out. It is the audit's counterpart of #AssessmentLog: a record
-// of a check that ran, carrying an outcome and no reasoning. Each check is a named
-// field so that a check never made is visible as a missing field rather than as an
-// absent list entry.
+// VerificationLog records what an audit established for one requirement: what it
+// examined, whether the evidence was obtained the way the policy required, and
+// whether the requirement was satisfied by it. It is the audit's counterpart of
+// #AssessmentLog — a record of checking, carrying determinations and no judgement.
+//
+// Its vocabulary is deliberately #Determination rather than #ComplianceStatus.
+// Conformance is about satisfaction, which is mechanical; compliance is a judgement,
+// and judgement belongs to the findings that synthesise these entries. A reader who
+// wants to know what was met reads here; a reader who wants to know what it means
+// reads a finding.
 #VerificationLog: {
-	// outcome is whether the target complies with this requirement. It is stated
-	// rather than left to be recomputed from the checks below or from the
-	// findings: giving every requirement an answer is what this layer is for.
-	// A check that came out Not Satisfied is expected to show here, since a
-	// requirement that is unevidenced, stale or unverified against its plan
-	// cannot be determined Satisfied. An outcome a reader would question is
-	// explained by a finding naming this requirement, because nothing recorded
-	// here reasons. Both relationships are documented rather than enforced, as
-	// #Result's roll-up precedence is.
-	outcome: #ComplianceStatus
-
 	// requirement names the assessment requirement this entry determines, and is
-	// also this entry's identity: one entry per requirement, so a finding names
-	// the requirement rather than a minted id.
+	// also this entry's identity: one entry per requirement, so a finding names the
+	// requirement rather than a minted id.
 	requirement: #EntryMapping
 
-	// effective is what the policy actually required of it, resolved at audit
-	// time, so the record says what was audited without fetching the catalog.
+	// effective is what the policy actually required of it, resolved at audit time,
+	// so the record says what was audited without fetching the catalog. Importing
+	// guidance into a policy makes it binding, so an effective requirement may have
+	// come from a control catalog, from guidance, or from another policy.
 	effective: #EffectiveRequirement
 
 	// assessments are the assessments this audit read, if any.
 	assessments?: [#EvidenceMapping, ...#EvidenceMapping]
 
-	// evidence records the data sources that support this result
+	// evidence records the data sources that support this determination.
 	evidence?: [#Evidence, ...#Evidence] @go(Evidence)
 
-	// evidence-present records whether this requirement is backed by evidence at
-	// all: the question verifications exist to answer, and answering it for every
-	// requirement is what makes them complete rather than selective. It may be
-	// omitted only where there was no evidence question to ask, which is a
-	// requirement the policy puts out of scope — and omitting it then obliges an
-	// outcome of Not Applicable, so the omission cannot hide an entry that was
-	// simply left unanswered.
-	EP="evidence-present"?: #Determination @go(EvidencePresent)
+	// plan-conformance records whether the evidence was obtained the way the policy
+	// required: under the plan bound to this requirement, by one of its accepted
+	// methods, by the executor it names, within its cadence. It is one determination
+	// rather than a field per dimension, because the policy grows dimensions and a
+	// record that mirrored them would have to grow with it — and because the detail
+	// of a shortfall is a judgement, which belongs in a finding. Not Applicable where
+	// the policy binds no plan to this requirement.
+	"plan-conformance": #Determination @go(PlanConformance)
 
-	// evidence-fresh records whether that evidence is current: collected within
-	// the plan's valid-for-days where a plan sets one, and within the auditor's
-	// judgement where none does.
-	"evidence-fresh"?: #Determination @go(EvidenceFresh)
+	// outcome is whether the evidence satisfied the requirement. It is stated for
+	// every governed requirement, complete by construction, so that a requirement
+	// checked and met is distinguishable from one never checked — which is the
+	// property an audit exists to establish. What it means for compliance is a
+	// finding's business, not this entry's.
+	outcome: #Determination
 
-	// plan records whether the plan behind this requirement was followed. It is
-	// absent when no plan backed the requirement, which is how a verification says
-	// the requirement was evidenced without one, and required when effective
-	// names a plan-id.
-	plan?: #PlanVerification @go(Plan,optional=nillable)
+	// basis is what in the evidence established that outcome. It is for evidence
+	// that does not say so itself: an assessment carries its own result, so a
+	// citation of one needs no restating, while a PDF or an API response leaves the
+	// reader with an artifact and a conclusion and nothing between them.
+	basis?: string
 
 	// ---- Validation --------------------------------------------------------
+	// Comments in validation sections stay detached (blank line after), so they
+	// are never published as a field's API description.
 
-	// A named plan obliges a record of how it was followed, and a record of how a
-	// plan was followed obliges the plan-id it was verified against. This is the
-	// obligation #AssessmentLog puts on plan and execution, at the checking end of
-	// the same chain.
-	//
-	// Both directions are stated positively, on the field each requires. Forbidding
-	// a field instead — plan?: error(...) where no plan-id is named — puts bottom in
-	// that field's type, and the Go projection degrades it to `any` with a TODO,
-	// which takes the field away from every consumer to catch an authoring mistake.
+	// With no plan bound to the requirement there is nothing to have conformed to.
 
-	if effective."plan-id" != _|_ {plan: #PlanVerification}
-
-	if plan != _|_ {effective: "plan-id": string}
-
-	// Omitting evidence-present says there was no evidence question to ask, which is
-	// true only of a requirement the audit determined Not Applicable. Everything the
-	// audit actually examined answers it.
-
-	if EP == _|_ {
-		outcome: "Not Applicable"
-	}
-
-	// An entry that names nothing cannot claim coverage. Stated as the
-	// contrapositive — no evidence and no assessments means evidence-present is not
-	// Satisfied — because conditioning on the absence of optional fields is
-	// decidable, while conditioning on the value of a required enum leaves the
-	// definition unevaluable and reports the wrong field when one is missing.
-	// Note that == _|_ is true of an invalid value as well as an absent one, so an
-	// entry whose evidence fails its own rules also reports here; the entry has no
-	// valid evidence either way. The constraint is optional so that it narrows the
-	// value when one is given without forcing the field back into existence for an
-	// out-of-scope requirement that omits it.
-
-	if evidence == _|_ if assessments == _|_ {
-		"evidence-present"?: "Not Satisfied" | "Not Applicable" | "Undetermined"
+	if effective."plan-id" == _|_ {
+		"plan-conformance": "Not Applicable"
 	}
 
 	// Each evidence entry carries a payload, a source, or both.
