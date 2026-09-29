@@ -56,9 +56,20 @@ import "list"
 	// be explained by findings, documented rather than enforced.
 	opinion: #Opinion
 
-	// policy is the single policy this audit was conducted against, at its
-	// pinned version. Auditing a baseline means authoring a policy that
-	// imports it.
+	// policy is this audit's criteria in ISO 19011's sense: the single versioned
+	// artifact the evidence was compared against. It is one policy rather than a
+	// list because the policy is also what defines scope — selection, exclusions
+	// and applicability — and the audit's completeness claim has nothing to be
+	// complete against without a governed set. Auditing a baseline means authoring
+	// a policy that imports it; auditing against several criteria means one policy
+	// that imports them all.
+	//
+	// This does not hide the criteria's content: the underlying catalogs stay named
+	// in metadata.mapping-references, and each verification carries the requirement
+	// as resolved, so a reader sees what was required without fetching the policy.
+	// It does mean the bare plan-id and method-id references elsewhere in this file
+	// are legal only while the criteria is singular — with one policy pinned here,
+	// nothing else needs a qualifier.
 	policy: #ArtifactMapping
 
 	// verifications records, for every requirement, what was mechanically checked

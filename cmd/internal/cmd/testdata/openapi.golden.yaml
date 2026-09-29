@@ -386,10 +386,7 @@ components:
         policy:
           allOf:
           - $ref: "#/components/schemas/ArtifactMapping"
-          description: |-
-            policy is the single policy this audit was conducted against, at its
-            pinned version. Auditing a baseline means authoring a policy that
-            imports it.
+          description: "policy is this audit's criteria in ISO 19011's sense: the single versioned\nartifact the evidence was compared against. It is one policy rather than a\nlist because the policy is also what defines scope — selection, exclusions\nand applicability — and the audit's completeness claim has nothing to be\ncomplete against without a governed set. Auditing a baseline means authoring\na policy that imports it; auditing against several criteria means one policy\nthat imports them all.\n\nThis does not hide the criteria's content: the underlying catalogs stay named\nin metadata.mapping-references, and each verification carries the requirement\nas resolved, so a reader sees what was required without fetching the policy.\nIt does mean the bare plan-id and method-id references elsewhere in this file\nare legal only while the criteria is singular — with one policy pinned here,\nnothing else needs a qualifier."
         summary:
           description: summary provides the high-level conclusion
           type: string
