@@ -64,7 +64,7 @@ owner:
       affiliation: "OpenSSF"
 
 policy:
-  reference-id: security-policy
+  reference-id: NOT-DECLARED-ANYWHERE
   remarks: "Organizational policy establishing the audit's criteria; it imports the OSPS baseline."
 
 objectives:
@@ -142,6 +142,8 @@ verifications:
         type: EnforcementLog
         description: "Enforcement actions taken for documentation failures"
         collected-at: "2025-08-22T16:05:00Z"
+        source:
+          reference-id: enforcement-log
 
   # Evidence that does not describe itself, so the entry says what established the outcome.
   - requirement:

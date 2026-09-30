@@ -119,23 +119,35 @@ func TestSchemaValidation(t *testing.T) {
 		{"valid enforcement log", "./test-data/good-enforcement-log.yaml", "#EnforcementLog", false, ""},
 
 		// EnforcementLog — negative
-		{"enforcement action with invalid disposition", "./test-data/bad-enforcement-log.yaml", "#EnforcementLog", true, ""},
-		{"enforcement action missing log reference", "./test-data/bad-enforcement-missing-log.yaml", "#EnforcementLog", true, ""},
-		{"clear disposition with failed assessment", "./test-data/bad-enforcement-clear-failed.yaml", "#EnforcementLog", true, ""},
+		{"enforcement action with invalid disposition", "./test-data/bad-enforcement-log.yaml", "#EnforcementLog", true, "disposition"},
+		{"enforcement action missing log reference", "./test-data/bad-enforcement-missing-log.yaml", "#EnforcementLog", true, "log"},
+		{"clear action carrying a justification", "./test-data/bad-enforcement-clear-failed.yaml", "#EnforcementLog", true, "nothing to justify"},
+		{"enforced action whose justification justifies nothing", "./test-data/bad-enforcement-empty-justification.yaml", "#EnforcementLog", true, "justifies itself"},
+		{"enforcement finding the gate never rated", "./test-data/bad-enforcement-finding-missing-severity.yaml", "#EnforcementLog", true, "findings.0.severity"},
+		{"enforcement log with duplicate action ids", "./test-data/bad-enforcement-duplicate-action-id.yaml", "#EnforcementLog", true, "_uniqueActionIds"},
+		{"enforcement log with duplicate finding ids across actions", "./test-data/bad-enforcement-duplicate-finding-id.yaml", "#EnforcementLog", true, "_uniqueFindingIds"},
 
 		// AuditLog — positive
 		{"valid audit log", "./test-data/good-audit-log.yaml", "#AuditLog", false, ""},
+		{"audit that passed with nothing to call out", "./test-data/good-audit-log-clean.yaml", "#AuditLog", false, ""},
 		{"audit log evidence mapping with both coordinate and entry-id", "./test-data/good-audit-log-coordinate-and-entry-id.yaml", "#AuditLog", false, ""},
 		{"digests across the registered and open algorithm profile", "./test-data/good-audit-log-digest-profile.yaml", "#AuditLog", false, ""},
 
 		// AuditLog — negative
-		{"audit log missing summary criteria and results", "./test-data/bad-audit-log.yaml", "#AuditLog", true, ""},
-		{"audit log evidence source with invalid digest format", "./test-data/bad-audit-log-invalid-digest.yaml", "#AuditLog", true, ""},
-		{"audit result referencing undeclared criteria", "./test-data/bad-audit-log-undeclared-criteria.yaml", "#AuditLog", true, ""},
-		{"audit log evidence with neither payload nor source", "./test-data/bad-audit-log-evidence-neither.yaml", "#AuditLog", true, ""},
-		{"audit log mapping reference url with no scheme", "./test-data/bad-audit-log-url-no-scheme.yaml", "#AuditLog", true, ""},
-		{"audit log mapping reference url with a non-alphabetic scheme", "./test-data/bad-audit-log-url-invalid-scheme.yaml", "#AuditLog", true, ""},
-		{"audit log target uri with no scheme", "./test-data/bad-audit-log-uri-no-scheme.yaml", "#AuditLog", true, ""},
+		{"audit log missing its criteria, objectives and verifications", "./test-data/bad-audit-log.yaml", "#AuditLog", true, "policy.\"reference-id\""},
+		{"audit citing an undeclared policy", "./test-data/bad-audit-log-undeclared-policy.yaml", "#AuditLog", true, "_refValidation"},
+		{"audit finding naming a requirement with no verification entry", "./test-data/bad-audit-log-finding-unknown-requirement.yaml", "#AuditLog", true, "_requirementValidation"},
+		{"audit finding citing an undeclared risk reference", "./test-data/bad-audit-log-dangling-risk.yaml", "#AuditLog", true, "_refValidation"},
+		{"requirement not satisfied that no finding synthesises", "./test-data/bad-audit-log-unsynthesised-failure.yaml", "#AuditLog", true, "_synthesisValidation"},
+		{"plan bound with no record of how it was followed", "./test-data/bad-audit-log-plan-without-conformance.yaml", "#AuditLog", true, "conformance"},
+		{"plan not conformed to, requirement satisfied anyway, nothing saying what was accepted", "./test-data/bad-audit-log-unexplained-divergence.yaml", "#AuditLog", true, "_synthesisValidation"},
+		{"finding citing an enforcement action in an undeclared log", "./test-data/bad-audit-log-response-undeclared.yaml", "#AuditLog", true, "findings-1-response"},
+		{"not compliant finding stating no severity", "./test-data/bad-audit-log-not-compliant-missing-severity.yaml", "#AuditLog", true, "findings.0.severity"},
+		{"audit log evidence source with invalid digest format", "./test-data/bad-audit-log-invalid-digest.yaml", "#AuditLog", true, "digest"},
+		{"audit log evidence with neither payload nor source", "./test-data/bad-audit-log-evidence-neither.yaml", "#AuditLog", true, "evidence.0.source"},
+		{"audit log target uri with no scheme", "./test-data/bad-audit-log-uri-no-scheme.yaml", "#AuditLog", true, "target.uri"},
+		{"audit log mapping reference url with a non-alphabetic scheme", "./test-data/bad-audit-log-url-invalid-scheme.yaml", "#AuditLog", true, ".url: invalid value"},
+		{"audit log mapping reference url with no scheme", "./test-data/bad-audit-log-url-no-scheme.yaml", "#AuditLog", true, ".url: invalid value"},
 
 		// CapabilityCatalog — negative
 		{"capability with invalid group", "./test-data/bad-capability-invalid-group.yaml", "#CapabilityCatalog", true, ""},

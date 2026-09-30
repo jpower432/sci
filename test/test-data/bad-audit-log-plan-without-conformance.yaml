@@ -1,9 +1,9 @@
 metadata:
-  id: audit-log-001
+  id: audit-log-plan-unrecorded
   type: AuditLog
   gemara-version: "1.1.0"
   version: "1.0.0"
-  description: "Q1 2026 Gemara Audit"
+  description: "Invalid audit log: a plan bound to a requirement with no record of how it was followed"
   author:
     id: lead-auditor
     name: "Jane Auditor"
@@ -105,15 +105,6 @@ verifications:
         - id: c-annual-review
           text: "Review the published user documentation at least annually."
       plan-id: plan-doc-review
-    conformance:
-      - method-id: EM-DOC-REVIEW
-        determination: Satisfied
-        required: "A maintainer review of the published documentation."
-        evidenced: "Reviewed by a maintainer on 2025-08-20."
-      - method-id: EM-DOC-PROBE
-        determination: Not Satisfied
-        required: "The automated probe runs within the requirement's 30-day cadence."
-        evidenced: "Last probe run 2025-05-14, 100 days before the audit window closed."
     outcome: Not Satisfied
     assessments:
       - reference-id: eval-log
@@ -142,6 +133,8 @@ verifications:
         type: EnforcementLog
         description: "Enforcement actions taken for documentation failures"
         collected-at: "2025-08-22T16:05:00Z"
+        source:
+          reference-id: enforcement-log
 
   # Evidence that does not describe itself, so the entry says what established the outcome.
   - requirement:

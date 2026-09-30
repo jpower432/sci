@@ -1,9 +1,9 @@
 metadata:
-  id: audit-log-001
+  id: audit-log-response-undeclared
   type: AuditLog
   gemara-version: "1.1.0"
   version: "1.0.0"
-  description: "Q1 2026 Gemara Audit"
+  description: "Invalid audit log: a finding citing an enforcement action in an undeclared log"
   author:
     id: lead-auditor
     name: "Jane Auditor"
@@ -142,6 +142,8 @@ verifications:
         type: EnforcementLog
         description: "Enforcement actions taken for documentation failures"
         collected-at: "2025-08-22T16:05:00Z"
+        source:
+          reference-id: enforcement-log
 
   # Evidence that does not describe itself, so the entry says what established the outcome.
   - requirement:
@@ -237,7 +239,7 @@ findings:
       reference-id: OSPS
       entry-id: OSPS-DO-02.01
     response:
-      reference-id: enforcement-log
+      reference-id: NOT-DECLARED-ANYWHERE
       entry-id: ACT-DO-02
     recommendations:
       - id: REC-02

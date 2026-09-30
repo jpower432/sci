@@ -142,6 +142,8 @@ verifications:
         type: EnforcementLog
         description: "Enforcement actions taken for documentation failures"
         collected-at: "2025-08-22T16:05:00Z"
+        source:
+          reference-id: enforcement-log
 
   # Evidence that does not describe itself, so the entry says what established the outcome.
   - requirement:
@@ -251,7 +253,7 @@ findings:
       repository, which satisfies this requirement for every repository in scope."
     requirement:
       reference-id: OSPS
-      entry-id: OSPS-AC-01.01
+      entry-id: OSPS-ZZ-99.01
 
   - id: AR-RISK-01
     status: Not Compliant

@@ -142,6 +142,8 @@ verifications:
         type: EnforcementLog
         description: "Enforcement actions taken for documentation failures"
         collected-at: "2025-08-22T16:05:00Z"
+        source:
+          reference-id: enforcement-log
 
   # Evidence that does not describe itself, so the entry says what established the outcome.
   - requirement:
@@ -259,7 +261,7 @@ findings:
     lifecycle: Open
     description: "Residual risk RISK-002 remains above the maximum severity its category tolerates."
     risk:
-      reference-id: risk-catalog
+      reference-id: NOT-DECLARED-ANYWHERE
       entry-id: RISK-002
     recommendations:
       - id: REC-03

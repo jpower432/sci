@@ -1,9 +1,9 @@
 metadata:
-  id: audit-log-001
+  id: audit-log-unsynthesised
   type: AuditLog
   gemara-version: "1.1.0"
   version: "1.0.0"
-  description: "Q1 2026 Gemara Audit"
+  description: "Invalid audit log: a requirement not satisfied and no finding saying what that means"
   author:
     id: lead-auditor
     name: "Jane Auditor"
@@ -142,6 +142,8 @@ verifications:
         type: EnforcementLog
         description: "Enforcement actions taken for documentation failures"
         collected-at: "2025-08-22T16:05:00Z"
+        source:
+          reference-id: enforcement-log
 
   # Evidence that does not describe itself, so the entry says what established the outcome.
   - requirement:
@@ -226,22 +228,6 @@ findings:
       - id: REC-01
         text: "Add user guide references to the Security Insights file and publish basic user documentation."
         required: true
-
-  - id: AR-DO-02
-    status: Not Compliant
-    severity: High
-    lifecycle: Resolved
-    description: "Private vulnerability reporting was not enabled during the period examined.
-      The release gate's autoremediation enabled it on 2025-08-22, after the failure."
-    requirement:
-      reference-id: OSPS
-      entry-id: OSPS-DO-02.01
-    response:
-      reference-id: enforcement-log
-      entry-id: ACT-DO-02
-    recommendations:
-      - id: REC-02
-        text: "Formalize the private vulnerability reporting process and document it in SECURITY.md."
 
   # A finding may record conformity: ISO 19011 findings indicate conformity or nonconformity.
   - id: AR-AC-01

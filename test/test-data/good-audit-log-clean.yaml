@@ -1,9 +1,9 @@
 metadata:
-  id: audit-log-001
+  id: audit-log-clean-001
   type: AuditLog
   gemara-version: "1.1.0"
   version: "1.0.0"
-  description: "Q1 2026 Gemara Audit"
+  description: "Q2 2026 Gemara Audit — no findings"
   author:
     id: lead-auditor
     name: "Jane Auditor"
@@ -111,10 +111,10 @@ verifications:
         required: "A maintainer review of the published documentation."
         evidenced: "Reviewed by a maintainer on 2025-08-20."
       - method-id: EM-DOC-PROBE
-        determination: Not Satisfied
+        determination: Satisfied
         required: "The automated probe runs within the requirement's 30-day cadence."
-        evidenced: "Last probe run 2025-05-14, 100 days before the audit window closed."
-    outcome: Not Satisfied
+        evidenced: "Probe ran 2025-08-19, three days before the audit window closed."
+    outcome: Satisfied
     assessments:
       - reference-id: eval-log
         entry-id: OSPS-DO-01.01
@@ -136,12 +136,14 @@ verifications:
         vulnerabilities."
       applicability:
         - Maturity Level 1
-    outcome: Not Satisfied
+    outcome: Satisfied
     evidence:
       - id: EV-DO-02
         type: EnforcementLog
         description: "Enforcement actions taken for documentation failures"
         collected-at: "2025-08-22T16:05:00Z"
+        source:
+          reference-id: enforcement-log
 
   # Evidence that does not describe itself, so the entry says what established the outcome.
   - requirement:
@@ -200,74 +202,9 @@ coverage:
       this mandate calls for; the mapping to it is recorded in the guidance mapping
       document."
 
-  # A mandate the policy adopted and then selected nothing to implement. The
-  # verifications cannot show this: every requirement the policy did select is
-  # satisfied, and this mandate simply has none bearing on it.
-  - mandate:
-      reference-id: SCG
-      entry-id: SCG-SUPPLY
-    statement: "The provenance of every released artifact can be established by a
-      consumer without trusting the build system operator."
-    implementation: Not Satisfied
-    basis: "The policy adopted this guidance and selected no requirement implementing
-      it, so nothing in scope would achieve it."
+opinion: Passed
 
-findings:
-  - id: AR-DO-01
-    status: Not Compliant
-    severity: Medium
-    lifecycle: Open
-    description: "No user guide is published or referenced in the Security Insights data,
-      and the review the plan requires ran outside its cadence."
-    requirement:
-      reference-id: OSPS
-      entry-id: OSPS-DO-01.01
-    recommendations:
-      - id: REC-01
-        text: "Add user guide references to the Security Insights file and publish basic user documentation."
-        required: true
-
-  - id: AR-DO-02
-    status: Not Compliant
-    severity: High
-    lifecycle: Resolved
-    description: "Private vulnerability reporting was not enabled during the period examined.
-      The release gate's autoremediation enabled it on 2025-08-22, after the failure."
-    requirement:
-      reference-id: OSPS
-      entry-id: OSPS-DO-02.01
-    response:
-      reference-id: enforcement-log
-      entry-id: ACT-DO-02
-    recommendations:
-      - id: REC-02
-        text: "Formalize the private vulnerability reporting process and document it in SECURITY.md."
-
-  # A finding may record conformity: ISO 19011 findings indicate conformity or nonconformity.
-  - id: AR-AC-01
-    status: Compliant
-    lifecycle: Resolved
-    description: "Multi-factor authentication is enforced organization-wide rather than per
-      repository, which satisfies this requirement for every repository in scope."
-    requirement:
-      reference-id: OSPS
-      entry-id: OSPS-AC-01.01
-
-  - id: AR-RISK-01
-    status: Not Compliant
-    severity: Critical
-    lifecycle: Open
-    description: "Residual risk RISK-002 remains above the maximum severity its category tolerates."
-    risk:
-      reference-id: risk-catalog
-      entry-id: RISK-002
-    recommendations:
-      - id: REC-03
-        text: "Add a compensating control or record a documented risk acceptance."
-
-opinion: Failed
-
-summary: "Access control and quality requirements are satisfied. Two documentation
-  requirements are not, one of them on evidence obtained outside the plan's cadence, and a
-  residual risk remains above tolerance. The audit examined evidence collected between
-  August 2025 and February 2026; conditions may have changed since."
+summary: "Every requirement the policy governs was satisfied, every conformance check
+  passed, and the guidance the policy adopted is implemented by requirements it selected.
+  The audit examined evidence collected between August 2025 and February 2026; conditions
+  may have changed since."
