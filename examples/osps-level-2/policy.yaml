@@ -1,0 +1,288 @@
+title: OpenSSF Baseline Adherence Policy — Maturity Level 2
+metadata:
+  id: OSPS-L2-POLICY
+  type: Policy
+  gemara-version: 1.1.0
+  version: '2026.1'
+  description: Adherence policy adopting the OpenSSF Project Security Baseline at Maturity Level 2,
+    with supply-chain guidance.
+  author:
+    id: security-office
+    name: Security Office
+    type: Human
+  mapping-references:
+  - id: OSPS-B
+    title: Open Source Project Security Baseline
+    version: 1.0.0
+    type: ControlCatalog
+    url: https://baseline.openssf.org
+  - id: SCG
+    title: Secure Development Guidance
+    version: '1.2'
+    type: GuidanceCatalog
+    url: https://guidance.example.com/secure-development
+contacts:
+  responsible:
+  - name: Security Office
+    affiliation: Example Org
+  accountable:
+  - name: VP Engineering
+    affiliation: Example Org
+scope:
+  in:
+    technologies:
+    - Git
+    - GitHub Actions
+    groups:
+    - Maturity2
+  out:
+    groups:
+    - Maturity3
+imports:
+  catalogs:
+  - reference-id: OSPS-B
+    exclusions:
+    - OSPS-AC-04.02
+    - OSPS-BR-02.02
+    - OSPS-DO-03.01
+  guidance:
+  - reference-id: SCG
+adherence:
+  evaluation-methods:
+  - id: EM-BASELINE-SCAN
+    type: Behavioral
+    mode: Automated
+    required: true
+    description: 'The fallback where no plan binds a method: the baseline scanner, run across every
+      in-scope repository.'
+    executor:
+      id: pvtr
+      name: pvtr-github-repo
+      type: Software
+      version: 2.4.1
+  assessment-plans:
+  - id: AP-OSPS-AC-01.01
+    requirement-id: OSPS-AC-01.01
+    frequency: every 30 days
+    evaluation-methods:
+    - id: EM-OSPS-AC-01.01-probe
+      type: Behavioral
+      mode: Automated
+      required: true
+      description: Automated probe run by the baseline scanner.
+      executor:
+        id: pvtr
+        name: pvtr-github-repo
+        type: Software
+        version: 2.4.1
+    - id: EM-OSPS-AC-01.01-review
+      type: Intent
+      mode: Manual
+      required: false
+      description: Maintainer review of the published policy text.
+    evidence-requirements: Scanner output retained for 90 days.
+    parameters:
+    - id: P-OSPS-AC-01.01-window
+      label: Lookback window
+      description: Days of history the probe inspects.
+      accepted-values:
+      - '30'
+      - '90'
+  - id: AP-OSPS-AC-02.01
+    requirement-id: OSPS-AC-02.01
+    frequency: quarterly
+    evaluation-methods:
+    - id: EM-OSPS-AC-02.01-probe
+      type: Behavioral
+      mode: Automated
+      required: true
+      description: Automated probe run by the baseline scanner.
+      executor:
+        id: pvtr
+        name: pvtr-github-repo
+        type: Software
+        version: 2.4.1
+  - id: AP-OSPS-AC-03.01
+    requirement-id: OSPS-AC-03.01
+    frequency: every 180 days
+    evaluation-methods:
+    - id: EM-OSPS-AC-03.01-probe
+      type: Behavioral
+      mode: Automated
+      required: true
+      description: Automated probe run by the baseline scanner.
+      executor:
+        id: pvtr
+        name: pvtr-github-repo
+        type: Software
+        version: 2.4.1
+  - id: AP-OSPS-AC-03.02
+    requirement-id: OSPS-AC-03.02
+    frequency: every 30 days
+    evaluation-methods:
+    - id: EM-OSPS-AC-03.02-probe
+      type: Behavioral
+      mode: Automated
+      required: true
+      description: Automated probe run by the baseline scanner.
+      executor:
+        id: pvtr
+        name: pvtr-github-repo
+        type: Software
+        version: 2.4.1
+    - id: EM-OSPS-AC-03.02-review
+      type: Intent
+      mode: Manual
+      required: false
+      description: Maintainer review of the published policy text.
+  - id: AP-OSPS-AC-04.01
+    requirement-id: OSPS-AC-04.01
+    frequency: quarterly
+    evaluation-methods:
+    - id: EM-OSPS-AC-04.01-probe
+      type: Behavioral
+      mode: Automated
+      required: true
+      description: Automated probe run by the baseline scanner.
+      executor:
+        id: pvtr
+        name: pvtr-github-repo
+        type: Software
+        version: 2.4.1
+    evidence-requirements: Scanner output retained for 90 days.
+  - id: AP-OSPS-BR-01.01
+    requirement-id: OSPS-BR-01.01
+    frequency: every 180 days
+    evaluation-methods:
+    - id: EM-OSPS-BR-01.01-probe
+      type: Behavioral
+      mode: Automated
+      required: true
+      description: Automated probe run by the baseline scanner.
+      executor:
+        id: pvtr
+        name: pvtr-github-repo
+        type: Software
+        version: 2.4.1
+    parameters:
+    - id: P-OSPS-BR-01.01-window
+      label: Lookback window
+      description: Days of history the probe inspects.
+      accepted-values:
+      - '30'
+      - '90'
+  - id: AP-OSPS-BR-01.02
+    requirement-id: OSPS-BR-01.02
+    frequency: every 30 days
+    evaluation-methods:
+    - id: EM-OSPS-BR-01.02-probe
+      type: Behavioral
+      mode: Automated
+      required: true
+      description: Automated probe run by the baseline scanner.
+      executor:
+        id: pvtr
+        name: pvtr-github-repo
+        type: Software
+        version: 2.4.1
+    - id: EM-OSPS-BR-01.02-review
+      type: Intent
+      mode: Manual
+      required: false
+      description: Maintainer review of the published policy text.
+  - id: AP-OSPS-BR-02.01
+    requirement-id: OSPS-BR-02.01
+    frequency: quarterly
+    evaluation-methods:
+    - id: EM-OSPS-BR-02.01-probe
+      type: Behavioral
+      mode: Automated
+      required: true
+      description: Automated probe run by the baseline scanner.
+      executor:
+        id: pvtr
+        name: pvtr-github-repo
+        type: Software
+        version: 2.4.1
+  - id: AP-OSPS-BR-03.01
+    requirement-id: OSPS-BR-03.01
+    frequency: every 180 days
+    evaluation-methods:
+    - id: EM-OSPS-BR-03.01-probe
+      type: Behavioral
+      mode: Automated
+      required: true
+      description: Automated probe run by the baseline scanner.
+      executor:
+        id: pvtr
+        name: pvtr-github-repo
+        type: Software
+        version: 2.4.1
+    evidence-requirements: Scanner output retained for 90 days.
+  - id: AP-OSPS-BR-03.02
+    requirement-id: OSPS-BR-03.02
+    frequency: every 30 days
+    evaluation-methods:
+    - id: EM-OSPS-BR-03.02-probe
+      type: Behavioral
+      mode: Automated
+      required: true
+      description: Automated probe run by the baseline scanner.
+      executor:
+        id: pvtr
+        name: pvtr-github-repo
+        type: Software
+        version: 2.4.1
+    - id: EM-OSPS-BR-03.02-review
+      type: Intent
+      mode: Manual
+      required: false
+      description: Maintainer review of the published policy text.
+  - id: AP-OSPS-BR-04.01
+    requirement-id: OSPS-BR-04.01
+    frequency: quarterly
+    evaluation-methods:
+    - id: EM-OSPS-BR-04.01-probe
+      type: Behavioral
+      mode: Automated
+      required: true
+      description: Automated probe run by the baseline scanner.
+      executor:
+        id: pvtr
+        name: pvtr-github-repo
+        type: Software
+        version: 2.4.1
+    parameters:
+    - id: P-OSPS-BR-04.01-window
+      label: Lookback window
+      description: Days of history the probe inspects.
+      accepted-values:
+      - '30'
+      - '90'
+  - id: AP-OSPS-BR-05.01
+    requirement-id: OSPS-BR-05.01
+    frequency: every 180 days
+    evaluation-methods:
+    - id: EM-OSPS-BR-05.01-probe
+      type: Behavioral
+      mode: Automated
+      required: true
+      description: Automated probe run by the baseline scanner.
+      executor:
+        id: pvtr
+        name: pvtr-github-repo
+        type: Software
+        version: 2.4.1
+  enforcement-methods:
+  - id: EM-BLOCK-RELEASE
+    type: Gate
+    mode: Automated
+    required: true
+    description: Release gate for repositories failing a required requirement.
+  - id: EM-ENABLE-REPORTING
+    type: Remediation
+    mode: Automated
+    required: false
+    description: Turns on private vulnerability reporting where the platform supports it.
+  non-compliance: A repository failing a Maturity Level 2 requirement after the enforcement date cannot
+    cut a release until the finding is resolved or an exception is granted.

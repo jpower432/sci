@@ -236,12 +236,17 @@ import "list"
 	// determination is what the check came to.
 	determination: #Determination
 
-	// required is what the plan required, quoted or derived from it.
+	// required is what the policy prescribed, quoted or derived from it.
 	required?: string
 
-	// evidenced is what the evidence showed instead. Both sides are stated so the
-	// entry is a comparison rather than a remark; where they agree, the entry records
-	// that the check was made and passed.
+	// evidenced is what the evidence showed instead.
+	//
+	// Both are for divergences. A check that passed needs neither: the method and the
+	// determination already say the prescribed thing was done, and restating the
+	// prescription back at the reader is how a complete record becomes an unreadable
+	// one — in an audit of a real baseline the passing checks outnumber the failing
+	// ones fifty to one. Where the two differ, state both, because the pair is what a
+	// determination alone throws away: required every 30 days, evidenced every 90.
 	evidenced?: string
 }
 

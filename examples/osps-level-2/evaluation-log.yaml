@@ -1,0 +1,1405 @@
+metadata:
+  id: OSPS-L2-SCAN-2026-03-28
+  type: EvaluationLog
+  gemara-version: 1.1.0
+  version: 1.0.0
+  description: Baseline scan of gemaraproj/gemara against the OSPS Level 2 adherence policy.
+  author:
+    id: compliance-orchestrator
+    name: Compliance Orchestrator
+    type: Software
+  mapping-references:
+  - id: OSPS-B
+    title: Open Source Project Security Baseline
+    version: 1.0.0
+    type: ControlCatalog
+    url: https://baseline.openssf.org
+  - id: OSPS-L2-POLICY
+    title: OpenSSF Baseline Adherence Policy — Maturity Level 2
+    version: '2026.1'
+    type: Policy
+target:
+  id: gemara-repo
+  name: gemaraproj/gemara
+  type: Software
+  uri: https://github.com/gemaraproj/gemara
+  environment: production
+result: Failed
+evaluations:
+- name: 'The project''s version control system MUST require multi-factor
+
+    authentication for collaborators modifying the project repository
+
+    settings or accessing sensitive data.
+
+    '
+  result: Passed
+  message: 2 of 2 assessments passed.
+  control:
+    reference-id: OSPS-B
+    entry-id: OSPS-AC-01
+  assessment-logs:
+  - requirement:
+      reference-id: OSPS-B
+      entry-id: OSPS-AC-01.01
+    description: When a user attempts to access a sensitive resource in the project's version control
+      system, the system MUST require t
+    result: Passed
+    message: Requirement satisfied.
+    applicability:
+    - Maturity1
+    - Maturity2
+    - Maturity3
+    steps:
+    - github.com/revanite-io/pvtr-github-repo/evaluation_plans/osps/access_control.OSPS_AC_01_01
+    steps-executed: 1
+    start: '2026-03-28T04:10:00Z'
+    end: '2026-03-28T04:10:00Z'
+    plan:
+      reference-id: OSPS-L2-POLICY
+      entry-id: AP-OSPS-AC-01.01
+    execution:
+      method-id: EM-OSPS-AC-01.01-probe
+    executor:
+      id: pvtr
+      name: pvtr-github-repo
+      type: Software
+      version: 2.4.1
+  - requirement:
+      reference-id: OSPS-B
+      entry-id: OSPS-AC-01.01
+    description: When a user attempts to access a sensitive resource in the project's version control
+      system, the system MUST require t
+    result: Passed
+    message: Requirement satisfied.
+    applicability:
+    - Maturity1
+    - Maturity2
+    - Maturity3
+    steps:
+    - github.com/revanite-io/pvtr-github-repo/evaluation_plans/osps/access_control.OSPS_AC_01_01
+    steps-executed: 1
+    start: '2026-03-28T04:10:00Z'
+    end: '2026-03-28T04:10:00Z'
+    plan:
+      reference-id: OSPS-L2-POLICY
+      entry-id: AP-OSPS-AC-01.01
+    execution:
+      method-id: EM-OSPS-AC-01.01-review
+    executor:
+      id: platform-security
+      name: Platform Security Review
+      type: Human
+- name: 'The project''s version control system MUST restrict collaborator
+
+    permissions to the lowest available privileges by default.
+
+    '
+  result: Passed
+  message: 1 of 1 assessments passed.
+  control:
+    reference-id: OSPS-B
+    entry-id: OSPS-AC-02
+  assessment-logs:
+  - requirement:
+      reference-id: OSPS-B
+      entry-id: OSPS-AC-02.01
+    description: When a new collaborator is added, the version control system MUST require manual
+      permission assignment, or restrict th
+    result: Passed
+    message: Requirement satisfied.
+    applicability:
+    - Maturity1
+    - Maturity2
+    - Maturity3
+    steps:
+    - github.com/revanite-io/pvtr-github-repo/evaluation_plans/osps/access_control.OSPS_AC_02_01
+    steps-executed: 1
+    start: '2026-03-28T04:11:00Z'
+    end: '2026-03-28T04:11:00Z'
+    plan:
+      reference-id: OSPS-L2-POLICY
+      entry-id: AP-OSPS-AC-02.01
+    execution:
+      method-id: EM-OSPS-AC-02.01-probe
+    executor:
+      id: pvtr
+      name: pvtr-github-repo
+      type: Software
+      version: 2.4.1
+- name: 'The project''s version control system MUST prevent unintentional
+
+    modification of the primary branch.
+
+    '
+  result: Passed
+  message: 3 of 3 assessments passed.
+  control:
+    reference-id: OSPS-B
+    entry-id: OSPS-AC-03
+  assessment-logs:
+  - requirement:
+      reference-id: OSPS-B
+      entry-id: OSPS-AC-03.01
+    description: When a direct commit is attempted on the project's primary branch, an enforcement
+      mechanism MUST prevent the change fr
+    result: Passed
+    message: Requirement satisfied.
+    applicability:
+    - Maturity1
+    - Maturity2
+    - Maturity3
+    steps:
+    - github.com/revanite-io/pvtr-github-repo/evaluation_plans/osps/access_control.OSPS_AC_03_01
+    steps-executed: 1
+    start: '2025-11-02T04:12:00Z'
+    end: '2025-11-02T04:12:00Z'
+    plan:
+      reference-id: OSPS-L2-POLICY
+      entry-id: AP-OSPS-AC-03.01
+    execution:
+      method-id: EM-OSPS-AC-03.01-probe
+    executor:
+      id: pvtr
+      name: pvtr-github-repo
+      type: Software
+      version: 2.4.1
+  - requirement:
+      reference-id: OSPS-B
+      entry-id: OSPS-AC-03.02
+    description: When an attempt is made to delete the project's primary branch, the version control
+      system MUST treat this as a sensit
+    result: Passed
+    message: Requirement satisfied.
+    applicability:
+    - Maturity1
+    - Maturity2
+    - Maturity3
+    steps:
+    - github.com/revanite-io/pvtr-github-repo/evaluation_plans/osps/access_control.OSPS_AC_03_02
+    steps-executed: 1
+    start: '2026-03-28T04:12:00Z'
+    end: '2026-03-28T04:12:00Z'
+    plan:
+      reference-id: OSPS-L2-POLICY
+      entry-id: AP-OSPS-AC-03.02
+    execution:
+      method-id: EM-OSPS-AC-03.02-probe
+    executor:
+      id: pvtr
+      name: pvtr-github-repo
+      type: Software
+      version: 2.4.1
+  - requirement:
+      reference-id: OSPS-B
+      entry-id: OSPS-AC-03.02
+    description: When an attempt is made to delete the project's primary branch, the version control
+      system MUST treat this as a sensit
+    result: Passed
+    message: Requirement satisfied.
+    applicability:
+    - Maturity1
+    - Maturity2
+    - Maturity3
+    steps:
+    - github.com/revanite-io/pvtr-github-repo/evaluation_plans/osps/access_control.OSPS_AC_03_02
+    steps-executed: 1
+    start: '2026-03-28T04:12:00Z'
+    end: '2026-03-28T04:12:00Z'
+    plan:
+      reference-id: OSPS-L2-POLICY
+      entry-id: AP-OSPS-AC-03.02
+    execution:
+      method-id: EM-OSPS-AC-03.02-review
+    executor:
+      id: platform-security
+      name: Platform Security Review
+      type: Human
+- name: 'The project''s permissions in CI/CD pipelines MUST follow the principle
+
+    of least privilege.
+
+    '
+  result: Passed
+  message: 1 of 1 assessments passed.
+  control:
+    reference-id: OSPS-B
+    entry-id: OSPS-AC-04
+  assessment-logs:
+  - requirement:
+      reference-id: OSPS-B
+      entry-id: OSPS-AC-04.01
+    description: 'When a CI/CD task is executed with no permissions specified, the project''s version
+      control system MUST default to the '
+    result: Passed
+    message: Requirement satisfied.
+    applicability:
+    - Maturity2
+    - Maturity3
+    steps:
+    - github.com/revanite-io/pvtr-github-repo/evaluation_plans/osps/access_control.OSPS_AC_04_01
+    steps-executed: 1
+    start: '2026-03-28T04:13:00Z'
+    end: '2026-03-28T04:13:00Z'
+    plan:
+      reference-id: OSPS-L2-POLICY
+      entry-id: AP-OSPS-AC-04.01
+    execution:
+      method-id: EM-OSPS-AC-04.01-probe
+    executor:
+      id: pvtr
+      name: pvtr-github-repo
+      type: Software
+      version: 2.4.1
+- name: 'The project''s build and release pipelines MUST NOT permit untrusted
+
+    input that allows access to privileged resources.
+
+    '
+  result: Passed
+  message: 3 of 3 assessments passed.
+  control:
+    reference-id: OSPS-B
+    entry-id: OSPS-BR-01
+  assessment-logs:
+  - requirement:
+      reference-id: OSPS-B
+      entry-id: OSPS-BR-01.01
+    description: When a CI/CD pipeline accepts an input parameter, that parameter MUST be sanitized
+      and validated prior to use in the p
+    result: Passed
+    message: Requirement satisfied.
+    applicability:
+    - Maturity1
+    - Maturity2
+    - Maturity3
+    steps:
+    - github.com/revanite-io/pvtr-github-repo/evaluation_plans/osps/build_and_release.OSPS_BR_01_01
+    steps-executed: 1
+    start: '2026-03-28T04:14:00Z'
+    end: '2026-03-28T04:14:00Z'
+    plan:
+      reference-id: OSPS-L2-POLICY
+      entry-id: AP-OSPS-BR-01.01
+    execution:
+      method-id: EM-OSPS-BR-01.01-probe
+    executor:
+      id: pvtr
+      name: pvtr-github-repo
+      type: Software
+      version: 2.4.1
+  - requirement:
+      reference-id: OSPS-B
+      entry-id: OSPS-BR-01.02
+    description: When a CI/CD pipeline uses a branch name in its functionality, that name value MUST
+      be sanitized and validated prior t
+    result: Passed
+    message: Requirement satisfied.
+    applicability:
+    - Maturity1
+    - Maturity2
+    - Maturity3
+    steps:
+    - github.com/revanite-io/pvtr-github-repo/evaluation_plans/osps/build_and_release.OSPS_BR_01_02
+    steps-executed: 1
+    start: '2026-03-28T04:14:00Z'
+    end: '2026-03-28T04:14:00Z'
+    plan:
+      reference-id: OSPS-L2-POLICY
+      entry-id: AP-OSPS-BR-01.02
+    execution:
+      method-id: EM-OSPS-BR-01.02-probe
+    executor:
+      id: pvtr
+      name: pvtr-github-repo
+      type: Software
+      version: 2.4.1
+  - requirement:
+      reference-id: OSPS-B
+      entry-id: OSPS-BR-01.02
+    description: When a CI/CD pipeline uses a branch name in its functionality, that name value MUST
+      be sanitized and validated prior t
+    result: Passed
+    message: Requirement satisfied.
+    applicability:
+    - Maturity1
+    - Maturity2
+    - Maturity3
+    steps:
+    - github.com/revanite-io/pvtr-github-repo/evaluation_plans/osps/build_and_release.OSPS_BR_01_02
+    steps-executed: 1
+    start: '2026-03-28T04:14:00Z'
+    end: '2026-03-28T04:14:00Z'
+    plan:
+      reference-id: OSPS-L2-POLICY
+      entry-id: AP-OSPS-BR-01.02
+    execution:
+      method-id: EM-OSPS-BR-01.02-review
+    executor:
+      id: platform-security
+      name: Platform Security Review
+      type: Human
+- name: 'All releases and released software assets MUST be assigned a unique
+
+    version identifier for each release intended to be used by users.
+
+    '
+  result: Passed
+  message: 1 of 1 assessments passed.
+  control:
+    reference-id: OSPS-B
+    entry-id: OSPS-BR-02
+  assessment-logs:
+  - requirement:
+      reference-id: OSPS-B
+      entry-id: OSPS-BR-02.01
+    description: When an official release is created, that release MUST be assigned a unique version
+      identifier.
+    result: Passed
+    message: Requirement satisfied.
+    applicability:
+    - Maturity2
+    - Maturity3
+    steps:
+    - github.com/revanite-io/pvtr-github-repo/evaluation_plans/osps/build_and_release.OSPS_BR_02_01
+    steps-executed: 1
+    start: '2026-03-28T04:15:00Z'
+    end: '2026-03-28T04:15:00Z'
+    plan:
+      reference-id: OSPS-L2-POLICY
+      entry-id: AP-OSPS-BR-02.01
+    execution:
+      method-id: EM-OSPS-BR-02.01-probe
+    executor:
+      id: pvtr
+      name: pvtr-github-repo
+      type: Software
+      version: 2.4.1
+- name: 'All official project URIs MUST be delivered using encrypted channels.
+
+    '
+  result: Failed
+  message: 2 of 3 assessments passed.
+  control:
+    reference-id: OSPS-B
+    entry-id: OSPS-BR-03
+  assessment-logs:
+  - requirement:
+      reference-id: OSPS-B
+      entry-id: OSPS-BR-03.01
+    description: When the project lists a URI as an official project channel, that URI MUST be exclusively
+      delivered using encrypted ch
+    result: Failed
+    message: Requirement not satisfied.
+    applicability:
+    - Maturity1
+    - Maturity2
+    - Maturity3
+    steps:
+    - github.com/revanite-io/pvtr-github-repo/evaluation_plans/osps/build_and_release.OSPS_BR_03_01
+    steps-executed: 1
+    start: '2026-03-28T04:16:00Z'
+    end: '2026-03-28T04:16:00Z'
+    plan:
+      reference-id: OSPS-L2-POLICY
+      entry-id: AP-OSPS-BR-03.01
+    execution:
+      method-id: EM-OSPS-BR-03.01-probe
+    executor:
+      id: pvtr
+      name: pvtr-github-repo
+      type: Software
+      version: 2.4.1
+  - requirement:
+      reference-id: OSPS-B
+      entry-id: OSPS-BR-03.02
+    description: When the project lists a URI as an official distribution channel, that URI MUST be
+      exclusively delivered using encrypt
+    result: Passed
+    message: Requirement satisfied.
+    applicability:
+    - Maturity1
+    - Maturity2
+    - Maturity3
+    steps:
+    - github.com/revanite-io/pvtr-github-repo/evaluation_plans/osps/build_and_release.OSPS_BR_03_02
+    steps-executed: 1
+    start: '2026-03-28T04:16:00Z'
+    end: '2026-03-28T04:16:00Z'
+    plan:
+      reference-id: OSPS-L2-POLICY
+      entry-id: AP-OSPS-BR-03.02
+    execution:
+      method-id: EM-OSPS-BR-03.02-probe
+    executor:
+      id: pvtr
+      name: pvtr-github-repo
+      type: Software
+      version: 2.4.1
+  - requirement:
+      reference-id: OSPS-B
+      entry-id: OSPS-BR-03.02
+    description: When the project lists a URI as an official distribution channel, that URI MUST be
+      exclusively delivered using encrypt
+    result: Passed
+    message: Requirement satisfied.
+    applicability:
+    - Maturity1
+    - Maturity2
+    - Maturity3
+    steps:
+    - github.com/revanite-io/pvtr-github-repo/evaluation_plans/osps/build_and_release.OSPS_BR_03_02
+    steps-executed: 1
+    start: '2026-03-28T04:16:00Z'
+    end: '2026-03-28T04:16:00Z'
+    plan:
+      reference-id: OSPS-L2-POLICY
+      entry-id: AP-OSPS-BR-03.02
+    execution:
+      method-id: EM-OSPS-BR-03.02-review
+    executor:
+      id: platform-security
+      name: Platform Security Review
+      type: Human
+- name: 'All releases MUST provide a descriptive log of functional and security
+
+    modifications.
+
+    '
+  result: Passed
+  message: 1 of 1 assessments passed.
+  control:
+    reference-id: OSPS-B
+    entry-id: OSPS-BR-04
+  assessment-logs:
+  - requirement:
+      reference-id: OSPS-B
+      entry-id: OSPS-BR-04.01
+    description: When an official release is created, that release MUST contain a descriptive log
+      of functional and security modificati
+    result: Passed
+    message: Requirement satisfied.
+    applicability:
+    - Maturity2
+    - Maturity3
+    steps:
+    - github.com/revanite-io/pvtr-github-repo/evaluation_plans/osps/build_and_release.OSPS_BR_04_01
+    steps-executed: 1
+    start: '2026-03-28T04:17:00Z'
+    end: '2026-03-28T04:17:00Z'
+    plan:
+      reference-id: OSPS-L2-POLICY
+      entry-id: AP-OSPS-BR-04.01
+    execution:
+      method-id: EM-OSPS-BR-04.01-probe
+    executor:
+      id: pvtr
+      name: pvtr-github-repo
+      type: Software
+      version: 2.4.1
+- name: 'All build and release pipelines MUST use standardized tooling where
+
+    available to ingest dependencies at build time.
+
+    '
+  result: Passed
+  message: 1 of 1 assessments passed.
+  control:
+    reference-id: OSPS-B
+    entry-id: OSPS-BR-05
+  assessment-logs:
+  - requirement:
+      reference-id: OSPS-B
+      entry-id: OSPS-BR-05.01
+    description: When a build and release pipeline ingests dependencies, it MUST use standardized
+      tooling where available.
+    result: Passed
+    message: Requirement satisfied.
+    applicability:
+    - Maturity2
+    - Maturity3
+    steps:
+    - github.com/revanite-io/pvtr-github-repo/evaluation_plans/osps/build_and_release.OSPS_BR_05_01
+    steps-executed: 1
+    start: '2026-03-28T04:18:00Z'
+    end: '2026-03-28T04:18:00Z'
+    plan:
+      reference-id: OSPS-L2-POLICY
+      entry-id: AP-OSPS-BR-05.01
+    execution:
+      method-id: EM-OSPS-BR-05.01-probe
+    executor:
+      id: pvtr
+      name: pvtr-github-repo
+      type: Software
+      version: 2.4.1
+- name: 'Produce all released software assets with signatures and hashes.
+
+    '
+  result: Passed
+  message: 1 of 1 assessments passed.
+  control:
+    reference-id: OSPS-B
+    entry-id: OSPS-BR-06
+  assessment-logs:
+  - requirement:
+      reference-id: OSPS-B
+      entry-id: OSPS-BR-06.01
+    description: 'When an official release is created, that release MUST be signed or accounted for
+      in a signed manifest including each '
+    result: Passed
+    message: Requirement satisfied.
+    applicability:
+    - Maturity2
+    - Maturity3
+    steps:
+    - github.com/revanite-io/pvtr-github-repo/evaluation_plans/osps/build_and_release.OSPS_BR_06_01
+    steps-executed: 1
+    start: '2026-03-28T04:19:00Z'
+    end: '2026-03-28T04:19:00Z'
+    execution:
+      method-id: EM-BASELINE-SCAN
+    executor:
+      id: pvtr
+      name: pvtr-github-repo
+      type: Software
+      version: 2.4.1
+- name: 'The project documentation MUST provide user guides for all basic
+
+    functionality.
+
+    '
+  result: Failed
+  message: 0 of 1 assessments passed.
+  control:
+    reference-id: OSPS-B
+    entry-id: OSPS-DO-01
+  assessment-logs:
+  - requirement:
+      reference-id: OSPS-B
+      entry-id: OSPS-DO-01.01
+    description: When the project has made a release, the project documentation MUST include user
+      guides for all basic functionality.
+    result: Failed
+    message: Requirement not satisfied.
+    applicability:
+    - Maturity1
+    - Maturity2
+    - Maturity3
+    steps:
+    - github.com/revanite-io/pvtr-github-repo/evaluation_plans/osps/documentation.OSPS_DO_01_01
+    steps-executed: 1
+    start: '2026-03-28T04:10:00Z'
+    end: '2026-03-28T04:10:00Z'
+    execution:
+      method-id: EM-BASELINE-SCAN
+    executor:
+      id: pvtr
+      name: pvtr-github-repo
+      type: Software
+      version: 2.4.1
+- name: 'The project MUST provide a mechanism for reporting defects.
+
+    '
+  result: Failed
+  message: 0 of 1 assessments passed.
+  control:
+    reference-id: OSPS-B
+    entry-id: OSPS-DO-02
+  assessment-logs:
+  - requirement:
+      reference-id: OSPS-B
+      entry-id: OSPS-DO-02.01
+    description: When the project has made a release, the project documentation MUST include a guide
+      for reporting defects.
+    result: Failed
+    message: Requirement not satisfied.
+    applicability:
+    - Maturity1
+    - Maturity2
+    - Maturity3
+    steps:
+    - github.com/revanite-io/pvtr-github-repo/evaluation_plans/osps/documentation.OSPS_DO_02_01
+    steps-executed: 1
+    start: '2026-03-28T04:11:00Z'
+    end: '2026-03-28T04:11:00Z'
+    execution:
+      method-id: EM-BASELINE-SCAN
+    executor:
+      id: pvtr
+      name: pvtr-github-repo
+      type: Software
+      version: 2.4.1
+- name: 'The project documentation MUST include a description of how the
+
+    project selects, obtains, and tracks its dependencies.
+
+    '
+  result: Passed
+  message: 1 of 1 assessments passed.
+  control:
+    reference-id: OSPS-B
+    entry-id: OSPS-DO-06
+  assessment-logs:
+  - requirement:
+      reference-id: OSPS-B
+      entry-id: OSPS-DO-06.01
+    description: 'When the project has made a release, the project documentation MUST include a description
+      of how the project selects, '
+    result: Passed
+    message: Requirement satisfied.
+    applicability:
+    - Maturity2
+    - Maturity3
+    steps:
+    - github.com/revanite-io/pvtr-github-repo/evaluation_plans/osps/documentation.OSPS_DO_06_01
+    steps-executed: 1
+    start: '2026-03-28T04:15:00Z'
+    end: '2026-03-28T04:15:00Z'
+    execution:
+      method-id: EM-BASELINE-SCAN
+    executor:
+      id: pvtr
+      name: pvtr-github-repo
+      type: Software
+      version: 2.4.1
+- name: 'The project documentation MUST include the roles and responsibilities
+
+    for members of the project.
+
+    '
+  result: Passed
+  message: 2 of 2 assessments passed.
+  control:
+    reference-id: OSPS-B
+    entry-id: OSPS-GV-01
+  assessment-logs:
+  - requirement:
+      reference-id: OSPS-B
+      entry-id: OSPS-GV-01.01
+    description: While active, the project documentation MUST include a list of project members with
+      access to sensitive resources.
+    result: Passed
+    message: Requirement satisfied.
+    applicability:
+    - Maturity2
+    - Maturity3
+    steps:
+    - github.com/revanite-io/pvtr-github-repo/evaluation_plans/osps/governance.OSPS_GV_01_01
+    steps-executed: 1
+    start: '2026-03-28T04:16:00Z'
+    end: '2026-03-28T04:16:00Z'
+    execution:
+      method-id: EM-BASELINE-SCAN
+    executor:
+      id: pvtr
+      name: pvtr-github-repo
+      type: Software
+      version: 2.4.1
+  - requirement:
+      reference-id: OSPS-B
+      entry-id: OSPS-GV-01.02
+    description: While active, the project documentation MUST include descriptions of the roles and
+      responsibilities for members of the
+    result: Passed
+    message: Requirement satisfied.
+    applicability:
+    - Maturity2
+    - Maturity3
+    steps:
+    - github.com/revanite-io/pvtr-github-repo/evaluation_plans/osps/governance.OSPS_GV_01_02
+    steps-executed: 1
+    start: '2026-03-28T04:16:00Z'
+    end: '2026-03-28T04:16:00Z'
+    execution:
+      method-id: EM-BASELINE-SCAN
+    executor:
+      id: pvtr
+      name: pvtr-github-repo
+      type: Software
+      version: 2.4.1
+- name: 'The project MUST have one or more mechanisms for public discussions
+
+    about proposed changes and usage obstacles.
+
+    '
+  result: Failed
+  message: 0 of 1 assessments passed.
+  control:
+    reference-id: OSPS-B
+    entry-id: OSPS-GV-02
+  assessment-logs:
+  - requirement:
+      reference-id: OSPS-B
+      entry-id: OSPS-GV-02.01
+    description: While active, the project MUST have one or more mechanisms for public discussions
+      about proposed changes and usage obs
+    result: Failed
+    message: Requirement not satisfied.
+    applicability:
+    - Maturity1
+    - Maturity2
+    - Maturity3
+    steps:
+    - github.com/revanite-io/pvtr-github-repo/evaluation_plans/osps/governance.OSPS_GV_02_01
+    steps-executed: 1
+    start: '2026-03-28T04:17:00Z'
+    end: '2026-03-28T04:17:00Z'
+    execution:
+      method-id: EM-BASELINE-SCAN
+    executor:
+      id: pvtr
+      name: pvtr-github-repo
+      type: Software
+      version: 2.4.1
+- name: 'The project documentation MUST include an explanation of the
+
+    contribution process.
+
+    '
+  result: Passed
+  message: 2 of 2 assessments passed.
+  control:
+    reference-id: OSPS-B
+    entry-id: OSPS-GV-03
+  assessment-logs:
+  - requirement:
+      reference-id: OSPS-B
+      entry-id: OSPS-GV-03.01
+    description: While active, the project documentation MUST include an explanation of the contribution
+      process.
+    result: Passed
+    message: Requirement satisfied.
+    applicability:
+    - Maturity1
+    - Maturity2
+    - Maturity3
+    steps:
+    - github.com/revanite-io/pvtr-github-repo/evaluation_plans/osps/governance.OSPS_GV_03_01
+    steps-executed: 1
+    start: '2026-03-28T04:18:00Z'
+    end: '2026-03-28T04:18:00Z'
+    execution:
+      method-id: EM-BASELINE-SCAN
+    executor:
+      id: pvtr
+      name: pvtr-github-repo
+      type: Software
+      version: 2.4.1
+  - requirement:
+      reference-id: OSPS-B
+      entry-id: OSPS-GV-03.02
+    description: While active, the project documentation MUST include a guide for code contributors
+      that includes requirements for acce
+    result: Passed
+    message: Requirement satisfied.
+    applicability:
+    - Maturity2
+    - Maturity3
+    steps:
+    - github.com/revanite-io/pvtr-github-repo/evaluation_plans/osps/governance.OSPS_GV_03_02
+    steps-executed: 1
+    start: '2026-03-28T04:18:00Z'
+    end: '2026-03-28T04:18:00Z'
+    execution:
+      method-id: EM-BASELINE-SCAN
+    executor:
+      id: pvtr
+      name: pvtr-github-repo
+      type: Software
+      version: 2.4.1
+- name: 'The version control system MUST require all code contributors to assert
+
+    that they are legally authorized to make the associated contributions
+
+    on every commit.
+
+    '
+  result: Passed
+  message: 1 of 1 assessments passed.
+  control:
+    reference-id: OSPS-B
+    entry-id: OSPS-LE-01
+  assessment-logs:
+  - requirement:
+      reference-id: OSPS-B
+      entry-id: OSPS-LE-01.01
+    description: While active, the version control system MUST require all code contributors to assert
+      that they are legally authorized
+    result: Passed
+    message: Requirement satisfied.
+    applicability:
+    - Maturity2
+    - Maturity3
+    steps:
+    - github.com/revanite-io/pvtr-github-repo/evaluation_plans/osps/legal.OSPS_LE_01_01
+    steps-executed: 1
+    start: '2026-03-28T04:10:00Z'
+    end: '2026-03-28T04:10:00Z'
+    execution:
+      method-id: EM-BASELINE-SCAN
+    executor:
+      id: pvtr
+      name: pvtr-github-repo
+      type: Software
+      version: 2.4.1
+- name: 'All licenses for the project MUST meet the OSI Open Source Definition
+
+    or the FSF Free Software Definition.
+
+    '
+  result: Passed
+  message: 2 of 2 assessments passed.
+  control:
+    reference-id: OSPS-B
+    entry-id: OSPS-LE-02
+  assessment-logs:
+  - requirement:
+      reference-id: OSPS-B
+      entry-id: OSPS-LE-02.01
+    description: While active, the license for the source code MUST meet the OSI Open Source Definition
+      or the FSF Free Software Defini
+    result: Passed
+    message: Requirement satisfied.
+    applicability:
+    - Maturity1
+    - Maturity2
+    - Maturity3
+    steps:
+    - github.com/revanite-io/pvtr-github-repo/evaluation_plans/osps/legal.OSPS_LE_02_01
+    steps-executed: 1
+    start: '2026-03-28T04:11:00Z'
+    end: '2026-03-28T04:11:00Z'
+    execution:
+      method-id: EM-BASELINE-SCAN
+    executor:
+      id: pvtr
+      name: pvtr-github-repo
+      type: Software
+      version: 2.4.1
+  - requirement:
+      reference-id: OSPS-B
+      entry-id: OSPS-LE-02.02
+    description: While active, the license for the released software assets MUST meet the OSI Open
+      Source Definition or the FSF Free So
+    result: Passed
+    message: Requirement satisfied.
+    applicability:
+    - Maturity1
+    - Maturity2
+    - Maturity3
+    steps:
+    - github.com/revanite-io/pvtr-github-repo/evaluation_plans/osps/legal.OSPS_LE_02_02
+    steps-executed: 1
+    start: '2026-03-28T04:11:00Z'
+    end: '2026-03-28T04:11:00Z'
+    execution:
+      method-id: EM-BASELINE-SCAN
+    executor:
+      id: pvtr
+      name: pvtr-github-repo
+      type: Software
+      version: 2.4.1
+- name: "All licenses for the project's source code MUST be maintained in a \nstandard location within\
+    \ the corresponding repository.\n"
+  result: Passed
+  message: 2 of 2 assessments passed.
+  control:
+    reference-id: OSPS-B
+    entry-id: OSPS-LE-03
+  assessment-logs:
+  - requirement:
+      reference-id: OSPS-B
+      entry-id: OSPS-LE-03.01
+    description: While active, the license for the source code MUST be maintained in the corresponding
+      repository's LICENSE file, COPYI
+    result: Passed
+    message: Requirement satisfied.
+    applicability:
+    - Maturity1
+    - Maturity2
+    - Maturity3
+    steps:
+    - github.com/revanite-io/pvtr-github-repo/evaluation_plans/osps/legal.OSPS_LE_03_01
+    steps-executed: 1
+    start: '2026-03-28T04:12:00Z'
+    end: '2026-03-28T04:12:00Z'
+    execution:
+      method-id: EM-BASELINE-SCAN
+    executor:
+      id: pvtr
+      name: pvtr-github-repo
+      type: Software
+      version: 2.4.1
+  - requirement:
+      reference-id: OSPS-B
+      entry-id: OSPS-LE-03.02
+    description: While active, the license for the released software assets MUST be included in the
+      released source code, or in a LICEN
+    result: Passed
+    message: Requirement satisfied.
+    applicability:
+    - Maturity1
+    - Maturity2
+    - Maturity3
+    steps:
+    - github.com/revanite-io/pvtr-github-repo/evaluation_plans/osps/legal.OSPS_LE_03_02
+    steps-executed: 1
+    start: '2026-03-28T04:12:00Z'
+    end: '2026-03-28T04:12:00Z'
+    execution:
+      method-id: EM-BASELINE-SCAN
+    executor:
+      id: pvtr
+      name: pvtr-github-repo
+      type: Software
+      version: 2.4.1
+- name: 'The project''s source code and change history MUST be publicly readable at
+
+    a static URL.
+
+    '
+  result: Passed
+  message: 2 of 2 assessments passed.
+  control:
+    reference-id: OSPS-B
+    entry-id: OSPS-QA-01
+  assessment-logs:
+  - requirement:
+      reference-id: OSPS-B
+      entry-id: OSPS-QA-01.01
+    description: While active, the project's source code repository MUST be publicly readable at a
+      static URL.
+    result: Passed
+    message: Requirement satisfied.
+    applicability:
+    - Maturity1
+    - Maturity2
+    - Maturity3
+    steps:
+    - github.com/revanite-io/pvtr-github-repo/evaluation_plans/osps/quality.OSPS_QA_01_01
+    steps-executed: 1
+    start: '2026-03-28T04:13:00Z'
+    end: '2026-03-28T04:13:00Z'
+    execution:
+      method-id: EM-BASELINE-SCAN
+    executor:
+      id: pvtr
+      name: pvtr-github-repo
+      type: Software
+      version: 2.4.1
+  - requirement:
+      reference-id: OSPS-B
+      entry-id: OSPS-QA-01.02
+    description: The version control system MUST contain a publicly readable record of all changes
+      made, who made the changes, and when
+    result: Passed
+    message: Requirement satisfied.
+    applicability:
+    - Maturity1
+    - Maturity2
+    - Maturity3
+    steps:
+    - github.com/revanite-io/pvtr-github-repo/evaluation_plans/osps/quality.OSPS_QA_01_02
+    steps-executed: 1
+    start: '2026-03-28T04:13:00Z'
+    end: '2026-03-28T04:13:00Z'
+    execution:
+      method-id: EM-BASELINE-SCAN
+    executor:
+      id: pvtr
+      name: pvtr-github-repo
+      type: Software
+      version: 2.4.1
+- name: 'The project MUST provide a list of dependencies used in the software.
+
+    '
+  result: Failed
+  message: 0 of 1 assessments passed.
+  control:
+    reference-id: OSPS-B
+    entry-id: OSPS-QA-02
+  assessment-logs:
+  - requirement:
+      reference-id: OSPS-B
+      entry-id: OSPS-QA-02.01
+    description: When the package management system supports it, the source code repository MUST contain
+      a dependency list that account
+    result: Failed
+    message: Requirement not satisfied.
+    applicability:
+    - Maturity1
+    - Maturity2
+    - Maturity3
+    steps:
+    - github.com/revanite-io/pvtr-github-repo/evaluation_plans/osps/quality.OSPS_QA_02_01
+    steps-executed: 1
+    start: '2026-03-28T04:14:00Z'
+    end: '2026-03-28T04:14:00Z'
+    execution:
+      method-id: EM-BASELINE-SCAN
+    executor:
+      id: pvtr
+      name: pvtr-github-repo
+      type: Software
+      version: 2.4.1
+- name: 'Any automated status checks for commits MUST pass or require manual
+
+    acknowledgement prior to merge.
+
+    '
+  result: Passed
+  message: 1 of 1 assessments passed.
+  control:
+    reference-id: OSPS-B
+    entry-id: OSPS-QA-03
+  assessment-logs:
+  - requirement:
+      reference-id: OSPS-B
+      entry-id: OSPS-QA-03.01
+    description: When a commit is made to the primary branch, any automated status checks for commits
+      MUST pass or be manually bypassed
+    result: Passed
+    message: Requirement satisfied.
+    applicability:
+    - Maturity2
+    - Maturity3
+    steps:
+    - github.com/revanite-io/pvtr-github-repo/evaluation_plans/osps/quality.OSPS_QA_03_01
+    steps-executed: 1
+    start: '2026-03-28T04:15:00Z'
+    end: '2026-03-28T04:15:00Z'
+    execution:
+      method-id: EM-BASELINE-SCAN
+    executor:
+      id: pvtr
+      name: pvtr-github-repo
+      type: Software
+      version: 2.4.1
+- name: 'Any additional subproject code repositories produced by the project
+
+    and compiled into a release MUST enforce security requirements as
+
+    applicable to the status and intent of the respective codebase.
+
+    '
+  result: Passed
+  message: 1 of 1 assessments passed.
+  control:
+    reference-id: OSPS-B
+    entry-id: OSPS-QA-04
+  assessment-logs:
+  - requirement:
+      reference-id: OSPS-B
+      entry-id: OSPS-QA-04.01
+    description: While active, the project documentation MUST contain a list of any codebases that
+      are considered subprojects or additi
+    result: Passed
+    message: Requirement satisfied.
+    applicability:
+    - Maturity1
+    - Maturity2
+    - Maturity3
+    steps:
+    - github.com/revanite-io/pvtr-github-repo/evaluation_plans/osps/quality.OSPS_QA_04_01
+    steps-executed: 1
+    start: '2026-03-28T04:16:00Z'
+    end: '2026-03-28T04:16:00Z'
+    execution:
+      method-id: EM-BASELINE-SCAN
+    executor:
+      id: pvtr
+      name: pvtr-github-repo
+      type: Software
+      version: 2.4.1
+- name: 'The version control system MUST NOT contain generated executable
+
+    artifacts.
+
+    '
+  result: Passed
+  message: 1 of 1 assessments passed.
+  control:
+    reference-id: OSPS-B
+    entry-id: OSPS-QA-05
+  assessment-logs:
+  - requirement:
+      reference-id: OSPS-B
+      entry-id: OSPS-QA-05.01
+    description: While active, the version control system MUST NOT contain generated executable artifacts.
+    result: Passed
+    message: Requirement satisfied.
+    applicability:
+    - Maturity1
+    - Maturity2
+    - Maturity3
+    steps:
+    - github.com/revanite-io/pvtr-github-repo/evaluation_plans/osps/quality.OSPS_QA_05_01
+    steps-executed: 1
+    start: '2026-03-28T04:17:00Z'
+    end: '2026-03-28T04:17:00Z'
+    execution:
+      method-id: EM-BASELINE-SCAN
+    executor:
+      id: pvtr
+      name: pvtr-github-repo
+      type: Software
+      version: 2.4.1
+- name: 'The project MUST use at least one automated test suite for the source
+
+    code repository.
+
+    '
+  result: Passed
+  message: 1 of 1 assessments passed.
+  control:
+    reference-id: OSPS-B
+    entry-id: OSPS-QA-06
+  assessment-logs:
+  - requirement:
+      reference-id: OSPS-B
+      entry-id: OSPS-QA-06.01
+    description: Prior to a commit being accepted, the project's CI/CD pipelines MUST run at least
+      one automated test suite to ensure t
+    result: Passed
+    message: Requirement satisfied.
+    applicability:
+    - Maturity2
+    - Maturity3
+    steps:
+    - github.com/revanite-io/pvtr-github-repo/evaluation_plans/osps/quality.OSPS_QA_06_01
+    steps-executed: 1
+    start: '2026-03-28T04:18:00Z'
+    end: '2026-03-28T04:18:00Z'
+    execution:
+      method-id: EM-BASELINE-SCAN
+    executor:
+      id: pvtr
+      name: pvtr-github-repo
+      type: Software
+      version: 2.4.1
+- name: 'The project documentation MUST provide design documentation demonstrating
+
+    all actions and actors within the system.
+
+    '
+  result: Passed
+  message: 1 of 1 assessments passed.
+  control:
+    reference-id: OSPS-B
+    entry-id: OSPS-SA-01
+  assessment-logs:
+  - requirement:
+      reference-id: OSPS-B
+      entry-id: OSPS-SA-01.01
+    description: When the project has made a release, the project documentation MUST include design
+      documentation demonstrating all act
+    result: Passed
+    message: Requirement satisfied.
+    applicability:
+    - Maturity2
+    - Maturity3
+    steps:
+    - github.com/revanite-io/pvtr-github-repo/evaluation_plans/osps/security_assessment.OSPS_SA_01_01
+    steps-executed: 1
+    start: '2026-03-28T04:10:00Z'
+    end: '2026-03-28T04:10:00Z'
+    execution:
+      method-id: EM-BASELINE-SCAN
+    executor:
+      id: pvtr
+      name: pvtr-github-repo
+      type: Software
+      version: 2.4.1
+- name: 'The project documentation MUST include descriptions of all external
+
+    software interfaces of the released software assets.
+
+    '
+  result: Passed
+  message: 1 of 1 assessments passed.
+  control:
+    reference-id: OSPS-B
+    entry-id: OSPS-SA-02
+  assessment-logs:
+  - requirement:
+      reference-id: OSPS-B
+      entry-id: OSPS-SA-02.01
+    description: When the project has made a release, the project documentation MUST include descriptions
+      of all external software inte
+    result: Passed
+    message: Requirement satisfied.
+    applicability:
+    - Maturity2
+    - Maturity3
+    steps:
+    - github.com/revanite-io/pvtr-github-repo/evaluation_plans/osps/security_assessment.OSPS_SA_02_01
+    steps-executed: 1
+    start: '2026-03-28T04:11:00Z'
+    end: '2026-03-28T04:11:00Z'
+    execution:
+      method-id: EM-BASELINE-SCAN
+    executor:
+      id: pvtr
+      name: pvtr-github-repo
+      type: Software
+      version: 2.4.1
+- name: 'The project MUST assess the security posture of all software assets.
+
+    '
+  result: Passed
+  message: 1 of 1 assessments passed.
+  control:
+    reference-id: OSPS-B
+    entry-id: OSPS-SA-03
+  assessment-logs:
+  - requirement:
+      reference-id: OSPS-B
+      entry-id: OSPS-SA-03.01
+    description: 'When the project has made a release, the project MUST perform a security assessment
+      to understand the most likely and '
+    result: Passed
+    message: Requirement satisfied.
+    applicability:
+    - Maturity2
+    - Maturity3
+    steps:
+    - github.com/revanite-io/pvtr-github-repo/evaluation_plans/osps/security_assessment.OSPS_SA_03_01
+    steps-executed: 1
+    start: '2026-03-28T04:12:00Z'
+    end: '2026-03-28T04:12:00Z'
+    execution:
+      method-id: EM-BASELINE-SCAN
+    executor:
+      id: pvtr
+      name: pvtr-github-repo
+      type: Software
+      version: 2.4.1
+- name: 'The project documentation MUST include a policy for coordinated
+
+    vulnerability reporting, with a clear timeframe for response.
+
+    '
+  result: Passed
+  message: 1 of 1 assessments passed.
+  control:
+    reference-id: OSPS-B
+    entry-id: OSPS-VM-01
+  assessment-logs:
+  - requirement:
+      reference-id: OSPS-B
+      entry-id: OSPS-VM-01.01
+    description: While active, the project documentation MUST include a policy for coordinated vulnerability
+      reporting, with a clear ti
+    result: Passed
+    message: Requirement satisfied.
+    applicability:
+    - Maturity2
+    - Maturity3
+    steps:
+    - github.com/revanite-io/pvtr-github-repo/evaluation_plans/osps/vulnerability_management.OSPS_VM_01_01
+    steps-executed: 1
+    start: '2026-03-28T04:13:00Z'
+    end: '2026-03-28T04:13:00Z'
+    execution:
+      method-id: EM-BASELINE-SCAN
+    executor:
+      id: pvtr
+      name: pvtr-github-repo
+      type: Software
+      version: 2.4.1
+- name: 'The project MUST publish contacts and process for reporting
+
+    vulnerabilities.
+
+    '
+  result: Failed
+  message: 0 of 1 assessments passed.
+  control:
+    reference-id: OSPS-B
+    entry-id: OSPS-VM-02
+  assessment-logs:
+  - requirement:
+      reference-id: OSPS-B
+      entry-id: OSPS-VM-02.01
+    description: While active, the project documentation MUST contain security contacts.
+    result: Failed
+    message: Requirement not satisfied.
+    applicability:
+    - Maturity1
+    steps:
+    - github.com/revanite-io/pvtr-github-repo/evaluation_plans/osps/vulnerability_management.OSPS_VM_02_01
+    steps-executed: 1
+    start: '2026-03-28T04:14:00Z'
+    end: '2026-03-28T04:14:00Z'
+    execution:
+      method-id: EM-BASELINE-SCAN
+    executor:
+      id: pvtr
+      name: pvtr-github-repo
+      type: Software
+      version: 2.4.1
+- name: 'The project MUST provide a means for reporting security
+
+    vulnerabilities privately to the security contacts within the project.
+
+    '
+  result: Passed
+  message: 1 of 1 assessments passed.
+  control:
+    reference-id: OSPS-B
+    entry-id: OSPS-VM-03
+  assessment-logs:
+  - requirement:
+      reference-id: OSPS-B
+      entry-id: OSPS-VM-03.01
+    description: While active, the project documentation MUST provide a means for reporting security
+      vulnerabilities privately to the s
+    result: Passed
+    message: Requirement satisfied.
+    applicability:
+    - Maturity2
+    - Maturity3
+    steps:
+    - github.com/revanite-io/pvtr-github-repo/evaluation_plans/osps/vulnerability_management.OSPS_VM_03_01
+    steps-executed: 1
+    start: '2026-03-28T04:15:00Z'
+    end: '2026-03-28T04:15:00Z'
+    execution:
+      method-id: EM-BASELINE-SCAN
+    executor:
+      id: pvtr
+      name: pvtr-github-repo
+      type: Software
+      version: 2.4.1
+- name: 'The project MUST publicly publish data about discovered vulnerabilities.
+
+    '
+  result: Passed
+  message: 1 of 1 assessments passed.
+  control:
+    reference-id: OSPS-B
+    entry-id: OSPS-VM-04
+  assessment-logs:
+  - requirement:
+      reference-id: OSPS-B
+      entry-id: OSPS-VM-04.01
+    description: While active, the project documentation MUST publicly publish data about discovered
+      vulnerabilities.
+    result: Passed
+    message: Requirement satisfied.
+    applicability:
+    - Maturity2
+    - Maturity3
+    steps:
+    - github.com/revanite-io/pvtr-github-repo/evaluation_plans/osps/vulnerability_management.OSPS_VM_04_01
+    steps-executed: 1
+    start: '2026-03-28T04:16:00Z'
+    end: '2026-03-28T04:16:00Z'
+    execution:
+      method-id: EM-BASELINE-SCAN
+    executor:
+      id: pvtr
+      name: pvtr-github-repo
+      type: Software
+      version: 2.4.1

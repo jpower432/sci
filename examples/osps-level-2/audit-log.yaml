@@ -1,0 +1,1024 @@
+metadata:
+  id: OSPS-L2-AUDIT-2026Q1
+  type: AuditLog
+  gemara-version: 1.1.0
+  version: 1.0.0
+  description: Q1 2026 audit of gemaraproj/gemara against the OSPS Level 2 adherence policy.
+  author:
+    id: lead-auditor
+    name: Jane Auditor
+    type: Human
+  mapping-references:
+  - id: OSPS-L2-POLICY
+    title: OpenSSF Baseline Adherence Policy — Maturity Level 2
+    version: '2026.1'
+    type: Policy
+  - id: OSPS-B
+    title: Open Source Project Security Baseline
+    version: 1.0.0
+    type: ControlCatalog
+    url: https://baseline.openssf.org
+  - id: SCG
+    title: Secure Development Guidance
+    version: '1.2'
+    type: GuidanceCatalog
+    url: https://guidance.example.com/secure-development
+  - id: eval-log
+    title: OSPS Level 2 Baseline Scan
+    version: 1.0.0
+    type: EvaluationLog
+    url: https://artifacts.example.com/eval-logs/OSPS-L2-SCAN-2026-03-28.yaml
+  - id: enforcement-log
+    title: Release Gate Actions
+    version: 1.0.0
+    type: EnforcementLog
+    url: https://artifacts.example.com/enforcement-logs/OSPS-L2-GATE-2026-03-29.yaml
+target:
+  id: gemara-repo
+  name: gemaraproj/gemara
+  type: Software
+  uri: https://github.com/gemaraproj/gemara
+  environment: production
+owner:
+  responsible:
+  - name: Jane Auditor
+    affiliation: External Audit Firm
+  accountable:
+  - name: Project Lead
+    affiliation: OpenSSF
+policy:
+  reference-id: OSPS-L2-POLICY
+  remarks: 'The criteria: the adherence policy, at its pinned version.'
+objectives:
+- Establish whether the target meets the requirements the policy binds to it.
+- Establish whether the evidence behind each determination was obtained as the policy prescribes.
+- Establish whether the policy implements the guidance it adopted.
+verifications:
+- requirement:
+    reference-id: OSPS-B
+    entry-id: OSPS-AC-01.01
+  effective:
+    text: When a user attempts to access a sensitive resource in the project's version control system,
+      the system MUST require the user to complete a multi-factor authentication process.
+    applicability:
+    - Maturity1
+    - Maturity2
+    - Maturity3
+    plan-id: AP-OSPS-AC-01.01
+  conformance:
+  - method-id: EM-OSPS-AC-01.01-probe
+    determination: Satisfied
+  - method-id: EM-OSPS-AC-01.01-review
+    determination: Satisfied
+  outcome: Satisfied
+  assessments:
+  - reference-id: eval-log
+    entry-id: OSPS-AC-01.01
+- requirement:
+    reference-id: OSPS-B
+    entry-id: OSPS-AC-02.01
+  effective:
+    text: When a new collaborator is added, the version control system MUST require manual permission
+      assignment, or restrict the collaborator permissions to the lowest available privileges by default.
+    applicability:
+    - Maturity1
+    - Maturity2
+    - Maturity3
+    plan-id: AP-OSPS-AC-02.01
+  conformance:
+  - method-id: EM-OSPS-AC-02.01-probe
+    determination: Satisfied
+  outcome: Satisfied
+  assessments:
+  - reference-id: eval-log
+    entry-id: OSPS-AC-02.01
+- requirement:
+    reference-id: OSPS-B
+    entry-id: OSPS-AC-03.01
+  effective:
+    text: When a direct commit is attempted on the project's primary branch, an enforcement mechanism
+      MUST prevent the change from being applied.
+    applicability:
+    - Maturity1
+    - Maturity2
+    - Maturity3
+    plan-id: AP-OSPS-AC-03.01
+  conformance:
+  - method-id: EM-OSPS-AC-03.01-probe
+    determination: Not Satisfied
+    required: The probe runs within the plan's every 180 days cadence.
+    evidenced: Last run 2025-11-02, five months before the window closed.
+  outcome: Undetermined
+  assessments:
+  - reference-id: eval-log
+    entry-id: OSPS-AC-03.01
+  basis: The only assessment predates the audit window, so the current state could not be established
+    from it.
+- requirement:
+    reference-id: OSPS-B
+    entry-id: OSPS-AC-03.02
+  effective:
+    text: When an attempt is made to delete the project's primary branch, the version control system
+      MUST treat this as a sensitive activity and require explicit confirmation of intent.
+    applicability:
+    - Maturity1
+    - Maturity2
+    - Maturity3
+    plan-id: AP-OSPS-AC-03.02
+  conformance:
+  - method-id: EM-OSPS-AC-03.02-probe
+    determination: Satisfied
+  - method-id: EM-OSPS-AC-03.02-review
+    determination: Satisfied
+  outcome: Satisfied
+  assessments:
+  - reference-id: eval-log
+    entry-id: OSPS-AC-03.02
+- requirement:
+    reference-id: OSPS-B
+    entry-id: OSPS-AC-04.01
+  effective:
+    text: When a CI/CD task is executed with no permissions specified, the project's version control
+      system MUST default to the lowest available permissions for all activities in the pipeline.
+    applicability:
+    - Maturity2
+    - Maturity3
+    plan-id: AP-OSPS-AC-04.01
+  conformance:
+  - method-id: EM-OSPS-AC-04.01-probe
+    determination: Satisfied
+  outcome: Satisfied
+  assessments:
+  - reference-id: eval-log
+    entry-id: OSPS-AC-04.01
+- requirement:
+    reference-id: OSPS-B
+    entry-id: OSPS-BR-01.01
+  effective:
+    text: When a CI/CD pipeline accepts an input parameter, that parameter MUST be sanitized and validated
+      prior to use in the pipeline.
+    applicability:
+    - Maturity1
+    - Maturity2
+    - Maturity3
+    plan-id: AP-OSPS-BR-01.01
+  conformance:
+  - method-id: EM-OSPS-BR-01.01-probe
+    determination: Satisfied
+  outcome: Satisfied
+  assessments:
+  - reference-id: eval-log
+    entry-id: OSPS-BR-01.01
+- requirement:
+    reference-id: OSPS-B
+    entry-id: OSPS-BR-01.02
+  effective:
+    text: When a CI/CD pipeline uses a branch name in its functionality, that name value MUST be sanitized
+      and validated prior to use in the pipeline.
+    applicability:
+    - Maturity1
+    - Maturity2
+    - Maturity3
+    plan-id: AP-OSPS-BR-01.02
+  conformance:
+  - method-id: EM-OSPS-BR-01.02-probe
+    determination: Satisfied
+  - method-id: EM-OSPS-BR-01.02-review
+    determination: Satisfied
+  outcome: Satisfied
+  assessments:
+  - reference-id: eval-log
+    entry-id: OSPS-BR-01.02
+- requirement:
+    reference-id: OSPS-B
+    entry-id: OSPS-BR-02.01
+  effective:
+    text: When an official release is created, that release MUST be assigned a unique version identifier.
+    applicability:
+    - Maturity2
+    - Maturity3
+    plan-id: AP-OSPS-BR-02.01
+  conformance:
+  - method-id: EM-OSPS-BR-02.01-probe
+    determination: Satisfied
+  outcome: Satisfied
+  assessments:
+  - reference-id: eval-log
+    entry-id: OSPS-BR-02.01
+- requirement:
+    reference-id: OSPS-B
+    entry-id: OSPS-BR-03.01
+  effective:
+    text: When the project lists a URI as an official project channel, that URI MUST be exclusively
+      delivered using encrypted channels.
+    applicability:
+    - Maturity1
+    - Maturity2
+    - Maturity3
+    plan-id: AP-OSPS-BR-03.01
+  conformance:
+  - method-id: EM-OSPS-BR-03.01-probe
+    determination: Satisfied
+  outcome: Not Satisfied
+  assessments:
+  - reference-id: eval-log
+    entry-id: OSPS-BR-03.01
+- requirement:
+    reference-id: OSPS-B
+    entry-id: OSPS-BR-03.02
+  effective:
+    text: When the project lists a URI as an official distribution channel, that URI MUST be exclusively
+      delivered using encrypted channels.
+    applicability:
+    - Maturity1
+    - Maturity2
+    - Maturity3
+    plan-id: AP-OSPS-BR-03.02
+  conformance:
+  - method-id: EM-OSPS-BR-03.02-probe
+    determination: Satisfied
+  - method-id: EM-OSPS-BR-03.02-review
+    determination: Satisfied
+  outcome: Satisfied
+  assessments:
+  - reference-id: eval-log
+    entry-id: OSPS-BR-03.02
+- requirement:
+    reference-id: OSPS-B
+    entry-id: OSPS-BR-04.01
+  effective:
+    text: When an official release is created, that release MUST contain a descriptive log of functional
+      and security modifications.
+    applicability:
+    - Maturity2
+    - Maturity3
+    plan-id: AP-OSPS-BR-04.01
+  conformance:
+  - method-id: EM-OSPS-BR-04.01-probe
+    determination: Satisfied
+  outcome: Satisfied
+  assessments:
+  - reference-id: eval-log
+    entry-id: OSPS-BR-04.01
+- requirement:
+    reference-id: OSPS-B
+    entry-id: OSPS-BR-05.01
+  effective:
+    text: When a build and release pipeline ingests dependencies, it MUST use standardized tooling
+      where available.
+    applicability:
+    - Maturity2
+    - Maturity3
+    plan-id: AP-OSPS-BR-05.01
+  conformance:
+  - method-id: EM-OSPS-BR-05.01-probe
+    determination: Satisfied
+  outcome: Satisfied
+  assessments:
+  - reference-id: eval-log
+    entry-id: OSPS-BR-05.01
+- requirement:
+    reference-id: OSPS-B
+    entry-id: OSPS-BR-06.01
+  effective:
+    text: When an official release is created, that release MUST be signed or accounted for in a signed
+      manifest including each asset's cryptographic hashes.
+    applicability:
+    - Maturity2
+    - Maturity3
+  conformance:
+  - method-id: EM-BASELINE-SCAN
+    determination: Satisfied
+  outcome: Satisfied
+  assessments:
+  - reference-id: eval-log
+    entry-id: OSPS-BR-06.01
+- requirement:
+    reference-id: OSPS-B
+    entry-id: OSPS-DO-01.01
+  effective:
+    text: When the project has made a release, the project documentation MUST include user guides
+      for all basic functionality.
+    applicability:
+    - Maturity1
+    - Maturity2
+    - Maturity3
+  conformance:
+  - method-id: EM-BASELINE-SCAN
+    determination: Satisfied
+  outcome: Not Satisfied
+  assessments:
+  - reference-id: eval-log
+    entry-id: OSPS-DO-01.01
+- requirement:
+    reference-id: OSPS-B
+    entry-id: OSPS-DO-02.01
+  effective:
+    text: When the project has made a release, the project documentation MUST include a guide for
+      reporting defects.
+    applicability:
+    - Maturity1
+    - Maturity2
+    - Maturity3
+  conformance:
+  - method-id: EM-BASELINE-SCAN
+    determination: Satisfied
+  outcome: Not Satisfied
+  assessments:
+  - reference-id: eval-log
+    entry-id: OSPS-DO-02.01
+- requirement:
+    reference-id: OSPS-B
+    entry-id: OSPS-DO-03.02
+  effective:
+    text: When the project has made a release, the project documentation MUST contain instructions
+      to verify the expected identity of the person or process authoring the software release.
+    applicability:
+    - Maturity3
+  outcome: Not Applicable
+- requirement:
+    reference-id: OSPS-B
+    entry-id: OSPS-DO-04.01
+  effective:
+    text: When the project has made a release, the project documentation MUST include a descriptive
+      statement about the scope and duration of support for each release.
+    applicability:
+    - Maturity3
+  outcome: Not Applicable
+- requirement:
+    reference-id: OSPS-B
+    entry-id: OSPS-DO-05.01
+  effective:
+    text: When the project has made a release, the project documentation MUST provide a descriptive
+      statement when releases or versions will no longer receive security updates.
+    applicability:
+    - Maturity3
+  outcome: Not Applicable
+- requirement:
+    reference-id: OSPS-B
+    entry-id: OSPS-DO-06.01
+  effective:
+    text: When the project has made a release, the project documentation MUST include a description
+      of how the project selects, obtains, and tracks its dependencies.
+    applicability:
+    - Maturity2
+    - Maturity3
+  conformance:
+  - method-id: EM-BASELINE-SCAN
+    determination: Satisfied
+  outcome: Satisfied
+  assessments:
+  - reference-id: eval-log
+    entry-id: OSPS-DO-06.01
+- requirement:
+    reference-id: OSPS-B
+    entry-id: OSPS-GV-01.01
+  effective:
+    text: While active, the project documentation MUST include a list of project members with access
+      to sensitive resources.
+    applicability:
+    - Maturity2
+    - Maturity3
+  conformance:
+  - method-id: EM-BASELINE-SCAN
+    determination: Satisfied
+  outcome: Satisfied
+  assessments:
+  - reference-id: eval-log
+    entry-id: OSPS-GV-01.01
+- requirement:
+    reference-id: OSPS-B
+    entry-id: OSPS-GV-01.02
+  effective:
+    text: While active, the project documentation MUST include descriptions of the roles and responsibilities
+      for members of the project.
+    applicability:
+    - Maturity2
+    - Maturity3
+  conformance:
+  - method-id: EM-BASELINE-SCAN
+    determination: Satisfied
+  outcome: Satisfied
+  assessments:
+  - reference-id: eval-log
+    entry-id: OSPS-GV-01.02
+- requirement:
+    reference-id: OSPS-B
+    entry-id: OSPS-GV-02.01
+  effective:
+    text: While active, the project MUST have one or more mechanisms for public discussions about
+      proposed changes and usage obstacles.
+    applicability:
+    - Maturity1
+    - Maturity2
+    - Maturity3
+  conformance:
+  - method-id: EM-BASELINE-SCAN
+    determination: Satisfied
+  outcome: Not Satisfied
+  assessments:
+  - reference-id: eval-log
+    entry-id: OSPS-GV-02.01
+- requirement:
+    reference-id: OSPS-B
+    entry-id: OSPS-GV-03.01
+  effective:
+    text: While active, the project documentation MUST include an explanation of the contribution
+      process.
+    applicability:
+    - Maturity1
+    - Maturity2
+    - Maturity3
+  conformance:
+  - method-id: EM-BASELINE-SCAN
+    determination: Satisfied
+  outcome: Satisfied
+  assessments:
+  - reference-id: eval-log
+    entry-id: OSPS-GV-03.01
+- requirement:
+    reference-id: OSPS-B
+    entry-id: OSPS-GV-03.02
+  effective:
+    text: While active, the project documentation MUST include a guide for code contributors that
+      includes requirements for acceptable contributions.
+    applicability:
+    - Maturity2
+    - Maturity3
+  conformance:
+  - method-id: EM-BASELINE-SCAN
+    determination: Satisfied
+  outcome: Satisfied
+  assessments:
+  - reference-id: eval-log
+    entry-id: OSPS-GV-03.02
+- requirement:
+    reference-id: OSPS-B
+    entry-id: OSPS-GV-04.01
+  effective:
+    text: While active, the project documentation MUST have a policy that code contributors are reviewed
+      prior to granting escalated permissions to sensitive resources.
+    applicability:
+    - Maturity3
+  outcome: Not Applicable
+- requirement:
+    reference-id: OSPS-B
+    entry-id: OSPS-LE-01.01
+  effective:
+    text: While active, the version control system MUST require all code contributors to assert that
+      they are legally authorized to make the associated contributions on every commit.
+    applicability:
+    - Maturity2
+    - Maturity3
+  conformance:
+  - method-id: EM-BASELINE-SCAN
+    determination: Satisfied
+  outcome: Satisfied
+  assessments:
+  - reference-id: eval-log
+    entry-id: OSPS-LE-01.01
+- requirement:
+    reference-id: OSPS-B
+    entry-id: OSPS-LE-02.01
+  effective:
+    text: While active, the license for the source code MUST meet the OSI Open Source Definition or
+      the FSF Free Software Definition.
+    applicability:
+    - Maturity1
+    - Maturity2
+    - Maturity3
+  conformance:
+  - method-id: EM-BASELINE-SCAN
+    determination: Satisfied
+  outcome: Satisfied
+  assessments:
+  - reference-id: eval-log
+    entry-id: OSPS-LE-02.01
+- requirement:
+    reference-id: OSPS-B
+    entry-id: OSPS-LE-02.02
+  effective:
+    text: While active, the license for the released software assets MUST meet the OSI Open Source
+      Definition or the FSF Free Software Definition.
+    applicability:
+    - Maturity1
+    - Maturity2
+    - Maturity3
+  conformance:
+  - method-id: EM-BASELINE-SCAN
+    determination: Satisfied
+  outcome: Satisfied
+  assessments:
+  - reference-id: eval-log
+    entry-id: OSPS-LE-02.02
+- requirement:
+    reference-id: OSPS-B
+    entry-id: OSPS-LE-03.01
+  effective:
+    text: While active, the license for the source code MUST be maintained in the corresponding repository's
+      LICENSE file, COPYING file, or LICENSE/ directory.
+    applicability:
+    - Maturity1
+    - Maturity2
+    - Maturity3
+  conformance:
+  - method-id: EM-BASELINE-SCAN
+    determination: Satisfied
+  outcome: Satisfied
+  assessments:
+  - reference-id: eval-log
+    entry-id: OSPS-LE-03.01
+- requirement:
+    reference-id: OSPS-B
+    entry-id: OSPS-LE-03.02
+  effective:
+    text: While active, the license for the released software assets MUST be included in the released
+      source code, or in a LICENSE file, COPYING file, or LICENSE/ directory alongside the corresponding
+      release assets.
+    applicability:
+    - Maturity1
+    - Maturity2
+    - Maturity3
+  conformance:
+  - method-id: EM-BASELINE-SCAN
+    determination: Satisfied
+  outcome: Satisfied
+  assessments:
+  - reference-id: eval-log
+    entry-id: OSPS-LE-03.02
+- requirement:
+    reference-id: OSPS-B
+    entry-id: OSPS-QA-01.01
+  effective:
+    text: While active, the project's source code repository MUST be publicly readable at a static
+      URL.
+    applicability:
+    - Maturity1
+    - Maturity2
+    - Maturity3
+  conformance:
+  - method-id: EM-BASELINE-SCAN
+    determination: Satisfied
+  outcome: Satisfied
+  assessments:
+  - reference-id: eval-log
+    entry-id: OSPS-QA-01.01
+- requirement:
+    reference-id: OSPS-B
+    entry-id: OSPS-QA-01.02
+  effective:
+    text: The version control system MUST contain a publicly readable record of all changes made,
+      who made the changes, and when the changes were made.
+    applicability:
+    - Maturity1
+    - Maturity2
+    - Maturity3
+  conformance:
+  - method-id: EM-BASELINE-SCAN
+    determination: Satisfied
+  outcome: Satisfied
+  assessments:
+  - reference-id: eval-log
+    entry-id: OSPS-QA-01.02
+- requirement:
+    reference-id: OSPS-B
+    entry-id: OSPS-QA-02.01
+  effective:
+    text: When the package management system supports it, the source code repository MUST contain
+      a dependency list that accounts for the direct language dependencies.
+    applicability:
+    - Maturity1
+    - Maturity2
+    - Maturity3
+  conformance:
+  - method-id: EM-BASELINE-SCAN
+    determination: Satisfied
+  outcome: Not Satisfied
+  assessments:
+  - reference-id: eval-log
+    entry-id: OSPS-QA-02.01
+- requirement:
+    reference-id: OSPS-B
+    entry-id: OSPS-QA-02.02
+  effective:
+    text: When the project has made a release, all compiled released software assets MUST be delivered
+      with a software bill of materials.
+    applicability:
+    - Maturity3
+  outcome: Not Applicable
+- requirement:
+    reference-id: OSPS-B
+    entry-id: OSPS-QA-03.01
+  effective:
+    text: When a commit is made to the primary branch, any automated status checks for commits MUST
+      pass or be manually bypassed.
+    applicability:
+    - Maturity2
+    - Maturity3
+  conformance:
+  - method-id: EM-BASELINE-SCAN
+    determination: Satisfied
+  outcome: Satisfied
+  assessments:
+  - reference-id: eval-log
+    entry-id: OSPS-QA-03.01
+- requirement:
+    reference-id: OSPS-B
+    entry-id: OSPS-QA-04.01
+  effective:
+    text: While active, the project documentation MUST contain a list of any codebases that are considered
+      subprojects or additional repositories.
+    applicability:
+    - Maturity1
+    - Maturity2
+    - Maturity3
+  conformance:
+  - method-id: EM-BASELINE-SCAN
+    determination: Satisfied
+  outcome: Satisfied
+  assessments:
+  - reference-id: eval-log
+    entry-id: OSPS-QA-04.01
+- requirement:
+    reference-id: OSPS-B
+    entry-id: OSPS-QA-04.02
+  effective:
+    text: When the project has made a release comprising multiple source code repositories, all subprojects
+      MUST enforce security requirements that are as strict or stricter than the primary codebase.
+    applicability:
+    - Maturity3
+  outcome: Not Applicable
+- requirement:
+    reference-id: OSPS-B
+    entry-id: OSPS-QA-05.01
+  effective:
+    text: While active, the version control system MUST NOT contain generated executable artifacts.
+    applicability:
+    - Maturity1
+    - Maturity2
+    - Maturity3
+  conformance:
+  - method-id: EM-BASELINE-SCAN
+    determination: Satisfied
+  outcome: Satisfied
+  assessments:
+  - reference-id: eval-log
+    entry-id: OSPS-QA-05.01
+- requirement:
+    reference-id: OSPS-B
+    entry-id: OSPS-QA-06.01
+  effective:
+    text: Prior to a commit being accepted, the project's CI/CD pipelines MUST run at least one automated
+      test suite to ensure the changes meet expectations.
+    applicability:
+    - Maturity2
+    - Maturity3
+  conformance:
+  - method-id: EM-BASELINE-SCAN
+    determination: Satisfied
+  outcome: Satisfied
+  assessments:
+  - reference-id: eval-log
+    entry-id: OSPS-QA-06.01
+- requirement:
+    reference-id: OSPS-B
+    entry-id: OSPS-QA-06.02
+  effective:
+    text: While active, project's documentation MUST clearly document when and how tests are run.
+    applicability:
+    - Maturity3
+  outcome: Not Applicable
+- requirement:
+    reference-id: OSPS-B
+    entry-id: OSPS-QA-06.03
+  effective:
+    text: While active, the project's documentation MUST include a policy that all major changes to
+      the software produced by the project should add or update tests of the functionality in an automated
+      test suite.
+    applicability:
+    - Maturity3
+  outcome: Not Applicable
+- requirement:
+    reference-id: OSPS-B
+    entry-id: OSPS-QA-07.01
+  effective:
+    text: When a commit is made to the primary branch, the project's version control system MUST require
+      at least one non-author approval of the changes before merging.
+    applicability:
+    - Maturity3
+  outcome: Not Applicable
+- requirement:
+    reference-id: OSPS-B
+    entry-id: OSPS-SA-01.01
+  effective:
+    text: When the project has made a release, the project documentation MUST include design documentation
+      demonstrating all actions and actors within the system.
+    applicability:
+    - Maturity2
+    - Maturity3
+  conformance:
+  - method-id: EM-BASELINE-SCAN
+    determination: Satisfied
+  outcome: Satisfied
+  assessments:
+  - reference-id: eval-log
+    entry-id: OSPS-SA-01.01
+- requirement:
+    reference-id: OSPS-B
+    entry-id: OSPS-SA-02.01
+  effective:
+    text: When the project has made a release, the project documentation MUST include descriptions
+      of all external software interfaces of the released software assets.
+    applicability:
+    - Maturity2
+    - Maturity3
+  conformance:
+  - method-id: EM-BASELINE-SCAN
+    determination: Satisfied
+  outcome: Satisfied
+  assessments:
+  - reference-id: eval-log
+    entry-id: OSPS-SA-02.01
+- requirement:
+    reference-id: OSPS-B
+    entry-id: OSPS-SA-03.01
+  effective:
+    text: When the project has made a release, the project MUST perform a security assessment to understand
+      the most likely and impactful potential security problems that could occur within the software.
+    applicability:
+    - Maturity2
+    - Maturity3
+  conformance:
+  - method-id: EM-BASELINE-SCAN
+    determination: Satisfied
+  outcome: Satisfied
+  assessments:
+  - reference-id: eval-log
+    entry-id: OSPS-SA-03.01
+- requirement:
+    reference-id: OSPS-B
+    entry-id: OSPS-SA-03.02
+  effective:
+    text: When the project has made a release, the project MUST perform a threat modeling and attack
+      surface analysis to understand and protect against attacks on critical code paths, functions,
+      and interactions within the system.
+    applicability:
+    - Maturity3
+  outcome: Not Applicable
+- requirement:
+    reference-id: OSPS-B
+    entry-id: OSPS-VM-01.01
+  effective:
+    text: While active, the project documentation MUST include a policy for coordinated vulnerability
+      reporting, with a clear timeframe for response.
+    applicability:
+    - Maturity2
+    - Maturity3
+  conformance:
+  - method-id: EM-BASELINE-SCAN
+    determination: Satisfied
+  outcome: Satisfied
+  assessments:
+  - reference-id: eval-log
+    entry-id: OSPS-VM-01.01
+- requirement:
+    reference-id: OSPS-B
+    entry-id: OSPS-VM-02.01
+  effective:
+    text: While active, the project documentation MUST contain security contacts.
+    applicability:
+    - Maturity1
+  conformance:
+  - method-id: EM-BASELINE-SCAN
+    determination: Satisfied
+  outcome: Not Satisfied
+  assessments:
+  - reference-id: eval-log
+    entry-id: OSPS-VM-02.01
+- requirement:
+    reference-id: OSPS-B
+    entry-id: OSPS-VM-03.01
+  effective:
+    text: While active, the project documentation MUST provide a means for reporting security vulnerabilities
+      privately to the security contacts within the project.
+    applicability:
+    - Maturity2
+    - Maturity3
+  conformance:
+  - method-id: EM-BASELINE-SCAN
+    determination: Satisfied
+  outcome: Satisfied
+  assessments:
+  - reference-id: eval-log
+    entry-id: OSPS-VM-03.01
+- requirement:
+    reference-id: OSPS-B
+    entry-id: OSPS-VM-04.01
+  effective:
+    text: While active, the project documentation MUST publicly publish data about discovered vulnerabilities.
+    applicability:
+    - Maturity2
+    - Maturity3
+  conformance:
+  - method-id: EM-BASELINE-SCAN
+    determination: Satisfied
+  outcome: Satisfied
+  assessments:
+  - reference-id: eval-log
+    entry-id: OSPS-VM-04.01
+- requirement:
+    reference-id: OSPS-B
+    entry-id: OSPS-VM-04.02
+  effective:
+    text: While active, any vulnerabilities in the software components not affecting the project MUST
+      be accounted for in a VEX document, augmenting the vulnerability report with non-exploitability
+      details.
+    applicability:
+    - Maturity3
+  outcome: Not Applicable
+- requirement:
+    reference-id: OSPS-B
+    entry-id: OSPS-VM-05.01
+  effective:
+    text: While active, the project documentation MUST include a policy that defines a threshold for
+      remediation of SCA findings related to vulnerabilities and licenses.
+    applicability:
+    - Maturity3
+  outcome: Not Applicable
+- requirement:
+    reference-id: OSPS-B
+    entry-id: OSPS-VM-05.02
+  effective:
+    text: While active, the project documentation MUST include a policy to address SCA violations
+      prior to any release.
+    applicability:
+    - Maturity3
+  outcome: Not Applicable
+- requirement:
+    reference-id: OSPS-B
+    entry-id: OSPS-VM-05.03
+  effective:
+    text: While active, all changes to the project's codebase MUST be automatically evaluated against
+      a documented policy for malicious dependencies and known vulnerabilities in dependencies, then
+      blocked in the event of violations, except when declared and suppressed as non-exploitable.
+    applicability:
+    - Maturity3
+  outcome: Not Applicable
+- requirement:
+    reference-id: OSPS-B
+    entry-id: OSPS-VM-06.01
+  effective:
+    text: While active, the project documentation MUST include a policy that defines a threshold for
+      remediation of SAST findings.
+    applicability:
+    - Maturity3
+  outcome: Not Applicable
+- requirement:
+    reference-id: OSPS-B
+    entry-id: OSPS-VM-06.02
+  effective:
+    text: While active, all changes to the project's codebase MUST be automatically evaluated against
+      a documented policy for security weaknesses and blocked in the event of violations except when
+      declared and suppressed as non-exploitable.
+    applicability:
+    - Maturity3
+  outcome: Not Applicable
+coverage:
+- mandate:
+    reference-id: SCG
+    entry-id: SCG-REVIEW
+  statement: Changes reach the default branch only after independent scrutiny.
+  implementation: Satisfied
+- mandate:
+    reference-id: SCG
+    entry-id: SCG-DEPS
+  statement: A consumer can determine what the project depends on, at the version it depends on.
+  implementation: Satisfied
+- mandate:
+    reference-id: SCG
+    entry-id: SCG-DISCLOSE
+  statement: A reporter can disclose a suspected vulnerability privately.
+  implementation: Satisfied
+- mandate:
+    reference-id: SCG
+    entry-id: SCG-PROVENANCE
+  statement: The provenance of every released artifact can be established without trusting the build
+    operator.
+  implementation: Not Satisfied
+  basis: The policy adopted this guidance and selected no requirement implementing it, so nothing
+    in scope would achieve it.
+findings:
+- id: AF-OSPS-DO-01.01
+  status: Not Compliant
+  severity: Medium
+  lifecycle: Open
+  description: No user guide is published or linked from the repository.
+  requirement:
+    reference-id: OSPS-B
+    entry-id: OSPS-DO-01.01
+  log:
+    reference-id: eval-log
+    entry-id: OSPS-DO-01.01
+  recommendations:
+  - id: REC-OSPS-DO-01.01
+    text: Remediate before the enforcement date.
+    required: true
+- id: AF-OSPS-DO-02.01
+  status: Not Compliant
+  severity: High
+  lifecycle: Resolved
+  description: No private channel for reporting suspected vulnerabilities is documented. The release
+    gate enabled it on 2026-03-29, after the window.
+  requirement:
+    reference-id: OSPS-B
+    entry-id: OSPS-DO-02.01
+  log:
+    reference-id: eval-log
+    entry-id: OSPS-DO-02.01
+  recommendations:
+  - id: REC-OSPS-DO-02.01
+    text: Remediate before the enforcement date.
+    required: true
+  response:
+    reference-id: enforcement-log
+    entry-id: ACT-OSPS-DO-02.01
+- id: AF-OSPS-QA-02.01
+  status: Not Compliant
+  severity: Medium
+  lifecycle: Open
+  description: Dependency manifests are published for the main module only.
+  requirement:
+    reference-id: OSPS-B
+    entry-id: OSPS-QA-02.01
+  log:
+    reference-id: eval-log
+    entry-id: OSPS-QA-02.01
+  recommendations:
+  - id: REC-OSPS-QA-02.01
+    text: Remediate before the enforcement date.
+    required: true
+- id: AF-OSPS-VM-02.01
+  status: Not Compliant
+  severity: High
+  lifecycle: Open
+  description: No documented process exists for accepting vulnerability reports.
+  requirement:
+    reference-id: OSPS-B
+    entry-id: OSPS-VM-02.01
+  log:
+    reference-id: eval-log
+    entry-id: OSPS-VM-02.01
+  recommendations:
+  - id: REC-OSPS-VM-02.01
+    text: Remediate before the enforcement date.
+    required: true
+- id: AF-OSPS-BR-03.01
+  status: Not Compliant
+  severity: Low
+  lifecycle: Open
+  description: Release pipelines run on a self-hosted runner with no pinned image digest.
+  requirement:
+    reference-id: OSPS-B
+    entry-id: OSPS-BR-03.01
+  log:
+    reference-id: eval-log
+    entry-id: OSPS-BR-03.01
+  recommendations:
+  - id: REC-OSPS-BR-03.01
+    text: Remediate before the enforcement date.
+    required: true
+- id: AF-OSPS-GV-02.01
+  status: Not Compliant
+  severity: Medium
+  lifecycle: Waived
+  description: Roles and responsibilities for the project are not documented.
+  requirement:
+    reference-id: OSPS-B
+    entry-id: OSPS-GV-02.01
+  log:
+    reference-id: eval-log
+    entry-id: OSPS-GV-02.01
+  recommendations:
+  - id: REC-OSPS-GV-02.01
+    text: Remediate before the enforcement date.
+    required: true
+  response:
+    reference-id: enforcement-log
+    entry-id: ACT-OSPS-GV-02.01
+- id: AF-OSPS-AC-03.01
+  status: Undetermined
+  lifecycle: Open
+  description: The probe for this requirement last ran five months before the audit window, so the
+    audit could not establish the current state. The plan requires it every 30 days.
+  requirement:
+    reference-id: OSPS-B
+    entry-id: OSPS-AC-03.01
+  recommendations:
+  - id: REC-CADENCE
+    text: Restore the probe to its scheduled cadence.
+    required: true
+opinion: Failed
+summary: Access control, build and legal requirements are met. Six requirements are not, one could
+  not be determined because its evidence predates the window, and the policy adopted supply-chain
+  guidance it selected nothing to implement. Evidence was examined for the period ending 2026-03-28;
+  conditions may have changed since.
