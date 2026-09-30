@@ -72,8 +72,8 @@ import "list"
 	// and without the question recorded a later reader cannot tell whether the audit
 	// achieved what it was for, or judge the scope it settled for.
 	//
-	// These are the audit's own objectives, not the objectives of the guidance or
-	// controls the policy adopted — those are judged one by one in attainment.
+	// These are the audit's own objectives, not the mandates the policy adopted —
+	// whether the policy implements those is recorded in coverage.
 	objectives: [string, ...string]
 
 	// verifications records, for every requirement the policy governs, what was
@@ -82,18 +82,21 @@ import "list"
 	// rather than judgements.
 	verifications: [#VerificationLog, ...#VerificationLog]
 
-	// attainment records, for every mandate the policy adopted from guidance or a
-	// parent policy, whether the policy implements it and whether the target meets
-	// it. Control objectives are absent by design: their assessment requirements
-	// determine them, so the verifications above already say it. It is complete over
-	// the mandates for the same reason verifications is complete over requirements —
-	// an audit that weighed the mandates it disliked could not be shown to have
-	// weighed the rest.
+	// coverage records, for every mandate the policy adopted from guidance or a
+	// parent policy, whether the policy implements it. It is complete over those
+	// mandates for the same reason verifications is complete over requirements: an
+	// audit that reported the gaps it happened to notice could not be shown to have
+	// looked for the rest. Control objectives are absent by design — their
+	// assessment requirements determine them, so selecting the requirements is
+	// implementing the objective.
 	//
-	// Not to be confused with objectives above, which are the objectives of the
-	// audit itself — what it set out to establish, rather than what the policy
-	// adopted from its imports.
-	attainment: [#ObjectiveAttainment, ...#ObjectiveAttainment]
+	// Whether a mandate is met is not here. Its statements are governed requirements
+	// with determinations of their own, and a mandate with no statements is itself a
+	// governed requirement with a verification entry.
+	//
+	// Not to be confused with objectives above, which are the audit's own — what it
+	// set out to establish, rather than what the policy adopted from its imports.
+	coverage: [#MandateCoverage, ...#MandateCoverage]
 
 	// findings are what this audit reports: the synthesis over those verifications,
 	// each naming the requirement or the risk it concerns and carrying the
@@ -155,15 +158,15 @@ import "list"
 		}
 	}
 
-	// An attainment names a declared reference, and the requirements it was built
-	// from are ones this audit actually verified.
+	// A coverage entry names a declared reference, and what it says implements the
+	// mandate is something this audit actually verified.
 
-	for i, a in attainment {
-		_refValidation: "attainment-\(i)": _refIds & list.Contains(a.objective."reference-id")
+	for i, c in coverage {
+		_refValidation: "coverage-\(i)": _refIds & list.Contains(c.mandate."reference-id")
 
-		if a.requirements != _|_ {
-			for j, r in a.requirements {
-				_requirementValidation: "attainment-\(i)-\(j)": _verifiedRequirements & list.Contains("\(r."reference-id")/\(r."entry-id")")
+		if c["implemented-by"] != _|_ {
+			for j, r in c["implemented-by"] {
+				_requirementValidation: "coverage-\(i)-\(j)": _verifiedRequirements & list.Contains("\(r."reference-id")/\(r."entry-id")")
 			}
 		}
 	}
@@ -235,46 +238,29 @@ import "list"
 	text: string
 }
 
-// ObjectiveAttainment records what a mandate the policy adopted came to: whether the
-// policy implements it, and whether the target meets it.
+// MandateCoverage records whether the policy implements a mandate it adopted from
+// guidance or a parent policy. It is the one question about the criteria that
+// nothing else answers: the verifications are each about a requirement the policy
+// selected, so every one of them can be satisfied while a mandate the policy
+// adopted goes unaddressed, and no roll-up over them can show it.
 //
-// It covers mandates — guidance, or a parent policy — and not control objectives. A
-// control's objective is determined by its assessment requirements: satisfying them
-// is what meeting it means, so a separate judgement would restate what the
-// verifications already say. A guideline's objective is not. It is a unified
-// statement of intent encompassing statements that are situationally applicable, so
-// its statements operationalise part of it and the rest is judgement — which is also
-// why a guideline with no statements appears here and nowhere else, having no
-// testable unit to verify.
-//
-// ISO 19011 asks the same of a conclusion, which addresses conformity including
-// effectiveness in meeting intended outcomes.
-//
-// It carries #Determination, not #ComplianceStatus: an objective is satisfied or it
-// is not, and compliance is decided in exactly one place, which is a finding.
-// Judging attainment takes reasoning, but reasoning is not what the two vocabularies
-// separate — conformance is about satisfaction, compliance is about obligation, and
-// an objective is intent rather than obligation.
-#ObjectiveAttainment: {
-	// objective names the guideline or control whose objective this is.
-	objective: #EntryMapping
+// Whether the mandate is *met* is not recorded here. A mandate's statements are
+// governed requirements like any other, so their determinations say it; a mandate
+// with no statements is itself the governed requirement and has a verification
+// entry of its own. One mechanical determination per governed thing, and this is
+// not one — it is about what the policy requires, not about what the target did.
+#MandateCoverage: {
+	// mandate names the guideline or parent-policy entry the policy adopted.
+	mandate: #EntryMapping
 
-	// statement is that objective as the policy adopted it, resolved at audit time
-	// for the same reason effective.text is: a pointer stops saying what was
-	// assessed once the catalog moves.
+	// statement is that mandate as the policy adopted it, resolved at audit time for
+	// the same reason effective.text is: a pointer stops saying what was adopted
+	// once the catalog moves.
 	statement: string
 
-	// implementation is whether the policy's selected requirements, taken together,
-	// implement this mandate at all. It is a judgement about the criteria rather
-	// than the target: a mandate the policy adopted and then selected nothing to
-	// achieve is a defect in the policy, and it is invisible in the verifications,
-	// which can every one be satisfied while the mandate goes unaddressed. Not
-	// Applicable where the policy excluded this deliberately, which a tool holding
-	// the policy can check against its exclusions.
-	//
-	// It does not imply attainment in either direction. A target may achieve an
-	// objective its policy never required, for its own reasons, and recording that
-	// is more useful than forbidding it: the gap is latent rather than absent.
+	// implementation is whether the policy's selections implement it. Not Applicable
+	// where the policy excluded it deliberately, which a tool holding the policy can
+	// check against its exclusion list.
 	implementation: #Determination
 
 	// implemented-by names what in the policy does the work: requirements it
@@ -283,18 +269,9 @@ import "list"
 	// it is partial coverage, with basis saying what is missing.
 	"implemented-by"?: [#EntryMapping, ...#EntryMapping] @go(ImplementedBy)
 
-	// attainment is whether the objective is met by the target.
-	attainment: #Determination
-
-	// basis is why, for both determinations. It is where the reasoning goes, since
-	// nothing mechanical establishes either one and a bare determination would be
-	// an assertion.
+	// basis is why. Nothing mechanical establishes this, so a bare determination
+	// would be an assertion.
 	basis?: string
-
-	// requirements names the verified requirements that bear on this objective, so
-	// a reader can see what the judgement was built from — and, where the policy
-	// selected nothing to implement it, sees that too.
-	requirements?: [#EntryMapping, ...#EntryMapping]
 }
 
 // ComplianceFinding is what an audit reports in its own right: a finding carrying

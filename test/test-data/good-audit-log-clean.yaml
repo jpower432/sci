@@ -179,11 +179,11 @@ verifications:
           coordinate: "/repos/gemaraproj/gemara/branches/main/protection"
           digest: "sha256:b7c8d9e0f1a2b3c4d5e6f7089abcdef1234567890abcdef1234567890abcdef1"
 
-attainment:
+coverage:
   # A mandate the policy adopted from guidance, implemented by a requirement it
-  # selected. The control objectives above are absent on purpose: their assessment
-  # requirements determine them, and the verifications already say so.
-  - objective:
+  # selected. Whether it is met is the outcome of that requirement, above — this
+  # says only that the policy required something capable of achieving it.
+  - mandate:
       reference-id: SCG
       entry-id: SCG-REVIEW
     statement: "Changes reach the default branch only after independent scrutiny."
@@ -191,16 +191,10 @@ attainment:
     implemented-by:
       - reference-id: SCG
         entry-id: SCG-REVIEW.01
-    attainment: Satisfied
-    basis: "Review is enforced by branch protection rather than by convention, and no
-      bypass was configured during the period examined."
-    requirements:
-      - reference-id: SCG
-        entry-id: SCG-REVIEW.01
 
 opinion: Passed
 
 summary: "Every requirement the policy governs was satisfied, the evidence behind each was
-  obtained as the policy requires, and the guidance the policy adopted is both implemented
-  and met. The audit examined evidence collected between August 2025 and February 2026;
-  conditions may have changed since."
+  obtained as the policy requires, and the guidance the policy adopted is implemented by
+  requirements it selected. The audit examined evidence collected between August 2025 and
+  February 2026; conditions may have changed since."

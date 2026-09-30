@@ -353,15 +353,15 @@ components:
         - policy
         - objectives
         - verifications
-        - attainment
+        - coverage
         - opinion
         - summary
       description: "AuditLog records an audit: what it examined the target against, what it\nestablished for each requirement, what it reports, and what it concludes. The\nfields follow the order the work happens in — criteria, then verification, then\nsynthesis, then decision — which is also ISO 19011's sequence: collecting and\nverifying information, generating findings, determining conclusions."
       properties:
-        attainment:
-          description: "attainment records, for every mandate the policy adopted from guidance or a\nparent policy, whether the policy implements it and whether the target meets\nit. Control objectives are absent by design: their assessment requirements\ndetermine them, so the verifications above already say it. It is complete over\nthe mandates for the same reason verifications is complete over requirements —\nan audit that weighed the mandates it disliked could not be shown to have\nweighed the rest.\n\nNot to be confused with objectives above, which are the objectives of the\naudit itself — what it set out to establish, rather than what the policy\nadopted from its imports."
+        coverage:
+          description: "coverage records, for every mandate the policy adopted from guidance or a\nparent policy, whether the policy implements it. It is complete over those\nmandates for the same reason verifications is complete over requirements: an\naudit that reported the gaps it happened to notice could not be shown to have\nlooked for the rest. Control objectives are absent by design — their\nassessment requirements determine them, so selecting the requirements is\nimplementing the objective.\n\nWhether a mandate is met is not here. Its statements are governed requirements\nwith determinations of their own, and a mandate with no statements is itself a\ngoverned requirement with a verification entry.\n\nNot to be confused with objectives above, which are the audit's own — what it\nset out to establish, rather than what the policy adopted from its imports."
           items:
-            $ref: "#/components/schemas/ObjectiveAttainment"
+            $ref: "#/components/schemas/MandateCoverage"
           minItems: 1
           type: array
         findings:
@@ -380,7 +380,7 @@ components:
           - type
           type: object
         objectives:
-          description: "objectives are what this audit set out to establish. They are stated because\nthe conclusion has to speak to them: an opinion is an answer to a question,\nand without the question recorded a later reader cannot tell whether the audit\nachieved what it was for, or judge the scope it settled for.\n\nThese are the audit's own objectives, not the objectives of the guidance or\ncontrols the policy adopted — those are judged one by one in attainment."
+          description: "objectives are what this audit set out to establish. They are stated because\nthe conclusion has to speak to them: an opinion is an answer to a question,\nand without the question recorded a later reader cannot tell whether the audit\nachieved what it was for, or judge the scope it settled for.\n\nThese are the audit's own objectives, not the mandates the policy adopted —\nwhether the policy implements those is recorded in coverage."
           items:
             type: string
           minItems: 1
@@ -398,7 +398,7 @@ components:
         policy:
           allOf:
           - $ref: "#/components/schemas/ArtifactMapping"
-          description: "policy is this audit's criteria in ISO 19011's sense: the single versioned\nartifact the evidence was compared against. It is one policy rather than a\nlist because the policy is also what defines scope — selection, exclusions\nand applicability — and the audit's completeness claim has nothing to be\ncomplete against without a governed set. Auditing a baseline means authoring\na policy that imports it; auditing against several criteria means one policy\nthat imports them all, and importing guidance into a policy makes it binding.\n\nThis does not hide the criteria's content: the underlying catalogs stay named\nin metadata.mapping-references, and each verification carries the requirement\nas resolved, so a reader sees what was required without fetching the policy.\nIt does mean the bare plan-id references elsewhere in this file are legal only\nwhile the criteria is singular — with one policy pinned here, nothing else\nneeds a qualifier."
+          description: "policy is this audit's criteria: the single versioned artifact the evidence\nwas compared against. It is one policy rather than a\nlist because the policy is also what defines scope — selection, exclusions\nand applicability — and the audit's completeness claim has nothing to be\ncomplete against without a governed set. Auditing a baseline means authoring\na policy that imports it; auditing against several criteria means one policy\nthat imports them all, and importing guidance into a policy makes it binding.\n\nThis does not hide the criteria's content: the underlying catalogs stay named\nin metadata.mapping-references, and each verification carries the requirement\nas resolved, so a reader sees what was required without fetching the policy.\nIt does mean the bare plan-id references elsewhere in this file are legal only\nwhile the criteria is singular — with one policy pinned here, nothing else\nneeds a qualifier."
         summary:
           description: "summary is that conclusion in prose, including anything the opinion cannot\ncarry: what the objectives established, trends across the findings, and the\nuncertainty any audit of a moment carries."
           type: string
@@ -1461,6 +1461,40 @@ components:
       - target
       type: object
       x-status: stable
+    MandateCoverage:
+      description: "MandateCoverage records whether the policy implements a mandate it adopted from\nguidance or a parent policy. It is the one question about the criteria that\nnothing else answers: the verifications are each about a requirement the policy\nselected, so every one of them can be satisfied while a mandate the policy\nadopted goes unaddressed, and no roll-up over them can show it.\n\nWhether the mandate is *met* is not recorded here. A mandate's statements are\ngoverned requirements like any other, so their determinations say it; a mandate\nwith no statements is itself the governed requirement and has a verification\nentry of its own. One mechanical determination per governed thing, and this is\nnot one — it is about what the policy requires, not about what the target did."
+      properties:
+        basis:
+          description: |-
+            basis is why. Nothing mechanical establishes this, so a bare determination
+            would be an assertion.
+          type: string
+        implementation:
+          allOf:
+          - $ref: "#/components/schemas/Determination"
+          description: |-
+            implementation is whether the policy's selections implement it. Not Applicable
+            where the policy excluded it deliberately, which a tool holding the policy can
+            check against its exclusion list.
+        implemented-by:
+          description: "implemented-by names what in the policy does the work: requirements it\nselected, or constraints it added. Absent alongside Not Satisfied, it is the\nvisible form of a mandate nothing implements; present alongside Not Satisfied,\nit is partial coverage, with basis saying what is missing."
+          items:
+            $ref: "#/components/schemas/EntryMapping"
+          minItems: 1
+          type: array
+        mandate:
+          allOf:
+          - $ref: "#/components/schemas/EntryMapping"
+          description: mandate names the guideline or parent-policy entry the policy adopted.
+        statement:
+          description: "statement is that mandate as the policy adopted it, resolved at audit time for\nthe same reason effective.text is: a pointer stops saying what was adopted\nonce the catalog moves."
+          type: string
+      required:
+      - mandate
+      - statement
+      - implementation
+      type: object
+      x-status: experimental
     Mapping:
       description: Mapping represents a relationship between a source entry and one or more target entries
       properties:
@@ -1716,52 +1750,6 @@ components:
           type: array
       type: object
       x-status: stable
-    ObjectiveAttainment:
-      description: "ObjectiveAttainment records what a mandate the policy adopted came to: whether the\npolicy implements it, and whether the target meets it.\n\nIt covers mandates — guidance, or a parent policy — and not control objectives. A\ncontrol's objective is determined by its assessment requirements: satisfying them\nis what meeting it means, so a separate judgement would restate what the\nverifications already say. A guideline's objective is not. It is a unified\nstatement of intent encompassing statements that are situationally applicable, so\nits statements operationalise part of it and the rest is judgement — which is also\nwhy a guideline with no statements appears here and nowhere else, having no\ntestable unit to verify.\n\nISO 19011 asks the same of a conclusion, which addresses conformity including\neffectiveness in meeting intended outcomes.\n\nIt carries #Determination, not #ComplianceStatus: an objective is satisfied or it\nis not, and compliance is decided in exactly one place, which is a finding.\nJudging attainment takes reasoning, but reasoning is not what the two vocabularies\nseparate — conformance is about satisfaction, compliance is about obligation, and\nan objective is intent rather than obligation."
-      properties:
-        attainment:
-          allOf:
-          - $ref: "#/components/schemas/Determination"
-          description: attainment is whether the objective is met by the target.
-        basis:
-          description: |-
-            basis is why, for both determinations. It is where the reasoning goes, since
-            nothing mechanical establishes either one and a bare determination would be
-            an assertion.
-          type: string
-        implementation:
-          allOf:
-          - $ref: "#/components/schemas/Determination"
-          description: "implementation is whether the policy's selected requirements, taken together,\nimplement this mandate at all. It is a judgement about the criteria rather\nthan the target: a mandate the policy adopted and then selected nothing to\nachieve is a defect in the policy, and it is invisible in the verifications,\nwhich can every one be satisfied while the mandate goes unaddressed. Not\nApplicable where the policy excluded this deliberately, which a tool holding\nthe policy can check against its exclusions.\n\nIt does not imply attainment in either direction. A target may achieve an\nobjective its policy never required, for its own reasons, and recording that\nis more useful than forbidding it: the gap is latent rather than absent."
-        implemented-by:
-          description: "implemented-by names what in the policy does the work: requirements it\nselected, or constraints it added. Absent alongside Not Satisfied, it is the\nvisible form of a mandate nothing implements; present alongside Not Satisfied,\nit is partial coverage, with basis saying what is missing."
-          items:
-            $ref: "#/components/schemas/EntryMapping"
-          minItems: 1
-          type: array
-        objective:
-          allOf:
-          - $ref: "#/components/schemas/EntryMapping"
-          description: objective names the guideline or control whose objective this is.
-        requirements:
-          description: |-
-            requirements names the verified requirements that bear on this objective, so
-            a reader can see what the judgement was built from — and, where the policy
-            selected nothing to implement it, sees that too.
-          items:
-            $ref: "#/components/schemas/EntryMapping"
-          minItems: 1
-          type: array
-        statement:
-          description: "statement is that objective as the policy adopted it, resolved at audit time\nfor the same reason effective.text is: a pointer stops saying what was\nassessed once the catalog moves."
-          type: string
-      required:
-      - objective
-      - statement
-      - implementation
-      - attainment
-      type: object
-      x-status: experimental
     Opinion:
       description: "Opinion is the audit's conclusion about the target as a whole: an audit\nconclusion, reached after weighing all of the findings against what the audit set\nout to establish. It carries the\naudit profession's four opinions: unqualified (Passed), qualified (Passed with\nConditions), adverse (Failed), and a disclaimer of opinion (Undetermined), when\nthe auditor could not obtain enough to conclude. It borrows #Result's tense\nbecause it answers the same shape of question at the scale of a whole audit.\n\nIt is a judgement, not a roll-up of verifications: whether requirements that\nwere not met are material enough to sink the audit is the auditor's call, and no\nprecedence over per-requirement outcomes can compute it. That is why it is\nstated rather than derived."
       enum:
