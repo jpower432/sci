@@ -136,6 +136,7 @@ func TestSchemaValidation(t *testing.T) {
 		{"audit finding citing an undeclared risk reference", "./test-data/bad-audit-log-dangling-risk.yaml", "#AuditLog", true, "_refValidation"},
 		{"requirement not satisfied that no finding synthesises", "./test-data/bad-audit-log-unsynthesised-failure.yaml", "#AuditLog", true, "_synthesisValidation"},
 		{"plan conformance asserted where no plan is bound", "./test-data/bad-audit-log-plan-conformance-without-plan.yaml", "#AuditLog", true, "\"plan-conformance\""},
+		{"objective judged from a requirement the audit never verified", "./test-data/bad-audit-log-attainment-unverified-requirement.yaml", "#AuditLog", true, "_requirementValidation"},
 		{"not compliant finding stating no severity", "./test-data/bad-audit-log-not-compliant-missing-severity.yaml", "#AuditLog", true, "findings.0.severity"},
 		{"audit log evidence source with invalid digest format", "./test-data/bad-audit-log-invalid-digest.yaml", "#AuditLog", true, "digest"},
 		{"audit log evidence with neither payload nor source", "./test-data/bad-audit-log-evidence-neither.yaml", "#AuditLog", true, "evidence.0.source"},

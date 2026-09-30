@@ -1,9 +1,9 @@
 metadata:
-  id: audit-log-001
+  id: audit-log-attainment-unverified
   type: AuditLog
   gemara-version: "1.1.0"
   version: "1.0.0"
-  description: "Q1 2026 Gemara Audit"
+  description: "Invalid audit log: an objective judged from a requirement the audit never verified"
   author:
     id: lead-auditor
     name: "Jane Auditor"
@@ -49,7 +49,7 @@ owner:
       affiliation: "OpenSSF"
 
 policy:
-  reference-id: NOT-DECLARED-ANYWHERE
+  reference-id: security-policy
   remarks: "Organizational policy establishing the audit's criteria; it imports the OSPS baseline."
 
 objectives:
@@ -186,7 +186,7 @@ attainment:
     attainment: Satisfied
     requirements:
       - reference-id: OSPS
-        entry-id: OSPS-QA-02.01
+        entry-id: OSPS-ZZ-99.01
 
 findings:
   - id: AR-DO-01

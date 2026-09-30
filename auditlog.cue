@@ -71,6 +71,9 @@ import "list"
 	// the conclusion has to speak to them: an opinion is an answer to a question,
 	// and without the question recorded a later reader cannot tell whether the audit
 	// achieved what it was for, or judge the scope it settled for.
+	//
+	// These are the audit's own objectives, not the objectives of the guidance or
+	// controls the policy adopted — those are judged one by one in attainment.
 	objectives: [string, ...string]
 
 	// verifications records, for every requirement the policy governs, what was
@@ -78,6 +81,18 @@ import "list"
 	// per requirement, including the boring passes — and carries determinations
 	// rather than judgements.
 	verifications: [#VerificationLog, ...#VerificationLog]
+
+	// attainment records, for every objective the policy adopted, whether it is met.
+	// Requirements are proxies for objectives, so the verifications above can all be
+	// satisfied while the intent behind them is not achieved — which only an audit
+	// can say. It is complete for the same reason verifications is: an audit that
+	// opined on the objectives it disliked could not be shown to have weighed the
+	// rest.
+	//
+	// Not to be confused with objectives above, which are the objectives of the
+	// audit itself — what it set out to establish, rather than what the policy
+	// adopted from its imports.
+	attainment: [#ObjectiveAttainment, ...#ObjectiveAttainment]
 
 	// findings are what this audit reports: the synthesis over those verifications,
 	// each naming the requirement or the risk it concerns and carrying the
@@ -136,6 +151,19 @@ import "list"
 
 		for i, f in findings if f.requirement != _|_ {
 			_refValidation: "findings-\(i)-requirement": _refIds & list.Contains(f.requirement."reference-id")
+		}
+	}
+
+	// An attainment names a declared reference, and the requirements it was built
+	// from are ones this audit actually verified.
+
+	for i, a in attainment {
+		_refValidation: "attainment-\(i)": _refIds & list.Contains(a.objective."reference-id")
+
+		if a.requirements != _|_ {
+			for j, r in a.requirements {
+				_requirementValidation: "attainment-\(i)-\(j)": _verifiedRequirements & list.Contains("\(r."reference-id")/\(r."entry-id")")
+			}
 		}
 	}
 
@@ -204,6 +232,41 @@ import "list"
 
 	// text is the constraint as it applied to the requirement.
 	text: string
+}
+
+// ObjectiveAttainment records whether an objective the policy adopted is met.
+// Every testable unit in Gemara sits under one — a control states an objective and
+// carries assessment requirements, a guideline states an objective and carries
+// statements — and the testable units are proxies for it. Satisfying all of them
+// does not establish the intent behind them, and nothing mechanical can bridge that
+// gap: only an audit can say whether the objective was achieved. ISO 19011 asks the
+// same of a conclusion, which addresses conformity including effectiveness in
+// meeting intended outcomes.
+//
+// It carries #Determination, not #ComplianceStatus: an objective is satisfied or it
+// is not, and compliance is decided in exactly one place, which is a finding.
+// Judging attainment takes reasoning, but reasoning is not what the two vocabularies
+// separate — conformance is about satisfaction, compliance is about obligation, and
+// an objective is intent rather than obligation.
+#ObjectiveAttainment: {
+	// objective names the guideline or control whose objective this is.
+	objective: #EntryMapping
+
+	// statement is that objective as the policy adopted it, resolved at audit time
+	// for the same reason effective.text is: a pointer stops saying what was
+	// assessed once the catalog moves.
+	statement: string
+
+	// attainment is whether the objective is met.
+	attainment: #Determination
+
+	// basis is why. It is where the reasoning goes, since nothing mechanical
+	// establishes attainment and a bare determination would be an assertion.
+	basis?: string
+
+	// requirements names the verified requirements that bear on this objective,
+	// so a reader can see what the judgement was built from.
+	requirements?: [#EntryMapping, ...#EntryMapping]
 }
 
 // ComplianceFinding is what an audit reports in its own right: a finding carrying
