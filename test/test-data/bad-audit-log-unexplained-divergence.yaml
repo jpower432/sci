@@ -1,9 +1,9 @@
 metadata:
-  id: audit-log-001
+  id: audit-log-unexplained-divergence
   type: AuditLog
   gemara-version: "1.1.0"
   version: "1.0.0"
-  description: "Q1 2026 Gemara Audit"
+  description: "Invalid audit log: a plan not conformed to, the requirement satisfied anyway, and nothing saying what was accepted"
   author:
     id: lead-auditor
     name: "Jane Auditor"
@@ -101,7 +101,7 @@ verifications:
           text: "Review the published user documentation at least annually."
       plan-id: plan-doc-review
     plan-conformance: Not Satisfied
-    outcome: Not Satisfied
+    outcome: Satisfied
     assessments:
       - reference-id: eval-log
         entry-id: OSPS-DO-01.01
@@ -113,7 +113,6 @@ verifications:
         source:
           reference-id: eval-log
           entry-id: "assessment-do-01"
-          coordinate: "$.results[0].checks[2]"
           digest: "sha256:c4d5e6f7a8b9012cdef34567890abcdef1234567890abcdef1234567890abc12"
 
   - requirement:
@@ -206,32 +205,14 @@ coverage:
       it, so nothing in scope would achieve it."
 
 findings:
-  - id: AR-DO-01
-    status: Not Compliant
-    severity: Medium
-    lifecycle: Open
-    description: "No user guide is published or referenced in the Security Insights data,
-      and the review the plan requires ran outside its cadence."
-    requirement:
-      reference-id: OSPS
-      entry-id: OSPS-DO-01.01
-    recommendations:
-      - id: REC-01
-        text: "Add user guide references to the Security Insights file and publish basic user documentation."
-        required: true
-
   - id: AR-DO-02
     status: Not Compliant
     severity: High
-    lifecycle: Resolved
-    description: "Private vulnerability reporting was not enabled during the period examined.
-      The release gate's autoremediation enabled it on 2025-08-22, after the failure."
+    lifecycle: Open
+    description: "Private vulnerability reporting was not enabled prior to enforcement remediation."
     requirement:
       reference-id: OSPS
       entry-id: OSPS-DO-02.01
-    response:
-      reference-id: enforcement-log
-      entry-id: ACT-DO-02
     recommendations:
       - id: REC-02
         text: "Formalize the private vulnerability reporting process and document it in SECURITY.md."

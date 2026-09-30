@@ -527,6 +527,10 @@ components:
         id:
           description: "id uniquely identifies this finding within the audit. It is declared here\nrather than in the #Finding core because a finding reported against a named\ncheck needs no id of its own, while this one is reported in its own right."
           type: string
+        response:
+          allOf:
+          - $ref: "#/components/schemas/EntryMapping"
+          description: "response names the enforcement action that produced this finding's current\nlifecycle: the gate that blocked it, the remediation that resolved it, or the\ntolerated action whose exception waived it. Without it a Waived finding\nasserts a lifecycle whose justification lives in a document the record cannot\npoint at, which is most of what a waiver is.\n\nIt is its own field rather than a second use of log, which names the\nevaluation entry a finding came from: the two answer where it came from and\nwhat was done about it. Singular, naming the action that explains the current\nlifecycle rather than every action ever taken — a sequence belongs in the\ndescription. Absent where nothing enforced: a finding may be waived by an\nexception recorded outside any enforcement log."
         risk:
           allOf:
           - $ref: "#/components/schemas/EntryMapping"
@@ -2283,7 +2287,7 @@ components:
           minItems: 1
           type: array
         basis:
-          description: "basis is what in the evidence established that outcome. It is for evidence\nthat does not say so itself: an assessment carries its own result, so a\ncitation of one needs no restating, while a PDF or an API response leaves the\nreader with an artifact and a conclusion and nothing between them."
+          description: "basis is what in the evidence established these determinations. It is for evidence\nthat does not say so itself: an assessment carries its own result, so a\ncitation of one needs no restating, while a PDF or an API response leaves the\nreader with an artifact and a conclusion and nothing between them."
           type: string
         effective:
           allOf:

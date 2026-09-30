@@ -156,6 +156,10 @@ import "list"
 		for i, f in findings if f.requirement != _|_ {
 			_refValidation: "findings-\(i)-requirement": _refIds & list.Contains(f.requirement."reference-id")
 		}
+
+		for i, f in findings if f.response != _|_ {
+			_refValidation: "findings-\(i)-response": _refIds & list.Contains(f.response."reference-id")
+		}
 	}
 
 	// A coverage entry names a declared reference, and what it says implements the
@@ -171,10 +175,16 @@ import "list"
 		}
 	}
 
-	// A requirement the evidence did not satisfy must be synthesised. Without a
-	// finding naming it, the record says the requirement was not met and never says
-	// what that means — non-compliance, or a gap the auditor accepted — which is
-	// exactly the judgement the verification layer defers to this one.
+	// Any determination a reader would question must be synthesised: an outcome that
+	// is not Satisfied, and a plan conformance that is not either. Without a finding
+	// naming the requirement, the record says the evidence fell short — of the
+	// requirement, or of the way the policy said to obtain it — and never says what
+	// that means. The silent case this closes is a plan not conformed to where the
+	// requirement was satisfied anyway: an auditor accepted a divergence, and
+	// nothing recorded what was accepted or why.
+	//
+	// Not Applicable is exempt on both, since nothing fell short: no plan was bound,
+	// or the requirement did not apply.
 
 	_findingRequirements: [
 		if findings != _|_
@@ -187,7 +197,9 @@ import "list"
 	// here leaves #AuditLog itself unevaluable.
 
 	for i, v in verifications {
-		_synthesisValidation: "\(i)": true & (v.outcome != "Not Satisfied" ||
+		_synthesisValidation: "\(i)": true & (
+						((v.outcome == "Satisfied" || v.outcome == "Not Applicable") &&
+			(v["plan-conformance"] == "Satisfied" || v["plan-conformance"] == "Not Applicable")) ||
 			list.Contains(_findingRequirements, "\(v.requirement."reference-id")/\(v.requirement."entry-id")"))
 	}
 
@@ -292,6 +304,20 @@ import "list"
 	// check needs no id of its own, while this one is reported in its own right.
 	id: string
 
+	// response names the enforcement action that produced this finding's current
+	// lifecycle: the gate that blocked it, the remediation that resolved it, or the
+	// tolerated action whose exception waived it. Without it a Waived finding
+	// asserts a lifecycle whose justification lives in a document the record cannot
+	// point at, which is most of what a waiver is.
+	//
+	// It is its own field rather than a second use of log, which names the
+	// evaluation entry a finding came from: the two answer where it came from and
+	// what was done about it. Singular, naming the action that explains the current
+	// lifecycle rather than every action ever taken — a sequence belongs in the
+	// description. Absent where nothing enforced: a finding may be waived by an
+	// exception recorded outside any enforcement log.
+	response?: #EntryMapping @go(Response,optional=nillable)
+
 	// risk names the risk this finding concerns, when it concerns one: a residual
 	// risk beyond its category's tolerance, for example. A finding names a risk or
 	// a requirement — the requirement comes from the #Finding core.
@@ -342,7 +368,7 @@ import "list"
 	// finding's business, not this entry's.
 	outcome: #Determination
 
-	// basis is what in the evidence established that outcome. It is for evidence
+	// basis is what in the evidence established these determinations. It is for evidence
 	// that does not say so itself: an assessment carries its own result, so a
 	// citation of one needs no restating, while a PDF or an API response leaves the
 	// reader with an artifact and a conclusion and nothing between them.

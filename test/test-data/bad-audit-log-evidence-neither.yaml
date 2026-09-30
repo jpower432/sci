@@ -220,11 +220,15 @@ findings:
   - id: AR-DO-02
     status: Not Compliant
     severity: High
-    lifecycle: Open
-    description: "Private vulnerability reporting was not enabled prior to enforcement remediation."
+    lifecycle: Resolved
+    description: "Private vulnerability reporting was not enabled during the period examined.
+      The release gate's autoremediation enabled it on 2025-08-22, after the failure."
     requirement:
       reference-id: OSPS
       entry-id: OSPS-DO-02.01
+    response:
+      reference-id: enforcement-log
+      entry-id: ACT-DO-02
     recommendations:
       - id: REC-02
         text: "Formalize the private vulnerability reporting process and document it in SECURITY.md."
