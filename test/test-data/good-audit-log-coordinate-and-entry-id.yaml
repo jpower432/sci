@@ -181,49 +181,27 @@ verifications:
           digest: "sha256:b7c8d9e0f1a2b3c4d5e6f7089abcdef1234567890abcdef1234567890abcdef1"
 
 attainment:
+  # A mandate the policy adopted from guidance, implemented by a requirement it
+  # selected. The control objectives above are absent on purpose: their assessment
+  # requirements determine them, and the verifications already say so.
   - objective:
-      reference-id: OSPS
-      entry-id: OSPS-AC-01
-    statement: "Access to sensitive resources in the project's version control system is
-      restricted to authenticated, authorized users."
+      reference-id: SCG
+      entry-id: SCG-REVIEW
+    statement: "Changes reach the default branch only after independent scrutiny."
     implementation: Satisfied
+    implemented-by:
+      - reference-id: SCG
+        entry-id: SCG-REVIEW.01
     attainment: Satisfied
-    basis: "Organization-wide MFA enforcement covers every repository in scope, so the
-      objective holds beyond the single requirement tested."
+    basis: "Review is enforced by branch protection rather than by convention, and no
+      bypass was configured during the period examined."
     requirements:
-      - reference-id: OSPS
-        entry-id: OSPS-AC-01.01
-
-  # The requirements below it are proxies, and one of them passing does not carry the
-  # objective: users still cannot find out how to install the software.
-  - objective:
-      reference-id: OSPS
-      entry-id: OSPS-DO-01
-    statement: "A user can obtain, install and operate the software from the project's
-      own documentation."
-    implementation: Satisfied
-    attainment: Not Satisfied
-    basis: "No user guide exists, so nothing the project publishes lets a user install
-      the software unaided."
-    requirements:
-      - reference-id: OSPS
-        entry-id: OSPS-DO-01.01
-
-  - objective:
-      reference-id: OSPS
-      entry-id: OSPS-DO-02
-    statement: "A reporter can disclose a suspected vulnerability privately to the project."
-    implementation: Satisfied
-    attainment: Not Satisfied
-    basis: "Private reporting was enabled only after the audit window, so no private
-      channel existed during the period examined."
-    requirements:
-      - reference-id: OSPS
-        entry-id: OSPS-DO-02.01
+      - reference-id: SCG
+        entry-id: SCG-REVIEW.01
 
   # A mandate the policy adopted and then selected nothing to implement. The
   # verifications cannot show this: every requirement the policy did select is
-  # satisfied, and this objective simply has none bearing on it.
+  # satisfied, and this mandate simply has none bearing on it.
   - objective:
       reference-id: SCG
       entry-id: SCG-SUPPLY
@@ -234,29 +212,6 @@ attainment:
     basis: "The policy adopted this guidance and selected no requirement implementing
       it, so nothing was assessed and the audit has no basis to say whether the target
       achieves it."
-
-  # The objective of the guideline, judged the same way a control's objective is.
-  - objective:
-      reference-id: SCG
-      entry-id: SCG-REVIEW
-    statement: "Changes reach the default branch only after independent scrutiny."
-    implementation: Satisfied
-    attainment: Satisfied
-    basis: "Review is enforced by branch protection rather than by convention, and no
-      bypass was configured during the period examined."
-    requirements:
-      - reference-id: SCG
-        entry-id: SCG-REVIEW.01
-
-  - objective:
-      reference-id: OSPS
-      entry-id: OSPS-QA-02
-    statement: "A consumer can determine what the project depends on."
-    implementation: Satisfied
-    attainment: Satisfied
-    requirements:
-      - reference-id: OSPS
-        entry-id: OSPS-QA-02.01
 
 findings:
   - id: AR-DO-01

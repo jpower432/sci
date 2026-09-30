@@ -359,7 +359,7 @@ components:
       description: "AuditLog records an audit: what it examined the target against, what it\nestablished for each requirement, what it reports, and what it concludes. The\nfields follow the order the work happens in — criteria, then verification, then\nsynthesis, then decision — which is also ISO 19011's sequence: collecting and\nverifying information, generating findings, determining conclusions."
       properties:
         attainment:
-          description: "attainment records, for every objective the policy adopted, whether it is met.\nRequirements are proxies for objectives, so the verifications above can all be\nsatisfied while the intent behind them is not achieved — which only an audit\ncan say. It is complete for the same reason verifications is: an audit that\nopined on the objectives it disliked could not be shown to have weighed the\nrest.\n\nNot to be confused with objectives above, which are the objectives of the\naudit itself — what it set out to establish, rather than what the policy\nadopted from its imports."
+          description: "attainment records, for every mandate the policy adopted from guidance or a\nparent policy, whether the policy implements it and whether the target meets\nit. Control objectives are absent by design: their assessment requirements\ndetermine them, so the verifications above already say it. It is complete over\nthe mandates for the same reason verifications is complete over requirements —\nan audit that weighed the mandates it disliked could not be shown to have\nweighed the rest.\n\nNot to be confused with objectives above, which are the objectives of the\naudit itself — what it set out to establish, rather than what the policy\nadopted from its imports."
           items:
             $ref: "#/components/schemas/ObjectiveAttainment"
           minItems: 1
@@ -1717,7 +1717,7 @@ components:
       type: object
       x-status: stable
     ObjectiveAttainment:
-      description: "ObjectiveAttainment records whether an objective the policy adopted is met.\nEvery testable unit in Gemara sits under one — a control states an objective and\ncarries assessment requirements, a guideline states an objective and carries\nstatements — and the testable units are proxies for it. Satisfying all of them\ndoes not establish the intent behind them, and nothing mechanical can bridge that\ngap: only an audit can say whether the objective was achieved. ISO 19011 asks the\nsame of a conclusion, which addresses conformity including effectiveness in\nmeeting intended outcomes.\n\nIt carries #Determination, not #ComplianceStatus: an objective is satisfied or it\nis not, and compliance is decided in exactly one place, which is a finding.\nJudging attainment takes reasoning, but reasoning is not what the two vocabularies\nseparate — conformance is about satisfaction, compliance is about obligation, and\nan objective is intent rather than obligation."
+      description: "ObjectiveAttainment records what a mandate the policy adopted came to: whether the\npolicy implements it, and whether the target meets it.\n\nIt covers mandates — guidance, or a parent policy — and not control objectives. A\ncontrol's objective is determined by its assessment requirements: satisfying them\nis what meeting it means, so a separate judgement would restate what the\nverifications already say. A guideline's objective is not. It is a unified\nstatement of intent encompassing statements that are situationally applicable, so\nits statements operationalise part of it and the rest is judgement — which is also\nwhy a guideline with no statements appears here and nowhere else, having no\ntestable unit to verify.\n\nISO 19011 asks the same of a conclusion, which addresses conformity including\neffectiveness in meeting intended outcomes.\n\nIt carries #Determination, not #ComplianceStatus: an objective is satisfied or it\nis not, and compliance is decided in exactly one place, which is a finding.\nJudging attainment takes reasoning, but reasoning is not what the two vocabularies\nseparate — conformance is about satisfaction, compliance is about obligation, and\nan objective is intent rather than obligation."
       properties:
         attainment:
           allOf:
@@ -1732,7 +1732,13 @@ components:
         implementation:
           allOf:
           - $ref: "#/components/schemas/Determination"
-          description: "implementation is whether the policy's selected requirements, taken together,\nimplement this objective at all. It is a judgement about the criteria rather\nthan the target: a mandate the policy adopted and then selected nothing to\nachieve is a defect in the policy, and it is invisible in the verifications,\nwhich can every one be satisfied while the objective goes unaddressed.\n\nIt does not imply attainment in either direction. A target may achieve an\nobjective its policy never required, for its own reasons, and recording that\nis more useful than forbidding it: the gap is latent rather than absent."
+          description: "implementation is whether the policy's selected requirements, taken together,\nimplement this mandate at all. It is a judgement about the criteria rather\nthan the target: a mandate the policy adopted and then selected nothing to\nachieve is a defect in the policy, and it is invisible in the verifications,\nwhich can every one be satisfied while the mandate goes unaddressed. Not\nApplicable where the policy excluded this deliberately, which a tool holding\nthe policy can check against its exclusions.\n\nIt does not imply attainment in either direction. A target may achieve an\nobjective its policy never required, for its own reasons, and recording that\nis more useful than forbidding it: the gap is latent rather than absent."
+        implemented-by:
+          description: "implemented-by names what in the policy does the work: requirements it\nselected, or constraints it added. Absent alongside Not Satisfied, it is the\nvisible form of a mandate nothing implements; present alongside Not Satisfied,\nit is partial coverage, with basis saying what is missing."
+          items:
+            $ref: "#/components/schemas/EntryMapping"
+          minItems: 1
+          type: array
         objective:
           allOf:
           - $ref: "#/components/schemas/EntryMapping"
@@ -1757,7 +1763,7 @@ components:
       type: object
       x-status: experimental
     Opinion:
-      description: "Opinion is the audit's conclusion about the target as a whole: ISO 19011's audit\nconclusion, reached after weighing all of the findings against what the audit set\nout to establish. It carries the\naudit profession's four opinions: unqualified (Passed), qualified (Passed with\nConditions), adverse (Failed), and a disclaimer of opinion (Undetermined), when\nthe auditor could not obtain enough to conclude. It borrows #Result's tense\nbecause it answers the same shape of question at the scale of a whole audit.\n\nIt is a judgement, not a roll-up of verifications: whether requirements that\nwere not met are material enough to sink the audit is the auditor's call, and no\nprecedence over per-requirement outcomes can compute it. That is why it is\nstated rather than derived."
+      description: "Opinion is the audit's conclusion about the target as a whole: an audit\nconclusion, reached after weighing all of the findings against what the audit set\nout to establish. It carries the\naudit profession's four opinions: unqualified (Passed), qualified (Passed with\nConditions), adverse (Failed), and a disclaimer of opinion (Undetermined), when\nthe auditor could not obtain enough to conclude. It borrows #Result's tense\nbecause it answers the same shape of question at the scale of a whole audit.\n\nIt is a judgement, not a roll-up of verifications: whether requirements that\nwere not met are material enough to sink the audit is the auditor's call, and no\nprecedence over per-requirement outcomes can compute it. That is why it is\nstated rather than derived."
       enum:
       - Passed
       - Passed with Conditions

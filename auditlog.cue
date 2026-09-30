@@ -25,7 +25,7 @@ import "list"
 // a whole, which belongs to #Opinion.
 #ComplianceStatus: "Compliant" | "Not Compliant" | "Not Applicable" | "Undetermined" @go(-)
 
-// Opinion is the audit's conclusion about the target as a whole: ISO 19011's audit
+// Opinion is the audit's conclusion about the target as a whole: an audit
 // conclusion, reached after weighing all of the findings against what the audit set
 // out to establish. It carries the
 // audit profession's four opinions: unqualified (Passed), qualified (Passed with
@@ -51,8 +51,8 @@ import "list"
 	// owner defines the RACI roles responsible for managing the audit
 	owner?: #RACI @go(Owner,optional=nillable)
 
-	// policy is this audit's criteria in ISO 19011's sense: the single versioned
-	// artifact the evidence was compared against. It is one policy rather than a
+	// policy is this audit's criteria: the single versioned artifact the evidence
+	// was compared against. It is one policy rather than a
 	// list because the policy is also what defines scope — selection, exclusions
 	// and applicability — and the audit's completeness claim has nothing to be
 	// complete against without a governed set. Auditing a baseline means authoring
@@ -82,12 +82,13 @@ import "list"
 	// rather than judgements.
 	verifications: [#VerificationLog, ...#VerificationLog]
 
-	// attainment records, for every objective the policy adopted, whether it is met.
-	// Requirements are proxies for objectives, so the verifications above can all be
-	// satisfied while the intent behind them is not achieved — which only an audit
-	// can say. It is complete for the same reason verifications is: an audit that
-	// opined on the objectives it disliked could not be shown to have weighed the
-	// rest.
+	// attainment records, for every mandate the policy adopted from guidance or a
+	// parent policy, whether the policy implements it and whether the target meets
+	// it. Control objectives are absent by design: their assessment requirements
+	// determine them, so the verifications above already say it. It is complete over
+	// the mandates for the same reason verifications is complete over requirements —
+	// an audit that weighed the mandates it disliked could not be shown to have
+	// weighed the rest.
 	//
 	// Not to be confused with objectives above, which are the objectives of the
 	// audit itself — what it set out to establish, rather than what the policy
@@ -234,14 +235,20 @@ import "list"
 	text: string
 }
 
-// ObjectiveAttainment records whether an objective the policy adopted is met.
-// Every testable unit in Gemara sits under one — a control states an objective and
-// carries assessment requirements, a guideline states an objective and carries
-// statements — and the testable units are proxies for it. Satisfying all of them
-// does not establish the intent behind them, and nothing mechanical can bridge that
-// gap: only an audit can say whether the objective was achieved. ISO 19011 asks the
-// same of a conclusion, which addresses conformity including effectiveness in
-// meeting intended outcomes.
+// ObjectiveAttainment records what a mandate the policy adopted came to: whether the
+// policy implements it, and whether the target meets it.
+//
+// It covers mandates — guidance, or a parent policy — and not control objectives. A
+// control's objective is determined by its assessment requirements: satisfying them
+// is what meeting it means, so a separate judgement would restate what the
+// verifications already say. A guideline's objective is not. It is a unified
+// statement of intent encompassing statements that are situationally applicable, so
+// its statements operationalise part of it and the rest is judgement — which is also
+// why a guideline with no statements appears here and nowhere else, having no
+// testable unit to verify.
+//
+// ISO 19011 asks the same of a conclusion, which addresses conformity including
+// effectiveness in meeting intended outcomes.
 //
 // It carries #Determination, not #ComplianceStatus: an objective is satisfied or it
 // is not, and compliance is decided in exactly one place, which is a finding.
@@ -258,15 +265,23 @@ import "list"
 	statement: string
 
 	// implementation is whether the policy's selected requirements, taken together,
-	// implement this objective at all. It is a judgement about the criteria rather
+	// implement this mandate at all. It is a judgement about the criteria rather
 	// than the target: a mandate the policy adopted and then selected nothing to
 	// achieve is a defect in the policy, and it is invisible in the verifications,
-	// which can every one be satisfied while the objective goes unaddressed.
+	// which can every one be satisfied while the mandate goes unaddressed. Not
+	// Applicable where the policy excluded this deliberately, which a tool holding
+	// the policy can check against its exclusions.
 	//
 	// It does not imply attainment in either direction. A target may achieve an
 	// objective its policy never required, for its own reasons, and recording that
 	// is more useful than forbidding it: the gap is latent rather than absent.
 	implementation: #Determination
+
+	// implemented-by names what in the policy does the work: requirements it
+	// selected, or constraints it added. Absent alongside Not Satisfied, it is the
+	// visible form of a mandate nothing implements; present alongside Not Satisfied,
+	// it is partial coverage, with basis saying what is missing.
+	"implemented-by"?: [#EntryMapping, ...#EntryMapping] @go(ImplementedBy)
 
 	// attainment is whether the objective is met by the target.
 	attainment: #Determination
