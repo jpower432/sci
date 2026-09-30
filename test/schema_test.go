@@ -135,7 +135,7 @@ func TestSchemaValidation(t *testing.T) {
 		{"audit finding naming a requirement with no verification entry", "./test-data/bad-audit-log-finding-unknown-requirement.yaml", "#AuditLog", true, "_requirementValidation"},
 		{"audit finding citing an undeclared risk reference", "./test-data/bad-audit-log-dangling-risk.yaml", "#AuditLog", true, "_refValidation"},
 		{"requirement not satisfied that no finding synthesises", "./test-data/bad-audit-log-unsynthesised-failure.yaml", "#AuditLog", true, "_synthesisValidation"},
-		{"plan bound with no record of how it was followed", "./test-data/bad-audit-log-plan-without-conformance.yaml", "#AuditLog", true, "method-conformance"},
+		{"plan bound with no record of how it was followed", "./test-data/bad-audit-log-plan-without-conformance.yaml", "#AuditLog", true, "conformance"},
 		{"plan not conformed to, requirement satisfied anyway, nothing saying what was accepted", "./test-data/bad-audit-log-unexplained-divergence.yaml", "#AuditLog", true, "_synthesisValidation"},
 		{"finding citing an enforcement action in an undeclared log", "./test-data/bad-audit-log-response-undeclared.yaml", "#AuditLog", true, "findings-1-response"},
 		{"not compliant finding stating no severity", "./test-data/bad-audit-log-not-compliant-missing-severity.yaml", "#AuditLog", true, "findings.0.severity"},

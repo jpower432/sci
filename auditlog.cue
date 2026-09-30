@@ -192,8 +192,8 @@ import "list"
 
 	for i, v in verifications {
 		let _checks = [
-			if v["method-conformance"] != _|_
-			for c in v["method-conformance"] {c.determination},
+			if v.conformance != _|_
+			for c in v.conformance {c.determination},
 		]
 		_synthesisValidation: "\(i)": true & (
 						((v.outcome == "Satisfied" || v.outcome == "Not Applicable") &&
@@ -384,20 +384,24 @@ import "list"
 	// evidence records the data sources that support this determination.
 	evidence?: [#Evidence, ...#Evidence] @go(Evidence)
 
-	// method-conformance records whether the evidence was obtained the way the policy
+	// conformance records whether the evidence was obtained the way the policy
 	// prescribed, as one entry per thing the audit checked. It is entries rather than
 	// a field per dimension because the policy grows dimensions and a mirrored field
 	// set would have to grow with it; and entries rather than a single determination
-	// because "the method was not followed" without saying how is not a record anyone
-	// can act on.
+	// because "it was not obtained as prescribed" without saying how is not a record
+	// anyone can act on.
 	//
-	// It is not named for the plan, because a plan is not the only thing that
-	// prescribes a method: a policy's own evaluation-methods are the fallback where no
-	// plan is bound, and a plan adds specificity where one is. So conformance is
-	// checkable for a requirement with no plan, against the methods the policy accepts
-	// generally. It is absent only where the policy prescribes nothing — no plan bound
-	// to this requirement and no fallback declared.
-	"method-conformance"?: [#ConformanceCheck, ...#ConformanceCheck] @go(MethodConformance)
+	// It is named for neither the plan nor the method, because it is about neither in
+	// particular: the method and its executor are declared on an #AcceptedMethod, and
+	// the cadence, the parameter values and the evidence validity window are declared
+	// on the plan — and the cadence belongs to the requirement rather than to any
+	// method. What the entries share is the question, not the thing that answers it.
+	//
+	// A plan is also not the only thing that prescribes: a policy's own
+	// evaluation-methods are the fallback where no plan is bound, and a plan adds
+	// specificity where one is. So conformance is checkable for a requirement with no
+	// plan. It is absent only where the policy prescribes nothing at all.
+	conformance?: [#ConformanceCheck, ...#ConformanceCheck]
 
 	// outcome is whether the evidence satisfied the requirement. It is stated for
 	// every governed requirement, complete by construction, so that a requirement
@@ -421,7 +425,7 @@ import "list"
 	// against the methods the policy accepts generally.
 
 	if effective."plan-id" != _|_ {
-		"method-conformance": [#ConformanceCheck, ...#ConformanceCheck]
+		conformance: [#ConformanceCheck, ...#ConformanceCheck]
 	}
 
 	// Each evidence entry carries a payload, a source, or both.

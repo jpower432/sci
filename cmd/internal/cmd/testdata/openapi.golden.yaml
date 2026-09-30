@@ -2306,6 +2306,12 @@ components:
         basis:
           description: "basis is what in the evidence established these determinations. It is for evidence\nthat does not say so itself: an assessment carries its own result, so a\ncitation of one needs no restating, while a PDF or an API response leaves the\nreader with an artifact and a conclusion and nothing between them."
           type: string
+        conformance:
+          description: "conformance records whether the evidence was obtained the way the policy\nprescribed, as one entry per thing the audit checked. It is entries rather than\na field per dimension because the policy grows dimensions and a mirrored field\nset would have to grow with it; and entries rather than a single determination\nbecause \"it was not obtained as prescribed\" without saying how is not a record\nanyone can act on.\n\nIt is named for neither the plan nor the method, because it is about neither in\nparticular: the method and its executor are declared on an #AcceptedMethod, and\nthe cadence, the parameter values and the evidence validity window are declared\non the plan — and the cadence belongs to the requirement rather than to any\nmethod. What the entries share is the question, not the thing that answers it.\n\nA plan is also not the only thing that prescribes: a policy's own\nevaluation-methods are the fallback where no plan is bound, and a plan adds\nspecificity where one is. So conformance is checkable for a requirement with no\nplan. It is absent only where the policy prescribes nothing at all."
+          items:
+            $ref: "#/components/schemas/ConformanceCheck"
+          minItems: 1
+          type: array
         effective:
           allOf:
           - $ref: "#/components/schemas/EffectiveRequirement"
@@ -2320,12 +2326,6 @@ components:
             allOf:
             - $ref: "#/components/schemas/Evidence"
             type: object
-          minItems: 1
-          type: array
-        method-conformance:
-          description: "method-conformance records whether the evidence was obtained the way the policy\nprescribed, as one entry per thing the audit checked. It is entries rather than\na field per dimension because the policy grows dimensions and a mirrored field\nset would have to grow with it; and entries rather than a single determination\nbecause \"the method was not followed\" without saying how is not a record anyone\ncan act on.\n\nIt is not named for the plan, because a plan is not the only thing that\nprescribes a method: a policy's own evaluation-methods are the fallback where no\nplan is bound, and a plan adds specificity where one is. So conformance is\ncheckable for a requirement with no plan, against the methods the policy accepts\ngenerally. It is absent only where the policy prescribes nothing — no plan bound\nto this requirement and no fallback declared."
-          items:
-            $ref: "#/components/schemas/ConformanceCheck"
           minItems: 1
           type: array
         outcome:
