@@ -147,6 +147,7 @@ attainment:
       entry-id: OSPS-AC-01
     statement: "Access to sensitive resources in the project's version control system is
       restricted to authenticated, authorized users."
+    implementation: Satisfied
     attainment: Satisfied
     basis: "Organization-wide MFA enforcement covers every repository in scope, so the
       objective holds beyond the single requirement tested."
@@ -159,6 +160,7 @@ attainment:
       entry-id: OSPS-DO-01
     statement: "A user can obtain, install and operate the software from the project's
       own documentation."
+    implementation: Satisfied
     attainment: Satisfied
     basis: "The published user guide covers installation and first use."
     requirements:
@@ -169,6 +171,7 @@ attainment:
       reference-id: OSPS
       entry-id: OSPS-DO-02
     statement: "A reporter can disclose a suspected vulnerability privately to the project."
+    implementation: Satisfied
     attainment: Satisfied
     basis: "Private vulnerability reporting is enabled and documented in SECURITY.md."
     requirements:
@@ -179,6 +182,7 @@ attainment:
       reference-id: OSPS
       entry-id: OSPS-QA-02
     statement: "A consumer can determine what the project depends on."
+    implementation: Satisfied
     attainment: Satisfied
     requirements:
       - reference-id: OSPS

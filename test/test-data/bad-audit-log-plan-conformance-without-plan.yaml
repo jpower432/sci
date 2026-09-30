@@ -12,26 +12,41 @@ metadata:
     - id: security-policy
       title: "Information Security Policy"
       version: "2.1.0"
+      type: Policy
+
     - id: OSPS
       title: "Open Source Project Security Baseline"
       version: "2025.1"
       url: "https://baseline.openssf.org"
+      type: ControlCatalog
+
     - id: eval-log
       title: "PVTR Evaluation Log"
       version: "2025-08-22"
       url: "https://artifacts.example.com/eval-logs/pvtr-baseline-scan.yaml"
+      type: EvaluationLog
+
     - id: enforcement-log
       title: "Example Enforcement Log"
       version: "2025-08-22"
       url: "https://artifacts.example.com/enforcement-logs/enforcement-log-001.yaml"
+      type: EnforcementLog
+
     - id: github-api
       title: "GitHub Dependency Graph API"
       version: "2026"
       url: "https://docs.github.com/en/rest/dependency-graph"
+    - id: SCG
+      title: "Secure Development Guidance"
+      version: "1.2"
+      type: GuidanceCatalog
+      url: "https://guidance.example.com/secure-development"
     - id: risk-catalog
       title: "Organizational Risk Catalog"
       version: "2026.1"
       url: "https://artifacts.example.com/risk-catalog.yaml"
+      type: RiskCatalog
+
 
 target:
   id: gemara-repo
@@ -140,6 +155,29 @@ verifications:
           reference-id: github-api
           coordinate: "/repos/gemaraproj/gemara/dependency-graph/sbom"
           digest: "sha256:a1b2c3d4e5f67890abcdef1234567890abcdef1234567890abcdef1234567890"
+  # A requirement the policy adopted from guidance rather than from a control
+  # catalog. Importing guidance makes it binding, so it is verified like any other.
+  - requirement:
+      reference-id: SCG
+      entry-id: SCG-REVIEW.01
+    effective:
+      text: "Every change to the default branch is reviewed by someone other than its
+        author before merge."
+      applicability:
+        - Maturity Level 1
+    plan-conformance: Not Applicable
+    outcome: Satisfied
+    basis: "Branch protection requires one approving review from a non-author on the
+      default branch, confirmed from the repository settings response."
+    evidence:
+      - id: EV-SCG-01
+        type: urn:gemara:evidence:api-response
+        description: "Branch protection settings for the default branch"
+        collected-at: "2026-02-10T15:07:00Z"
+        source:
+          reference-id: github-api
+          coordinate: "/repos/gemaraproj/gemara/branches/main/protection"
+          digest: "sha256:b7c8d9e0f1a2b3c4d5e6f7089abcdef1234567890abcdef1234567890abcdef1"
 
 attainment:
   - objective:
@@ -147,6 +185,7 @@ attainment:
       entry-id: OSPS-AC-01
     statement: "Access to sensitive resources in the project's version control system is
       restricted to authenticated, authorized users."
+    implementation: Satisfied
     attainment: Satisfied
     basis: "Organization-wide MFA enforcement covers every repository in scope, so the
       objective holds beyond the single requirement tested."
@@ -161,6 +200,7 @@ attainment:
       entry-id: OSPS-DO-01
     statement: "A user can obtain, install and operate the software from the project's
       own documentation."
+    implementation: Satisfied
     attainment: Not Satisfied
     basis: "No user guide exists, so nothing the project publishes lets a user install
       the software unaided."
@@ -172,6 +212,7 @@ attainment:
       reference-id: OSPS
       entry-id: OSPS-DO-02
     statement: "A reporter can disclose a suspected vulnerability privately to the project."
+    implementation: Satisfied
     attainment: Not Satisfied
     basis: "Private reporting was enabled only after the audit window, so no private
       channel existed during the period examined."
@@ -179,10 +220,38 @@ attainment:
       - reference-id: OSPS
         entry-id: OSPS-DO-02.01
 
+  # A mandate the policy adopted and then selected nothing to implement. The
+  # verifications cannot show this: every requirement the policy did select is
+  # satisfied, and this objective simply has none bearing on it.
+  - objective:
+      reference-id: SCG
+      entry-id: SCG-SUPPLY
+    statement: "The provenance of every released artifact can be established by a
+      consumer without trusting the build system operator."
+    implementation: Not Satisfied
+    attainment: Undetermined
+    basis: "The policy adopted this guidance and selected no requirement implementing
+      it, so nothing was assessed and the audit has no basis to say whether the target
+      achieves it."
+
+  # The objective of the guideline, judged the same way a control's objective is.
+  - objective:
+      reference-id: SCG
+      entry-id: SCG-REVIEW
+    statement: "Changes reach the default branch only after independent scrutiny."
+    implementation: Satisfied
+    attainment: Satisfied
+    basis: "Review is enforced by branch protection rather than by convention, and no
+      bypass was configured during the period examined."
+    requirements:
+      - reference-id: SCG
+        entry-id: SCG-REVIEW.01
+
   - objective:
       reference-id: OSPS
       entry-id: OSPS-QA-02
     statement: "A consumer can determine what the project depends on."
+    implementation: Satisfied
     attainment: Satisfied
     requirements:
       - reference-id: OSPS

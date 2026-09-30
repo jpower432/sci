@@ -1553,6 +1553,16 @@ components:
         title:
           description: title describes the purpose of this mapping reference at a glance
           type: string
+        type:
+          allOf:
+          - $ref: "#/components/schemas/ArtifactType"
+          description: |-
+            type is the kind of artifact this reference points at. It is what lets a
+            consumer tell a control catalog from a guidance catalog without fetching
+            either — so an audit citing both can report its coverage of each, and a
+            reader can see which requirements came from guidance a policy adopted and
+            which from controls. Stated once per reference rather than on every entry
+            that cites it, since a catalog holds one kind of entry.
         url:
           description: |-
             url is the path where the artifact may be retrieved; preferably responds with Gemara-compatible YAML/JSON.
@@ -1712,20 +1722,26 @@ components:
         attainment:
           allOf:
           - $ref: "#/components/schemas/Determination"
-          description: attainment is whether the objective is met.
+          description: attainment is whether the objective is met by the target.
         basis:
           description: |-
-            basis is why. It is where the reasoning goes, since nothing mechanical
-            establishes attainment and a bare determination would be an assertion.
+            basis is why, for both determinations. It is where the reasoning goes, since
+            nothing mechanical establishes either one and a bare determination would be
+            an assertion.
           type: string
+        implementation:
+          allOf:
+          - $ref: "#/components/schemas/Determination"
+          description: "implementation is whether the policy's selected requirements, taken together,\nimplement this objective at all. It is a judgement about the criteria rather\nthan the target: a mandate the policy adopted and then selected nothing to\nachieve is a defect in the policy, and it is invisible in the verifications,\nwhich can every one be satisfied while the objective goes unaddressed.\n\nIt does not imply attainment in either direction. A target may achieve an\nobjective its policy never required, for its own reasons, and recording that\nis more useful than forbidding it: the gap is latent rather than absent."
         objective:
           allOf:
           - $ref: "#/components/schemas/EntryMapping"
           description: objective names the guideline or control whose objective this is.
         requirements:
           description: |-
-            requirements names the verified requirements that bear on this objective,
-            so a reader can see what the judgement was built from.
+            requirements names the verified requirements that bear on this objective, so
+            a reader can see what the judgement was built from — and, where the policy
+            selected nothing to implement it, sees that too.
           items:
             $ref: "#/components/schemas/EntryMapping"
           minItems: 1
@@ -1736,6 +1752,7 @@ components:
       required:
       - objective
       - statement
+      - implementation
       - attainment
       type: object
       x-status: experimental

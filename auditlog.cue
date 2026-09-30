@@ -257,15 +257,28 @@ import "list"
 	// assessed once the catalog moves.
 	statement: string
 
-	// attainment is whether the objective is met.
+	// implementation is whether the policy's selected requirements, taken together,
+	// implement this objective at all. It is a judgement about the criteria rather
+	// than the target: a mandate the policy adopted and then selected nothing to
+	// achieve is a defect in the policy, and it is invisible in the verifications,
+	// which can every one be satisfied while the objective goes unaddressed.
+	//
+	// It does not imply attainment in either direction. A target may achieve an
+	// objective its policy never required, for its own reasons, and recording that
+	// is more useful than forbidding it: the gap is latent rather than absent.
+	implementation: #Determination
+
+	// attainment is whether the objective is met by the target.
 	attainment: #Determination
 
-	// basis is why. It is where the reasoning goes, since nothing mechanical
-	// establishes attainment and a bare determination would be an assertion.
+	// basis is why, for both determinations. It is where the reasoning goes, since
+	// nothing mechanical establishes either one and a bare determination would be
+	// an assertion.
 	basis?: string
 
-	// requirements names the verified requirements that bear on this objective,
-	// so a reader can see what the judgement was built from.
+	// requirements names the verified requirements that bear on this objective, so
+	// a reader can see what the judgement was built from — and, where the policy
+	// selected nothing to implement it, sees that too.
 	requirements?: [#EntryMapping, ...#EntryMapping]
 }
 
