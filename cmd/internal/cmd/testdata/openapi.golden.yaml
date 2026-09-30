@@ -220,6 +220,14 @@ components:
             type: object
           minItems: 1
           type: array
+        execution:
+          allOf:
+          - $ref: "#/components/schemas/ExecutionConfiguration"
+          description: "execution records how this assessment was configured. A cited plan obliges a\nmethod: the plan lists the methods it accepts, so a record of running under it\nhas to say which one ran."
+        executor:
+          allOf:
+          - $ref: "#/components/schemas/Actor"
+          description: "executor is the actor that performed this assessment: the tool instance,\nservice or person that produced this result, not the author of the log. A\nmulti-source log is assembled by one orchestrator — metadata.author — from\nresults several executors produced, so attribution per result cannot be derived\nfrom the document. It is recorded only where it differs from metadata.author,\nsince repeating the author on every assessment would be a second copy of one\nfact.\n\nWhere the cited plan's accepted method also names an executor, this records\nwhat actually ran and that records what was meant to. The two disagreeing is\nnot an error: an assessment performed by an instance the plan does not accept\nis a real event, and a schema that rejected the record would leave a producer\nchoosing between lying and omitting the attribution this field exists for. An\naudit reports the mismatch as a plan-conformance failure, comparing by\nauthoritative identifier rather than by display name. Neither document\noverrides the other, and no consumer should silently reconcile them.\n\nFor that reason, where the plan's method names an executor, record this field\nexplicitly rather than leaning on the omission convention: an omission asserts\nthat the log's author ran the assessment, which is itself a disagreement with\nthe plan, and a silent one.\n\nAttribution does not deconflict: two results for one requirement are told\napart by the plan's methods, per the identity rule below, not by who produced\nthem."
         message:
           description: Message provides additional context about the assessment result.
           type: string
@@ -1034,6 +1042,14 @@ components:
         EvaluationLog, EnforcementLog) plus categories for common evidence forms.
       type: string
       x-status: experimental
+    ExecutionConfiguration:
+      description: "ExecutionConfiguration records how an assessment was configured: which method it\nran, and the values it ran with. The name is qualified on purpose — in this domain\na bare \"configuration\" reads as the target's, since a scanner's evidence is so\noften the repository's own settings, and this is the configuration of the run.\n\nWhat the assessment *is* — its result, timing, steps, and the executor that\nproduced it — stays at the top level of #AssessmentLog, where it is meaningful\nwhether or not a policy exists. Who performed the execution is executor, not part\nof its configuration.\n\nIt is one field rather than several so that a stable type does not gain a permanent\ntop-level field per configuration input; further inputs land here additively, where\na top-level field could never be moved.\n\nNot everything here need come from a policy. A policy-aware producer records the\nmethod the policy prescribed and the values the plan declared; a producer that knows\nof no policy still has a configuration, and this is where it goes. Only the parts a\npolicy prescribed are comparable against it, which is a property of those fields\nrather than of this container: an audit checks method-id and declared parameter\nvalues, and treats anything else as evidence about the run."
+      properties:
+        method-id:
+          description: "method-id names the accepted method this assessment executed, where the policy\nprescribed one: a method of the cited plan, or one of the policy's own\nevaluation-methods, which are the fallback where no plan is bound. Method ids\nare unique across a policy, so the id resolves without saying which of the two\ndeclared it — unlike #ActionResult.method, which carries a full mapping because\nan enforcement action cites no plan."
+          type: string
+      type: object
+      x-status: stable
     Exemption:
       description: Exemption describes a single scenario where the catalog is not applicable
       properties:
