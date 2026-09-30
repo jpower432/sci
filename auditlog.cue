@@ -162,21 +162,15 @@ import "list"
 		}
 	}
 
-	// A coverage entry names a declared reference, and what it says implements the
-	// mandate is something this audit actually verified.
+	// A coverage entry names a declared reference.
 
 	for i, c in coverage {
 		_refValidation: "coverage-\(i)": _refIds & list.Contains(c.mandate."reference-id")
-
-		if c["implemented-by"] != _|_ {
-			for j, r in c["implemented-by"] {
-				_requirementValidation: "coverage-\(i)-\(j)": _verifiedRequirements & list.Contains("\(r."reference-id")/\(r."entry-id")")
-			}
-		}
 	}
 
 	// Any determination a reader would question must be synthesised: an outcome that
-	// is not Satisfied, and a plan conformance that is not either. Without a finding
+	// is not Satisfied, and any conformance check that came out Not Satisfied or
+	// Undetermined. Without a finding
 	// naming the requirement, the record says the evidence fell short — of the
 	// requirement, or of the way the policy said to obtain it — and never says what
 	// that means. The silent case this closes is a plan not conformed to where the
@@ -197,9 +191,14 @@ import "list"
 	// here leaves #AuditLog itself unevaluable.
 
 	for i, v in verifications {
+		let _checks = [
+			if v["plan-conformance"] != _|_
+			for c in v["plan-conformance"] {c.determination},
+		]
 		_synthesisValidation: "\(i)": true & (
 						((v.outcome == "Satisfied" || v.outcome == "Not Applicable") &&
-			(v["plan-conformance"] == "Satisfied" || v["plan-conformance"] == "Not Applicable")) ||
+			!list.Contains(_checks, "Not Satisfied") &&
+			!list.Contains(_checks, "Undetermined")) ||
 			list.Contains(_findingRequirements, "\(v.requirement."reference-id")/\(v.requirement."entry-id")"))
 	}
 
@@ -213,6 +212,34 @@ import "list"
 			_requirementValidation: "\(i)": _verifiedRequirements & list.Contains("\(f.requirement."reference-id")/\(f.requirement."entry-id")")
 		}
 	}
+}
+
+// ConformanceCheck is one thing an audit checked about how evidence was obtained: a
+// method the plan accepts having been used, an executor matching the one the plan
+// names, a run falling inside the requirement's cadence, parameter values within the
+// accepted ones.
+//
+// The schema does not enumerate those dimensions. It did once — a field per
+// dimension — and that set was a mirror of #AssessmentPlan's fields, so every
+// dimension the policy gained needed a matching field or the audit silently stopped
+// verifying it. An entry says what it looked at in its own terms instead, and the
+// required and evidenced pair carries what a determination alone throws away:
+// required every 30 days, evidenced every 90.
+#ConformanceCheck: {
+	// method-id names the accepted method this entry concerns, where it concerns one.
+	// A plan may require several methods, and which one fell short matters.
+	"method-id"?: string @go(MethodId)
+
+	// determination is what the check came to.
+	determination: #Determination
+
+	// required is what the plan required, quoted or derived from it.
+	required?: string
+
+	// evidenced is what the evidence showed instead. Both sides are stated so the
+	// entry is a comparison rather than a remark; where they agree, the entry records
+	// that the check was made and passed.
+	evidenced?: string
 }
 
 // EffectiveRequirement is what a policy required of one requirement, as resolved
@@ -270,19 +297,21 @@ import "list"
 	// once the catalog moves.
 	statement: string
 
-	// implementation is whether the policy's selections implement it. Not Applicable
-	// where the policy excluded it deliberately, which a tool holding the policy can
-	// check against its exclusion list.
+	// implementation is whether the policy's selections implement it: Satisfied where
+	// they cover it, Not Satisfied where they cover none or only part of it, and Not
+	// Applicable where the policy excluded it deliberately — which a tool holding the
+	// policy can check against its exclusion list.
 	implementation: #Determination
 
-	// implemented-by names what in the policy does the work: requirements it
-	// selected, or constraints it added. Absent alongside Not Satisfied, it is the
-	// visible form of a mandate nothing implements; present alongside Not Satisfied,
-	// it is partial coverage, with basis saying what is missing.
-	"implemented-by"?: [#EntryMapping, ...#EntryMapping] @go(ImplementedBy)
-
-	// basis is why. Nothing mechanical establishes this, so a bare determination
-	// would be an assertion.
+	// basis is why: which of the policy's selections cover the mandate, and what
+	// they leave uncovered. It carries no list of them, because "this control
+	// implements that guideline" is what a #MappingDocument records, with the
+	// implements relationship it already has — restating those links here would be a
+	// second copy of a mapping, free to disagree with the first. An audit relying on
+	// one names it in metadata.mapping-references.
+	//
+	// Nothing mechanical establishes this determination, so without a basis it is an
+	// assertion.
 	basis?: string
 }
 
@@ -353,13 +382,16 @@ import "list"
 	evidence?: [#Evidence, ...#Evidence] @go(Evidence)
 
 	// plan-conformance records whether the evidence was obtained the way the policy
-	// required: under the plan bound to this requirement, by one of its accepted
-	// methods, by the executor it names, within its cadence. It is one determination
-	// rather than a field per dimension, because the policy grows dimensions and a
-	// record that mirrored them would have to grow with it — and because the detail
-	// of a shortfall is a judgement, which belongs in a finding. Not Applicable where
-	// the policy binds no plan to this requirement.
-	"plan-conformance": #Determination @go(PlanConformance)
+	// required, as one entry per thing the audit checked. It is entries rather than a
+	// field per dimension because the policy grows dimensions and a mirrored field set
+	// would have to grow with it; and entries rather than a single determination
+	// because "the plan was not followed" without saying how is not a record anyone
+	// can act on.
+	//
+	// Absent where the policy binds no plan to this requirement — and a policy binds
+	// plans to control requirements only, so a requirement adopted from guidance has
+	// none.
+	PC="plan-conformance"?: [#ConformanceCheck, ...#ConformanceCheck] @go(PlanConformance)
 
 	// outcome is whether the evidence satisfied the requirement. It is stated for
 	// every governed requirement, complete by construction, so that a requirement
@@ -378,10 +410,19 @@ import "list"
 	// Comments in validation sections stay detached (blank line after), so they
 	// are never published as a field's API description.
 
-	// With no plan bound to the requirement there is nothing to have conformed to.
+	// A plan bound to the requirement obliges a record of how it was followed, and
+	// conformance entries oblige the plan they were checked against. Each direction
+	// is stated on the field it requires, except the second, which writes a hidden
+	// field: two rules each requiring the other's field is a circular dependency CUE
+	// rejects, and an error() on plan-conformance would put bottom in its type and
+	// degrade the field to `any` for every Go consumer.
 
-	if effective."plan-id" == _|_ {
-		"plan-conformance": "Not Applicable"
+	if effective."plan-id" != _|_ {
+		"plan-conformance": [#ConformanceCheck, ...#ConformanceCheck]
+	}
+
+	if PC != _|_ if effective."plan-id" == _|_ {
+		_conformanceNeedsPlan: error("plan conformance has nothing to check where the policy binds no plan: set effective.plan-id, or drop these entries")
 	}
 
 	// Each evidence entry carries a payload, a source, or both.
@@ -406,7 +447,7 @@ import "list"
 	payload?: _ @go(Payload,type=any)
 
 	// source identifies the artifact or system from which this evidence was collected
-	source?: #EvidenceMapping @go(Source)
+	source?: #EvidenceMapping @go(Source,optional=nillable)
 
 	// description explains what this evidence represents
 	description?: string

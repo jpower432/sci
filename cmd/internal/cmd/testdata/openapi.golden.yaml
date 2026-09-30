@@ -559,6 +559,31 @@ components:
       - High
       type: string
       x-status: stable
+    ConformanceCheck:
+      description: "ConformanceCheck is one thing an audit checked about how evidence was obtained: a\nmethod the plan accepts having been used, an executor matching the one the plan\nnames, a run falling inside the requirement's cadence, parameter values within the\naccepted ones.\n\nThe schema does not enumerate those dimensions. It did once — a field per\ndimension — and that set was a mirror of #AssessmentPlan's fields, so every\ndimension the policy gained needed a matching field or the audit silently stopped\nverifying it. An entry says what it looked at in its own terms instead, and the\nrequired and evidenced pair carries what a determination alone throws away:\nrequired every 30 days, evidenced every 90."
+      properties:
+        determination:
+          allOf:
+          - $ref: "#/components/schemas/Determination"
+          description: determination is what the check came to.
+        evidenced:
+          description: |-
+            evidenced is what the evidence showed instead. Both sides are stated so the
+            entry is a comparison rather than a remark; where they agree, the entry records
+            that the check was made and passed.
+          type: string
+        method-id:
+          description: |-
+            method-id names the accepted method this entry concerns, where it concerns one.
+            A plan may require several methods, and which one fell short matters.
+          type: string
+        required:
+          description: required is what the plan required, quoted or derived from it.
+          type: string
+      required:
+      - determination
+      type: object
+      x-status: experimental
     Constraint:
       description: Constraint defines a prescriptive requirement that applies to a specific guidance or control.
       properties:
@@ -1469,23 +1494,12 @@ components:
       description: "MandateCoverage records whether the policy implements a mandate it adopted from\nguidance or a parent policy. It is the one question about the criteria that\nnothing else answers: the verifications are each about a requirement the policy\nselected, so every one of them can be satisfied while a mandate the policy\nadopted goes unaddressed, and no roll-up over them can show it.\n\nWhether the mandate is *met* is not recorded here. A mandate's statements are\ngoverned requirements like any other, so their determinations say it; a mandate\nwith no statements is itself the governed requirement and has a verification\nentry of its own. One mechanical determination per governed thing, and this is\nnot one — it is about what the policy requires, not about what the target did."
       properties:
         basis:
-          description: |-
-            basis is why. Nothing mechanical establishes this, so a bare determination
-            would be an assertion.
+          description: "basis is why: which of the policy's selections cover the mandate, and what\nthey leave uncovered. It carries no list of them, because \"this control\nimplements that guideline\" is what a #MappingDocument records, with the\nimplements relationship it already has — restating those links here would be a\nsecond copy of a mapping, free to disagree with the first. An audit relying on\none names it in metadata.mapping-references.\n\nNothing mechanical establishes this determination, so without a basis it is an\nassertion."
           type: string
         implementation:
           allOf:
           - $ref: "#/components/schemas/Determination"
-          description: |-
-            implementation is whether the policy's selections implement it. Not Applicable
-            where the policy excluded it deliberately, which a tool holding the policy can
-            check against its exclusion list.
-        implemented-by:
-          description: "implemented-by names what in the policy does the work: requirements it\nselected, or constraints it added. Absent alongside Not Satisfied, it is the\nvisible form of a mandate nothing implements; present alongside Not Satisfied,\nit is partial coverage, with basis saying what is missing."
-          items:
-            $ref: "#/components/schemas/EntryMapping"
-          minItems: 1
-          type: array
+          description: "implementation is whether the policy's selections implement it: Satisfied where\nthey cover it, Not Satisfied where they cover none or only part of it, and Not\nApplicable where the policy excluded it deliberately — which a tool holding the\npolicy can check against its exclusion list."
         mandate:
           allOf:
           - $ref: "#/components/schemas/EntryMapping"
@@ -2315,9 +2329,21 @@ components:
             property an audit exists to establish. What it means for compliance is a
             finding's business, not this entry's.
         plan-conformance:
-          allOf:
-          - $ref: "#/components/schemas/Determination"
-          description: "plan-conformance records whether the evidence was obtained the way the policy\nrequired: under the plan bound to this requirement, by one of its accepted\nmethods, by the executor it names, within its cadence. It is one determination\nrather than a field per dimension, because the policy grows dimensions and a\nrecord that mirrored them would have to grow with it — and because the detail\nof a shortfall is a judgement, which belongs in a finding. Not Applicable where\nthe policy binds no plan to this requirement."
+          description: |-
+            plan-conformance records whether the evidence was obtained the way the policy
+            required, as one entry per thing the audit checked. It is entries rather than a
+            field per dimension because the policy grows dimensions and a mirrored field set
+            would have to grow with it; and entries rather than a single determination
+            because "the plan was not followed" without saying how is not a record anyone
+            can act on.
+            
+            Absent where the policy binds no plan to this requirement — and a policy binds
+            plans to control requirements only, so a requirement adopted from guidance has
+            none.
+          items:
+            $ref: "#/components/schemas/ConformanceCheck"
+          minItems: 1
+          type: array
         requirement:
           allOf:
           - $ref: "#/components/schemas/EntryMapping"
@@ -2325,7 +2351,6 @@ components:
       required:
       - requirement
       - effective
-      - plan-conformance
       - outcome
       type: object
       x-status: experimental

@@ -81,7 +81,6 @@ verifications:
         control system, the system MUST require multi-factor authentication."
       applicability:
         - Maturity Level 1
-    plan-conformance: Not Applicable
     outcome: Satisfied
     assessments:
       - reference-id: eval-log
@@ -100,7 +99,15 @@ verifications:
         - id: c-annual-review
           text: "Review the published user documentation at least annually."
       plan-id: plan-doc-review
-    plan-conformance: Not Satisfied
+    plan-conformance:
+      - method-id: EM-DOC-REVIEW
+        determination: Satisfied
+        required: "A maintainer review of the published documentation."
+        evidenced: "Reviewed by a maintainer on 2025-08-20."
+      - method-id: EM-DOC-PROBE
+        determination: Not Satisfied
+        required: "The automated probe runs within the requirement's 30-day cadence."
+        evidenced: "Last probe run 2025-05-14, 100 days before the audit window closed."
     outcome: Not Satisfied
     assessments:
       - reference-id: eval-log
@@ -124,7 +131,6 @@ verifications:
         vulnerabilities."
       applicability:
         - Maturity Level 1
-    plan-conformance: Not Applicable
     outcome: Not Satisfied
     evidence:
       - id: EV-DO-02
@@ -143,7 +149,6 @@ verifications:
         dependencies."
       applicability:
         - Maturity Level 2
-    plan-conformance: Not Applicable
     outcome: Satisfied
     basis: "The SBOM endpoint returned a manifest enumerating all 41 direct dependencies,
       each with a resolved version."
@@ -166,7 +171,6 @@ verifications:
         author before merge."
       applicability:
         - Maturity Level 1
-    plan-conformance: Not Applicable
     outcome: Satisfied
     basis: "Branch protection requires one approving review from a non-author on the
       default branch, confirmed from the repository settings response."
@@ -189,9 +193,9 @@ coverage:
       entry-id: SCG-REVIEW
     statement: "Changes reach the default branch only after independent scrutiny."
     implementation: Satisfied
-    implemented-by:
-      - reference-id: SCG
-        entry-id: SCG-REVIEW.01
+    basis: "The policy selected SCG-REVIEW.01, which requires the independent review
+      this mandate calls for; the mapping to it is recorded in the guidance mapping
+      document."
 
   # A mandate the policy adopted and then selected nothing to implement. The
   # verifications cannot show this: every requirement the policy did select is
