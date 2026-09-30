@@ -192,8 +192,8 @@ import "list"
 
 	for i, v in verifications {
 		let _checks = [
-			if v["plan-conformance"] != _|_
-			for c in v["plan-conformance"] {c.determination},
+			if v["method-conformance"] != _|_
+			for c in v["method-conformance"] {c.determination},
 		]
 		_synthesisValidation: "\(i)": true & (
 						((v.outcome == "Satisfied" || v.outcome == "Not Applicable") &&
@@ -226,8 +226,11 @@ import "list"
 // required and evidenced pair carries what a determination alone throws away:
 // required every 30 days, evidenced every 90.
 #ConformanceCheck: {
-	// method-id names the accepted method this entry concerns, where it concerns one.
-	// A plan may require several methods, and which one fell short matters.
+	// method-id names the accepted method this entry concerns, where it concerns one:
+	// one of the plan's where a plan is bound, or one of the policy's fallback methods
+	// where none is. Method ids are unique across a policy, so the id resolves without
+	// saying which of the two declared it. A plan may require several methods, and
+	// which one fell short matters.
 	"method-id"?: string @go(MethodId)
 
 	// determination is what the check came to.
@@ -381,17 +384,20 @@ import "list"
 	// evidence records the data sources that support this determination.
 	evidence?: [#Evidence, ...#Evidence] @go(Evidence)
 
-	// plan-conformance records whether the evidence was obtained the way the policy
-	// required, as one entry per thing the audit checked. It is entries rather than a
-	// field per dimension because the policy grows dimensions and a mirrored field set
-	// would have to grow with it; and entries rather than a single determination
-	// because "the plan was not followed" without saying how is not a record anyone
+	// method-conformance records whether the evidence was obtained the way the policy
+	// prescribed, as one entry per thing the audit checked. It is entries rather than
+	// a field per dimension because the policy grows dimensions and a mirrored field
+	// set would have to grow with it; and entries rather than a single determination
+	// because "the method was not followed" without saying how is not a record anyone
 	// can act on.
 	//
-	// Absent where the policy binds no plan to this requirement — and a policy binds
-	// plans to control requirements only, so a requirement adopted from guidance has
-	// none.
-	PC="plan-conformance"?: [#ConformanceCheck, ...#ConformanceCheck] @go(PlanConformance)
+	// It is not named for the plan, because a plan is not the only thing that
+	// prescribes a method: a policy's own evaluation-methods are the fallback where no
+	// plan is bound, and a plan adds specificity where one is. So conformance is
+	// checkable for a requirement with no plan, against the methods the policy accepts
+	// generally. It is absent only where the policy prescribes nothing — no plan bound
+	// to this requirement and no fallback declared.
+	"method-conformance"?: [#ConformanceCheck, ...#ConformanceCheck] @go(MethodConformance)
 
 	// outcome is whether the evidence satisfied the requirement. It is stated for
 	// every governed requirement, complete by construction, so that a requirement
@@ -410,19 +416,12 @@ import "list"
 	// Comments in validation sections stay detached (blank line after), so they
 	// are never published as a field's API description.
 
-	// A plan bound to the requirement obliges a record of how it was followed, and
-	// conformance entries oblige the plan they were checked against. Each direction
-	// is stated on the field it requires, except the second, which writes a hidden
-	// field: two rules each requiring the other's field is a circular dependency CUE
-	// rejects, and an error() on plan-conformance would put bottom in its type and
-	// degrade the field to `any` for every Go consumer.
+	// A plan bound to the requirement obliges a record of how it was followed. The
+	// reverse does not hold: entries without a plan-id are the fallback case, checked
+	// against the methods the policy accepts generally.
 
 	if effective."plan-id" != _|_ {
-		"plan-conformance": [#ConformanceCheck, ...#ConformanceCheck]
-	}
-
-	if PC != _|_ if effective."plan-id" == _|_ {
-		_conformanceNeedsPlan: error("plan conformance has nothing to check where the policy binds no plan: set effective.plan-id, or drop these entries")
+		"method-conformance": [#ConformanceCheck, ...#ConformanceCheck]
 	}
 
 	// Each evidence entry carries a payload, a source, or both.

@@ -574,8 +574,11 @@ components:
           type: string
         method-id:
           description: |-
-            method-id names the accepted method this entry concerns, where it concerns one.
-            A plan may require several methods, and which one fell short matters.
+            method-id names the accepted method this entry concerns, where it concerns one:
+            one of the plan's where a plan is bound, or one of the policy's fallback methods
+            where none is. Method ids are unique across a policy, so the id resolves without
+            saying which of the two declared it. A plan may require several methods, and
+            which one fell short matters.
           type: string
         required:
           description: required is what the plan required, quoted or derived from it.
@@ -2319,6 +2322,12 @@ components:
             type: object
           minItems: 1
           type: array
+        method-conformance:
+          description: "method-conformance records whether the evidence was obtained the way the policy\nprescribed, as one entry per thing the audit checked. It is entries rather than\na field per dimension because the policy grows dimensions and a mirrored field\nset would have to grow with it; and entries rather than a single determination\nbecause \"the method was not followed\" without saying how is not a record anyone\ncan act on.\n\nIt is not named for the plan, because a plan is not the only thing that\nprescribes a method: a policy's own evaluation-methods are the fallback where no\nplan is bound, and a plan adds specificity where one is. So conformance is\ncheckable for a requirement with no plan, against the methods the policy accepts\ngenerally. It is absent only where the policy prescribes nothing — no plan bound\nto this requirement and no fallback declared."
+          items:
+            $ref: "#/components/schemas/ConformanceCheck"
+          minItems: 1
+          type: array
         outcome:
           allOf:
           - $ref: "#/components/schemas/Determination"
@@ -2328,22 +2337,6 @@ components:
             checked and met is distinguishable from one never checked — which is the
             property an audit exists to establish. What it means for compliance is a
             finding's business, not this entry's.
-        plan-conformance:
-          description: |-
-            plan-conformance records whether the evidence was obtained the way the policy
-            required, as one entry per thing the audit checked. It is entries rather than a
-            field per dimension because the policy grows dimensions and a mirrored field set
-            would have to grow with it; and entries rather than a single determination
-            because "the plan was not followed" without saying how is not a record anyone
-            can act on.
-            
-            Absent where the policy binds no plan to this requirement — and a policy binds
-            plans to control requirements only, so a requirement adopted from guidance has
-            none.
-          items:
-            $ref: "#/components/schemas/ConformanceCheck"
-          minItems: 1
-          type: array
         requirement:
           allOf:
           - $ref: "#/components/schemas/EntryMapping"

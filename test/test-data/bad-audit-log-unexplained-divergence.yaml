@@ -81,6 +81,12 @@ verifications:
         control system, the system MUST require multi-factor authentication."
       applicability:
         - Maturity Level 1
+    method-conformance:
+      - method-id: EM-BASELINE-SCAN
+        determination: Satisfied
+        required: "The policy's fallback method, since it binds no plan to this
+          requirement: the baseline scanner, run by the scanner identity it names."
+        evidenced: "Scanned by pvtr-github-repo on 2025-08-22."
     outcome: Satisfied
     assessments:
       - reference-id: eval-log
@@ -99,7 +105,7 @@ verifications:
         - id: c-annual-review
           text: "Review the published user documentation at least annually."
       plan-id: plan-doc-review
-    plan-conformance:
+    method-conformance:
       - method-id: EM-DOC-REVIEW
         determination: Satisfied
         required: "A maintainer review of the published documentation."
