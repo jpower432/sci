@@ -1495,6 +1495,14 @@ components:
         title:
           description: title describes the purpose of this mapping reference at a glance
           type: string
+        type:
+          allOf:
+          - $ref: "#/components/schemas/ArtifactType"
+          description: |-
+            type is the kind of artifact this reference points at, so a consumer can
+            tell a control catalog from a guidance catalog without fetching either. It
+            is stated once per reference rather than on every entry that cites it,
+            since a catalog holds one kind of entry.
         url:
           description: |-
             url is the path where the artifact may be retrieved; preferably responds with Gemara-compatible YAML/JSON.
