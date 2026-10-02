@@ -116,9 +116,13 @@ func TestSchemaValidation(t *testing.T) {
 		{"valid enforcement log", "./test-data/good-enforcement-log.yaml", "#EnforcementLog", false, ""},
 
 		// EnforcementLog — negative
-		{"enforcement action with invalid disposition", "./test-data/bad-enforcement-log.yaml", "#EnforcementLog", true, ""},
-		{"enforcement action missing log reference", "./test-data/bad-enforcement-missing-log.yaml", "#EnforcementLog", true, ""},
-		{"clear disposition with failed assessment", "./test-data/bad-enforcement-clear-failed.yaml", "#EnforcementLog", true, ""},
+		{"enforcement action with invalid disposition", "./test-data/bad-enforcement-log.yaml", "#EnforcementLog", true, "disposition"},
+		{"enforcement action missing log reference", "./test-data/bad-enforcement-missing-log.yaml", "#EnforcementLog", true, "log"},
+		{"clear action carrying a justification", "./test-data/bad-enforcement-clear-failed.yaml", "#EnforcementLog", true, "nothing to justify"},
+		{"enforced action whose justification justifies nothing", "./test-data/bad-enforcement-empty-justification.yaml", "#EnforcementLog", true, "justifies itself"},
+		{"enforcement finding the gate never rated", "./test-data/bad-enforcement-finding-missing-severity.yaml", "#EnforcementLog", true, "findings.0.severity"},
+		{"enforcement log with duplicate action ids", "./test-data/bad-enforcement-duplicate-action-id.yaml", "#EnforcementLog", true, "_uniqueActionIds"},
+		{"enforcement log with duplicate finding ids across actions", "./test-data/bad-enforcement-duplicate-finding-id.yaml", "#EnforcementLog", true, "_uniqueFindingIds"},
 
 		// AuditLog — positive
 		{"valid audit log", "./test-data/good-audit-log.yaml", "#AuditLog", false, ""},
