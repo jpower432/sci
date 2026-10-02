@@ -17,7 +17,7 @@ metadata:
     - id: OSPS
       title: "Open Source Project Security Baseline"
       version: "2025.1"
-      url: "2oci://baseline.openssf.org"
+      url: "https://baseline.openssf.org"
       type: ControlCatalog
 
     - id: eval-log
@@ -248,7 +248,7 @@ findings:
     lifecycle: Open
     description: "Residual risk RISK-002 remains above the maximum severity its category tolerates."
     risk:
-      reference-id: risk-catalog
+      reference-id: NOT-DECLARED-ANYWHERE
       entry-id: RISK-002
     recommendations:
       - id: REC-03

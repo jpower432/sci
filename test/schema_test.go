@@ -126,16 +126,29 @@ func TestSchemaValidation(t *testing.T) {
 
 		// AuditLog — positive
 		{"valid audit log", "./test-data/good-audit-log.yaml", "#AuditLog", false, ""},
+		{"audit that passed with nothing to call out", "./test-data/good-audit-log-clean.yaml", "#AuditLog", false, ""},
 		{"audit log evidence mapping with both coordinate and entry-id", "./test-data/good-audit-log-coordinate-and-entry-id.yaml", "#AuditLog", false, ""},
 
 		// AuditLog — negative
-		{"audit log missing summary criteria and results", "./test-data/bad-audit-log.yaml", "#AuditLog", true, ""},
-		{"audit log evidence source with invalid digest format", "./test-data/bad-audit-log-invalid-digest.yaml", "#AuditLog", true, ""},
-		{"audit result referencing undeclared criteria", "./test-data/bad-audit-log-undeclared-criteria.yaml", "#AuditLog", true, ""},
-		{"audit log evidence with neither payload nor source", "./test-data/bad-audit-log-evidence-neither.yaml", "#AuditLog", true, ""},
-		{"audit log mapping reference url with no scheme", "./test-data/bad-audit-log-url-no-scheme.yaml", "#AuditLog", true, ""},
-		{"audit log mapping reference url with a non-alphabetic scheme", "./test-data/bad-audit-log-url-invalid-scheme.yaml", "#AuditLog", true, ""},
-		{"audit log target uri with no scheme", "./test-data/bad-audit-log-uri-no-scheme.yaml", "#AuditLog", true, ""},
+		{"audit log missing its opinion, criteria, objectives and verifications", "./test-data/bad-audit-log.yaml", "#AuditLog", true, "opinion"},
+		{"audit citing an undeclared policy", "./test-data/bad-audit-log-undeclared-policy.yaml", "#AuditLog", true, "_refValidation"},
+		{"audit finding naming a control with no verification entry", "./test-data/bad-audit-log-finding-unverified-control.yaml", "#AuditLog", true, "_controlValidation"},
+		{"audit finding naming neither a control nor a risk", "./test-data/bad-audit-log-finding-no-subject.yaml", "#AuditLog", true, "_findingSubjectValidation"},
+		{"guideline relying on a control the audit never verified", "./test-data/bad-audit-log-guideline-unverified-control.yaml", "#AuditLog", true, "_guidelineControlValidation"},
+		{"guideline citing a finding on a control it does not rely on", "./test-data/bad-audit-log-guideline-unrelated-finding.yaml", "#AuditLog", true, "_guidelineFindingValidation"},
+		{"guideline with no controls and no rationale", "./test-data/bad-audit-log-guideline-no-rationale.yaml", "#AuditLog", true, "_guidelineRationaleValidation"},
+		{"audit log with two findings sharing an id", "./test-data/bad-audit-log-duplicate-finding-id.yaml", "#AuditLog", true, "_uniqueFindingIds"},
+		{"audit finding citing an undeclared risk reference", "./test-data/bad-audit-log-dangling-risk.yaml", "#AuditLog", true, "_refValidation"},
+		{"requirement not satisfied with no finding on its control", "./test-data/bad-audit-log-unsynthesised-failure.yaml", "#AuditLog", true, "_synthesisValidation"},
+		{"plan bound with no record of how it was followed", "./test-data/bad-audit-log-plan-without-fidelity.yaml", "#AuditLog", true, "_fidelityValidation"},
+		{"plan not conformed to, requirement satisfied anyway, nothing saying what was accepted", "./test-data/bad-audit-log-unexplained-divergence.yaml", "#AuditLog", true, "_synthesisValidation"},
+		{"finding citing an enforcement action in an undeclared log", "./test-data/bad-audit-log-response-undeclared.yaml", "#AuditLog", true, "findings-1-response"},
+		{"not compliant finding stating no severity", "./test-data/bad-audit-log-not-compliant-missing-severity.yaml", "#AuditLog", true, "findings.0.severity"},
+		{"audit log evidence source with invalid digest format", "./test-data/bad-audit-log-invalid-digest.yaml", "#AuditLog", true, "digest"},
+		{"audit log evidence with neither payload nor source", "./test-data/bad-audit-log-evidence-neither.yaml", "#AuditLog", true, "evidence.0.source"},
+		{"audit log target uri with no scheme", "./test-data/bad-audit-log-uri-no-scheme.yaml", "#AuditLog", true, "target.uri"},
+		{"audit log mapping reference url with a non-alphabetic scheme", "./test-data/bad-audit-log-url-invalid-scheme.yaml", "#AuditLog", true, ".url: invalid value"},
+		{"audit log mapping reference url with no scheme", "./test-data/bad-audit-log-url-no-scheme.yaml", "#AuditLog", true, ".url: invalid value"},
 
 		// CapabilityCatalog — negative
 		{"capability with invalid group", "./test-data/bad-capability-invalid-group.yaml", "#CapabilityCatalog", true, ""},

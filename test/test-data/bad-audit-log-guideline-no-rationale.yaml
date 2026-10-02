@@ -3,7 +3,7 @@ metadata:
   type: AuditLog
   gemara-version: "1.1.0"
   version: "1.0.0"
-  description: "Q1 2026 Gemara Audit"
+  description: "Invalid audit log: a guideline with no controls behind it says nothing about that"
   author:
     id: lead-auditor
     name: "Jane Auditor"
@@ -17,7 +17,7 @@ metadata:
     - id: OSPS
       title: "Open Source Project Security Baseline"
       version: "2025.1"
-      url: "2oci://baseline.openssf.org"
+      url: "https://baseline.openssf.org"
       type: ControlCatalog
 
     - id: eval-log
@@ -200,6 +200,37 @@ verifications:
           reference-id: github-api
           coordinate: "/repos/gemaraproj/gemara/branches/main/protection"
           digest: "sha256:b7c8d9e0f1a2b3c4d5e6f7089abcdef1234567890abcdef1234567890abcdef1"
+
+coverage:
+  # Supported by a control the audit verified, with nothing found against it.
+  - guideline:
+      reference-id: SCG
+      entry-id: SCG-REVIEW
+    statement: "Changes reach the default branch only after independent scrutiny."
+    controls:
+      - reference-id: OSPS
+        entry-id: OSPS-AC-03
+    rationale: "Branch protection on the primary branch blocks direct commits, so every
+      change arrives through a merge that the protection rules gate."
+
+  # Supported by a control the audit found wanting; the finding carries the decision.
+  - guideline:
+      reference-id: SCG
+      entry-id: SCG-DOCS
+    statement: "Users can find accurate instructions for installing and operating the
+      software."
+    controls:
+      - reference-id: OSPS
+        entry-id: OSPS-DO-01
+    findings:
+      - AR-DO-01
+
+  # Adopted by the policy, and nothing in scope supports it.
+  - guideline:
+      reference-id: SCG
+      entry-id: SCG-SUPPLY
+    statement: "The provenance of every released artifact can be established by a
+      consumer without trusting the build system operator."
 
 findings:
   - id: AR-DO-01

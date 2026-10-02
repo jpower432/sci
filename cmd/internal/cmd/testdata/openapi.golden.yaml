@@ -350,16 +350,31 @@ components:
       - $ref: "#/components/schemas/Log"
       - required:
         - metadata
+        - opinion
         - summary
-        - criteria
-        - results
-      description: AuditLog records results from an audit performed against a target resource
+        - policy
+        - objectives
+        - verifications
+      description: |-
+        AuditLog records an audit, including what it examined the target against, what it
+        established for each requirement, what it reports, and what it concludes.
       properties:
-        criteria:
-          description: criteria defines the acceptable state for the audited resource
+        coverage:
+          description: |-
+            coverage records, for guidance the policy adopted, the controls this audit
+            relied on to support each guideline and the findings on them. A guideline is
+            not testable, so it is judged through this map rather than verified.
           items:
-            $ref: "#/components/schemas/ArtifactMapping"
+            $ref: "#/components/schemas/GuidelineCoverage"
           minItems: 1
+          type: array
+        findings:
+          description: |-
+            findings are the audit's decisions about control objectives and risks. A
+            finding about a control decides from the verifications of that control's
+            requirements. It is absent when the audit had nothing to call out.
+          items:
+            $ref: "#/components/schemas/ComplianceFinding"
           type: array
         metadata:
           description: metadata provides detailed data about this log
@@ -371,61 +386,43 @@ components:
           required:
           - type
           type: object
+        objectives:
+          description: |-
+            objectives are what this audit set out to establish. They are recorded
+            because the conclusion has to speak to them. An opinion answers a question,
+            and without the question a later reader cannot tell whether the audit
+            achieved what it was for, or judge the scope it settled for.
+          items:
+            type: string
+          minItems: 1
+          type: array
+        opinion:
+          allOf:
+          - $ref: "#/components/schemas/Opinion"
+          description: |-
+            opinion is the audit's conclusion in one word, so a consumer of the
+            attestation need not weigh the findings itself.
         owner:
           allOf:
           - $ref: "#/components/schemas/RACI"
           description: owner defines the RACI roles responsible for managing the audit
-        results:
-          description: results records audit results against the criteria
-          items:
-            $ref: "#/components/schemas/AuditResult"
-          minItems: 1
-          type: array
+        policy:
+          allOf:
+          - $ref: "#/components/schemas/ArtifactMapping"
+          description: "policy is this audit's criteria: the single versioned artifact the evidence\nwas compared against. It is one policy rather than a list because the policy\nalso defines scope. The audit's completeness claim needs a governed set to be\ncomplete against."
         summary:
-          description: summary provides the high-level conclusion
+          description: "summary is that conclusion in prose, including anything the opinion cannot\ncarry: what the objectives established, trends across the findings, and the\nuncertainty any audit of a moment carries."
           type: string
-      type: object
-      x-status: experimental
-    AuditResult:
-      description: AuditResult records a single result with supporting evidence and recommendations.
-      properties:
-        criteria-reference:
-          allOf:
-          - $ref: "#/components/schemas/MultiEntryMapping"
-          description: criteria-reference maps this result to specific criteria entries
-        description:
-          description: description explains the result in detail
-          type: string
-        evidence:
-          description: evidence records the data sources that support this result
+        verifications:
+          description: |-
+            verifications are the mechanical checks of each assessment requirement the
+            policy governs, against the evidence provided. They are complete by
+            construction, with one entry per requirement including the boring passes,
+            and carry verification outcomes rather than compliance decisions.
           items:
-            allOf:
-            - $ref: "#/components/schemas/Evidence"
-            type: object
+            $ref: "#/components/schemas/VerificationLog"
           minItems: 1
           type: array
-        id:
-          description: id uniquely identifies this result
-          type: string
-        recommendations:
-          description: recommendations records corrective actions for this result
-          items:
-            $ref: "#/components/schemas/Recommendation"
-          minItems: 1
-          type: array
-        title:
-          description: title describes this result at a glance
-          type: string
-        type:
-          allOf:
-          - $ref: "#/components/schemas/ResultType"
-          description: type classifies the nature of this result
-      required:
-      - id
-      - title
-      - type
-      - description
-      - criteria-reference
       type: object
       x-status: experimental
     Capability:
@@ -529,6 +526,47 @@ components:
       required:
       - reference-id
       type: object
+      x-status: experimental
+    ComplianceFinding:
+      allOf:
+      - $ref: "#/components/schemas/Finding"
+      - required:
+        - status
+        - id
+      description: |-
+        ComplianceFinding is the audit's decision about one control's objective, or
+        about a risk. It does not restate the verification outcomes it decides from;
+        it says what they mean for compliance, which takes an auditor's reasoning.
+      properties:
+        id:
+          description: "id uniquely identifies this finding within the audit. It is declared here\nrather than in the #Finding core because a finding reported against a named\ncheck needs no id of its own. This one is reported in its own right."
+          type: string
+        response:
+          allOf:
+          - $ref: "#/components/schemas/EntryMapping"
+          description: "response names the enforcement action that produced this finding's current\nlifecycle: the gate that blocked it, the remediation that resolved it, or the\ntolerated action whose exception waived it."
+        risk:
+          allOf:
+          - $ref: "#/components/schemas/EntryMapping"
+          description: "risk names the risk this finding concerns, when it concerns one: a residual\nrisk beyond its category's tolerance, for example. A finding names a control,\nthrough the #Finding core, or a risk."
+        status:
+          allOf:
+          - $ref: "#/components/schemas/ComplianceStatus"
+          description: status is the audit's decision about the control's objective or the risk.
+      type: object
+      x-status: experimental
+    ComplianceStatus:
+      description: |-
+        ComplianceStatus is the audit's decision about one control's objective, or
+        about a risk. It is the audit's conclusion, which an auditor may reach
+        differently from what the assessment observed. Compliance is decided one
+        control at a time, so there is no "compliant with exceptions".
+      enum:
+      - Compliant
+      - Not Compliant
+      - Not Applicable
+      - Undetermined
+      type: string
       x-status: experimental
     ConfidenceLevel:
       description: ConfidenceLevel indicates the evaluator's confidence level in an assessment result.
@@ -704,6 +742,15 @@ components:
       format: date-time
       type: string
       x-status: stable
+    Determination:
+      description: Determination describes the outcome of a performed verification.
+      enum:
+      - Satisfied
+      - Not Satisfied
+      - Not Applicable
+      - Undetermined
+      type: string
+      x-status: experimental
     Dimensions:
       description: Dimensions specify the applicability criteria for a policy
       properties:
@@ -746,6 +793,61 @@ components:
       - Tolerated
       - Clear
       type: string
+      x-status: experimental
+    EffectiveConstraint:
+      description: |-
+        EffectiveConstraint is one prescriptive addition a policy attached to a
+        requirement, as it applied.
+      properties:
+        id:
+          description: id identifies this constraint within the policy that attached it.
+          type: string
+        text:
+          description: text is the constraint as it applied to the requirement.
+          type: string
+      required:
+      - id
+      - text
+      type: object
+      x-status: experimental
+    EffectiveRequirement:
+      description: "EffectiveRequirement is what a policy required of one assessment requirement,\nas resolved at audit time: the control it tests, the text as it applied, the\napplicability that selected it, the constraints the policy attached, and the\nplan bound to it."
+      properties:
+        applicability:
+          description: applicability names the groups under which this requirement was selected.
+          items:
+            type: string
+          minItems: 1
+          type: array
+        constraints:
+          description: constraints are the prescriptive additions the policy attached to it.
+          items:
+            $ref: "#/components/schemas/EffectiveConstraint"
+          type: array
+        control:
+          allOf:
+          - $ref: "#/components/schemas/EntryMapping"
+          description: |-
+            control names the control whose objective this requirement tests. It is
+            recorded rather than derived because an entry id only suggests its control,
+            and the audit decides compliance per control.
+        plan-id:
+          description: plan-id names the assessment plan bound to this requirement.
+          type: string
+        requirement:
+          allOf:
+          - $ref: "#/components/schemas/EntryMapping"
+          description: |-
+            requirement names the assessment requirement this effective requirement
+            builds on.
+        text:
+          description: text is the requirement as it applied, after the policy's constraints.
+          type: string
+      required:
+      - control
+      - requirement
+      - text
+      type: object
       x-status: experimental
     Email:
       description: Email represents a validated email address pattern
@@ -1009,6 +1111,29 @@ components:
       - reason
       type: object
       x-status: experimental
+    FidelityCheck:
+      description: "FidelityCheck is one check of how faithfully evidence was obtained to what the\npolicy prescribed, for example: that a method the plan accepts was used, that\nthe executor matches the one the plan names, that a run fell inside the\nrequirement's cadence, that parameter values were within the accepted ones."
+      properties:
+        determination:
+          allOf:
+          - $ref: "#/components/schemas/Determination"
+          description: determination is what the check came to.
+        evidenced:
+          description: "evidenced is what the evidence showed instead.\n\nBoth are for divergences. A check that passed needs neither: the method and\nthe determination already say the prescribed thing was done. Restating the\nprescription on every passing check makes a complete record unreadable. In\nan audit of a real baseline the passing checks outnumber the failing ones\nfifty to one. Where the two differ, state both, because the pair is what a\ndetermination alone throws away: required every 30 days, evidenced every 90."
+          type: string
+        method-id:
+          description: |-
+            method-id names the accepted method this entry concerns, where it concerns one:
+            one of the plan's where a plan is bound, or one of the policy's fallback methods
+            where none is.
+          type: string
+        required:
+          description: required is what the policy prescribed, quoted or derived from it.
+          type: string
+      required:
+      - determination
+      type: object
+      x-status: experimental
     Finding:
       description: |-
         Finding records something an evaluation, an enforcement action or an audit
@@ -1220,6 +1345,42 @@ components:
       - title
       - objective
       - group
+      type: object
+      x-status: experimental
+    GuidelineCoverage:
+      description: "GuidelineCoverage is how the audit judged one guideline the policy adopted. A\nguideline is not testable, so nothing verifies it directly: the audit names the\ncontrols it relied on to support the guideline and cites the findings on them.\nThe map is recorded here rather than pointed at in a #MappingDocument because\nan audit is a self-contained record of what it relied on."
+      properties:
+        controls:
+          description: |-
+            controls are the controls the audit relied on to support the guideline.
+            Absent means nothing in scope supports it.
+          items:
+            $ref: "#/components/schemas/EntryMapping"
+          minItems: 1
+          type: array
+        findings:
+          description: |-
+            findings are the ids of this audit's findings, on those controls, that bear
+            on the guideline.
+          items:
+            type: string
+          minItems: 1
+          type: array
+        guideline:
+          allOf:
+          - $ref: "#/components/schemas/EntryMapping"
+          description: guideline names the guideline the policy adopted.
+        rationale:
+          description: "rationale is how the audit reads the map: what the controls cover of the\nguideline and what they leave uncovered. It is required where no control\nsupports the guideline."
+          type: string
+        statement:
+          description: |-
+            statement is the guideline as the policy adopted it, resolved at audit time
+            so the record says what was judged without fetching the catalog.
+          type: string
+      required:
+      - guideline
+      - statement
       type: object
       x-status: experimental
     ImplementationDetails:
@@ -1656,6 +1817,17 @@ components:
           type: array
       type: object
       x-status: stable
+    Opinion:
+      description: |-
+        Opinion is the audit's conclusion about the target as a whole, reached after
+        weighing all of the findings against what the audit set out to establish.
+      enum:
+      - Passed
+      - Passed with Conditions
+      - Failed
+      - Undetermined
+      type: string
+      x-status: experimental
     Parameter:
       description: Parameter defines a configurable parameter for assessment or enforcement activities.
       properties:
@@ -1816,11 +1988,7 @@ components:
       type: object
       x-status: experimental
     Recommendation:
-      description: |-
-        Recommendation provides a corrective action for an audit result
-        
-        
-        Recommendation provides a corrective action for a finding.
+      description: Recommendation provides a corrective action for a finding.
       properties:
         id:
           description: id uniquely identifies this recommendation
@@ -1873,15 +2041,6 @@ components:
       - Unknown
       type: string
       x-status: stable
-    ResultType:
-      description: ResultType classifies the nature of an audit result
-      enum:
-      - Gap
-      - Finding
-      - Observation
-      - Strength
-      type: string
-      x-status: experimental
     Risk:
       description: A Risk represents the potential for negative impact resulting from one or more threats.
       properties:
@@ -2181,6 +2340,57 @@ components:
             $ref: "#/components/schemas/Vector"
           minItems: 1
           type: array
+      type: object
+      x-status: experimental
+    VerificationLog:
+      description: |-
+        VerificationLog records the mechanical checks for one governed requirement:
+        what was examined, whether the evidence was obtained the way the policy
+        required, and whether it satisfied the requirement. Findings decide from these
+        entries, which establish how far the evidence can be trusted and what it shows.
+      properties:
+        assessments:
+          description: assessments are the assessments this audit read, if any.
+          items:
+            $ref: "#/components/schemas/EvidenceMapping"
+          minItems: 1
+          type: array
+        effective-requirement:
+          allOf:
+          - $ref: "#/components/schemas/EffectiveRequirement"
+          description: |-
+            effective-requirement is what the policy required, resolved at audit time,
+            so the record says what was audited without fetching the policy or catalog.
+        evidence:
+          description: evidence records the data sources that support this outcome.
+          items:
+            allOf:
+            - $ref: "#/components/schemas/Evidence"
+            type: object
+          minItems: 1
+          type: array
+        fidelity:
+          description: |-
+            fidelity records whether the evidence was obtained the way the policy
+            prescribed, as one entry per thing the audit checked. It concerns how the
+            evidence was produced; whether the requirement was satisfied is outcome.
+          items:
+            $ref: "#/components/schemas/FidelityCheck"
+          minItems: 1
+          type: array
+        outcome:
+          allOf:
+          - $ref: "#/components/schemas/Determination"
+          description: outcome is whether the evidence satisfied the requirement.
+        rationale:
+          description: |-
+            rationale is what in the evidence established these determinations, for
+            evidence that does not say so itself. An assessment carries its own result,
+            so a citation of one needs no restating.
+          type: string
+      required:
+      - effective-requirement
+      - outcome
       type: object
       x-status: experimental
 info:

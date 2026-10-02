@@ -1,9 +1,9 @@
 metadata:
-  id: audit-log-001
+  id: audit-log-clean-001
   type: AuditLog
   gemara-version: "1.1.0"
   version: "1.0.0"
-  description: "Q1 2026 Gemara Audit"
+  description: "Q2 2026 Gemara Audit, no findings"
   author:
     id: lead-auditor
     name: "Jane Auditor"
@@ -17,7 +17,7 @@ metadata:
     - id: OSPS
       title: "Open Source Project Security Baseline"
       version: "2025.1"
-      url: "2oci://baseline.openssf.org"
+      url: "https://baseline.openssf.org"
       type: ControlCatalog
 
     - id: eval-log
@@ -115,10 +115,8 @@ verifications:
       - method-id: EM-DOC-REVIEW
         determination: Satisfied
       - method-id: EM-DOC-PROBE
-        determination: Not Satisfied
-        required: "The automated probe runs within the requirement's 30-day cadence."
-        evidenced: "Last probe run 2025-05-14, 100 days before the audit window closed."
-    outcome: Not Satisfied
+        determination: Satisfied
+    outcome: Satisfied
     assessments:
       - reference-id: eval-log
         entry-id: OSPS-DO-01.01
@@ -143,7 +141,7 @@ verifications:
         vulnerabilities."
       applicability:
         - Maturity Level 1
-    outcome: Not Satisfied
+    outcome: Satisfied
     evidence:
       - id: EV-DO-02
         type: EnforcementLog
@@ -201,62 +199,21 @@ verifications:
           coordinate: "/repos/gemaraproj/gemara/branches/main/protection"
           digest: "sha256:b7c8d9e0f1a2b3c4d5e6f7089abcdef1234567890abcdef1234567890abcdef1"
 
-findings:
-  - id: AR-DO-01
-    status: Not Compliant
-    severity: Medium
-    lifecycle: Open
-    description: "No user guide is published or referenced in the Security Insights data,
-      and the review the plan requires ran outside its cadence."
-    control:
-      reference-id: OSPS
-      entry-id: OSPS-DO-01
-    recommendations:
-      - id: REC-01
-        text: "Add user guide references to the Security Insights file and publish basic user documentation."
-        required: true
+coverage:
+  # Supported by a control the audit verified, with nothing found against it.
+  - guideline:
+      reference-id: SCG
+      entry-id: SCG-REVIEW
+    statement: "Changes reach the default branch only after independent scrutiny."
+    controls:
+      - reference-id: OSPS
+        entry-id: OSPS-AC-03
+    rationale: "Branch protection on the primary branch blocks direct commits, so every
+      change arrives through a merge that the protection rules gate."
 
-  - id: AR-DO-02
-    status: Not Compliant
-    severity: High
-    lifecycle: Resolved
-    description: "Private vulnerability reporting was not enabled during the period examined.
-      The release gate's autoremediation enabled it on 2025-08-22, after the failure."
-    control:
-      reference-id: OSPS
-      entry-id: OSPS-DO-02
-    response:
-      reference-id: enforcement-log
-      entry-id: ACT-DO-02
-    recommendations:
-      - id: REC-02
-        text: "Formalize the private vulnerability reporting process and document it in SECURITY.md."
+opinion: Passed
 
-  # A finding may record conformity: ISO 19011 findings indicate conformity or nonconformity.
-  - id: AR-AC-01
-    status: Compliant
-    lifecycle: Resolved
-    description: "Multi-factor authentication is enforced organization-wide rather than per
-      repository, which satisfies this requirement for every repository in scope."
-    control:
-      reference-id: OSPS
-      entry-id: OSPS-AC-01
-
-  - id: AR-RISK-01
-    status: Not Compliant
-    severity: Critical
-    lifecycle: Open
-    description: "Residual risk RISK-002 remains above the maximum severity its category tolerates."
-    risk:
-      reference-id: risk-catalog
-      entry-id: RISK-002
-    recommendations:
-      - id: REC-03
-        text: "Add a compensating control or record a documented risk acceptance."
-
-opinion: Failed
-
-summary: "Access control and quality requirements are satisfied. Two documentation
-  requirements are not, one of them on evidence obtained outside the plan's cadence, and a
-  residual risk remains above tolerance. The audit examined evidence collected between
-  August 2025 and February 2026; conditions may have changed since."
+summary: "Every requirement the policy governs was satisfied, every fidelity check
+  passed, and the guidance the policy adopted is implemented by requirements it selected.
+  The audit examined evidence collected between August 2025 and February 2026; conditions
+  may have changed since."

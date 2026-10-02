@@ -1,9 +1,9 @@
 metadata:
-  id: audit-log-001
+  id: audit-log-response-undeclared
   type: AuditLog
   gemara-version: "1.1.0"
   version: "1.0.0"
-  description: "Q1 2026 Gemara Audit"
+  description: "Invalid audit log: a finding citing an enforcement action in an undeclared log"
   author:
     id: lead-auditor
     name: "Jane Auditor"
@@ -17,7 +17,7 @@ metadata:
     - id: OSPS
       title: "Open Source Project Security Baseline"
       version: "2025.1"
-      url: "2oci://baseline.openssf.org"
+      url: "https://baseline.openssf.org"
       type: ControlCatalog
 
     - id: eval-log
@@ -226,7 +226,7 @@ findings:
       reference-id: OSPS
       entry-id: OSPS-DO-02
     response:
-      reference-id: enforcement-log
+      reference-id: NOT-DECLARED-ANYWHERE
       entry-id: ACT-DO-02
     recommendations:
       - id: REC-02

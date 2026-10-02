@@ -17,7 +17,7 @@ metadata:
     - id: OSPS
       title: "Open Source Project Security Baseline"
       version: "2025.1"
-      url: "2oci://baseline.openssf.org"
+      url: "https://baseline.openssf.org"
       type: ControlCatalog
 
     - id: eval-log
@@ -240,7 +240,7 @@ findings:
       repository, which satisfies this requirement for every repository in scope."
     control:
       reference-id: OSPS
-      entry-id: OSPS-AC-01
+      entry-id: OSPS-ZZ-99
 
   - id: AR-RISK-01
     status: Not Compliant

@@ -1,9 +1,9 @@
 metadata:
-  id: audit-log-001
+  id: audit-log-unexplained-divergence
   type: AuditLog
   gemara-version: "1.1.0"
   version: "1.0.0"
-  description: "Q1 2026 Gemara Audit"
+  description: "Invalid audit log: a fidelity check that fell short, the requirement satisfied anyway, and nothing saying what was accepted"
   author:
     id: lead-auditor
     name: "Jane Auditor"
@@ -17,7 +17,7 @@ metadata:
     - id: OSPS
       title: "Open Source Project Security Baseline"
       version: "2025.1"
-      url: "2oci://baseline.openssf.org"
+      url: "https://baseline.openssf.org"
       type: ControlCatalog
 
     - id: eval-log
@@ -118,7 +118,7 @@ verifications:
         determination: Not Satisfied
         required: "The automated probe runs within the requirement's 30-day cadence."
         evidenced: "Last probe run 2025-05-14, 100 days before the audit window closed."
-    outcome: Not Satisfied
+    outcome: Satisfied
     assessments:
       - reference-id: eval-log
         entry-id: OSPS-DO-01.01
@@ -202,20 +202,6 @@ verifications:
           digest: "sha256:b7c8d9e0f1a2b3c4d5e6f7089abcdef1234567890abcdef1234567890abcdef1"
 
 findings:
-  - id: AR-DO-01
-    status: Not Compliant
-    severity: Medium
-    lifecycle: Open
-    description: "No user guide is published or referenced in the Security Insights data,
-      and the review the plan requires ran outside its cadence."
-    control:
-      reference-id: OSPS
-      entry-id: OSPS-DO-01
-    recommendations:
-      - id: REC-01
-        text: "Add user guide references to the Security Insights file and publish basic user documentation."
-        required: true
-
   - id: AR-DO-02
     status: Not Compliant
     severity: High
