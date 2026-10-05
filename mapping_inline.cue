@@ -20,6 +20,12 @@ package gemara
 	// description is prose regarding the artifact's purpose or content
 	description?: string
 
+	// type is the kind of artifact this reference points at, so a consumer can
+	// tell a control catalog from a guidance catalog without fetching either. It
+	// is stated once per reference rather than on every entry that cites it,
+	// since a catalog holds one kind of entry.
+	type?: #ArtifactType
+
 	// url is the path where the artifact may be retrieved; preferably responds with Gemara-compatible YAML/JSON.
 	// Any URI scheme is accepted (e.g. https, file, oci, s3, arn) so evidence can be
 	// addressed wherever it actually lives.

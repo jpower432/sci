@@ -111,6 +111,8 @@ func TestSchemaValidation(t *testing.T) {
 
 		// EvaluationLog — negative
 		{"executed assessment missing start", "./test-data/bad-evaluation-log-missing-start.yaml", "#EvaluationLog", true, ""},
+		{"evaluation log evaluating one control twice", "./test-data/bad-evaluation-log-duplicate-control.yaml", "#EvaluationLog", true, "_uniqueControlEvaluations"},
+		{"evaluation log evaluating one control twice under two aliases", "./test-data/bad-evaluation-log-control-alias.yaml", "#EvaluationLog", true, "_uniqueControlEvaluations"},
 
 		// EnforcementLog — positive
 		{"valid enforcement log", "./test-data/good-enforcement-log.yaml", "#EnforcementLog", false, ""},

@@ -12,7 +12,29 @@ package gemara
 	metadata: type: "EvaluationLog"
 	// result is the aggregate outcome across all evaluations in this log
 	result: #Result
+	// evaluations holds one entry per control evaluated. A log evaluates each
+	// control once, so the log and a control together identify an evaluation,
+	// which is how a finding points into it.
 	evaluations: [#ControlEvaluation, ...#ControlEvaluation] @go(Evaluations,type=[]*ControlEvaluation)
+
+	// ---- Validation --------------------------------------------------------
+	// Comments in validation sections stay detached (blank line after), so they
+	// are never published as a field's API description.
+
+	// Each control is evaluated at most once. A finding identifies its evaluation
+	// by the log and the control rather than by an id the log would have to mint.
+	// A reference-id is a local alias, so the key resolves it through _catalogOf;
+	// two aliases for one catalog are one catalog, and so are two versions of it
+	// that share a url.
+
+	_catalogOf: _ // computed on #Log; named here only so this block can reference it
+	_uniqueControlEvaluations: {
+		for i, e in evaluations {
+			let _ref = e.control."reference-id"
+			let _cat = [if _catalogOf[_ref] != _|_ {_catalogOf[_ref]}, _ref][0]
+			("\(_cat)#\(e.control."entry-id")"): i
+		}
+	}
 }
 
 // ControlEvaluation contains the results of evaluating a single Layer 5 control.
