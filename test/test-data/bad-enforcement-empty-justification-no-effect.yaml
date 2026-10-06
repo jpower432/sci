@@ -90,6 +90,8 @@ actions:
     start: "2025-08-22T16:07:00Z"
     steps:
       - github.com/gemaraproj/gemara/enforcement/allow.PassThrough
+    justification: {}
+
   - id: ACT-QA-04
     effect: None
     method:
@@ -105,7 +107,6 @@ actions:
         - id: FIND-QA-04
           description: "Dependency manifests were not published for the current release."
           severity: Medium
-          disposition: Waived
           control:
             reference-id: OSPS
             entry-id: OSPS-QA-04

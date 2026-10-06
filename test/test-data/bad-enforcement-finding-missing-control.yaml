@@ -3,7 +3,7 @@ metadata:
   type: EnforcementLog
   gemara-version: "1.1.0"
   version: "1.0.0"
-  description: "Enforcement actions taken against pvtr evaluation findings for the Gemara repository"
+  description: "Invalid enforcement log: a finding names no control"
   author:
     id: enforcement-engine
     name: "Example Enforcement Engine"
@@ -53,9 +53,6 @@ actions:
         - id: FIND-DO-01
           description: "No user guide is published or referenced in the Security Insights data."
           severity: Medium
-          control:
-            reference-id: OSPS
-            entry-id: OSPS-DO-01
           log:
             reference-id: eval-log
 
@@ -105,7 +102,6 @@ actions:
         - id: FIND-QA-04
           description: "Dependency manifests were not published for the current release."
           severity: Medium
-          disposition: Waived
           control:
             reference-id: OSPS
             entry-id: OSPS-QA-04

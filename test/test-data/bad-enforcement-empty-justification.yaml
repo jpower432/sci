@@ -1,5 +1,5 @@
 metadata:
-  id: "enforcement-log-001"
+  id: "enforcement-log-empty-justification"
   type: EnforcementLog
   gemara-version: "1.1.0"
   version: "1.0.0"
@@ -48,16 +48,7 @@ actions:
     end: "2025-08-22T16:05:01Z"
     steps:
       - github.com/gemaraproj/gemara/enforcement/gate.BlockMerge
-    justification:
-      findings:
-        - id: FIND-DO-01
-          description: "No user guide is published or referenced in the Security Insights data."
-          severity: Medium
-          control:
-            reference-id: OSPS
-            entry-id: OSPS-DO-01
-          log:
-            reference-id: eval-log
+    justification: {}
 
   - id: ACT-DO-02
     effect: Remediated
@@ -105,7 +96,6 @@ actions:
         - id: FIND-QA-04
           description: "Dependency manifests were not published for the current release."
           severity: Medium
-          disposition: Waived
           control:
             reference-id: OSPS
             entry-id: OSPS-QA-04
