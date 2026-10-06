@@ -1,9 +1,9 @@
 metadata:
-  id: audit-log-001
+  id: audit-log-plan-unrecorded
   type: AuditLog
   gemara-version: "1.1.0"
   version: "1.0.0"
-  description: "Q1 2026 Gemara Audit"
+  description: "Invalid audit log: a plan bound to a requirement with no record of how it was followed"
   author:
     id: lead-auditor
     name: "Jane Auditor"
@@ -17,7 +17,7 @@ metadata:
     - id: OSPS
       title: "Open Source Project Security Baseline"
       version: "2025.1"
-      url: "2oci://baseline.openssf.org"
+      url: "https://baseline.openssf.org"
       type: ControlCatalog
 
     - id: eval-log
@@ -109,15 +109,6 @@ verifications:
         - id: c-annual-review
           text: "Review the published user documentation at least annually."
       plan-id: plan-doc-review
-    fidelity:
-      # A check that passed: the method and the determination say it. Restating what
-      # the plan required would only repeat the plan.
-      - method-id: EM-DOC-REVIEW
-        determination: Satisfied
-      - method-id: EM-DOC-PROBE
-        determination: Not Satisfied
-        required: "The automated probe runs within the requirement's 30-day cadence."
-        evidenced: "Last probe run 2025-05-14, 100 days before the audit window closed."
     outcome: Not Satisfied
     assessments:
       - reference-id: eval-log

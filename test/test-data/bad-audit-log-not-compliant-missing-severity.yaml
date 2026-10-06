@@ -1,9 +1,9 @@
 metadata:
-  id: audit-log-001
+  id: audit-log-unrated-finding
   type: AuditLog
   gemara-version: "1.1.0"
   version: "1.0.0"
-  description: "Q1 2026 Gemara Audit"
+  description: "Invalid audit log: a Not Compliant finding states no severity"
   author:
     id: lead-auditor
     name: "Jane Auditor"
@@ -17,7 +17,7 @@ metadata:
     - id: OSPS
       title: "Open Source Project Security Baseline"
       version: "2025.1"
-      url: "2oci://baseline.openssf.org"
+      url: "https://baseline.openssf.org"
       type: ControlCatalog
 
     - id: eval-log
@@ -204,7 +204,6 @@ verifications:
 findings:
   - id: AR-DO-01
     status: Not Compliant
-    severity: Medium
     disposition: Open
     description: "No user guide is published or referenced in the Security Insights data,
       and the review the plan requires ran outside its cadence."

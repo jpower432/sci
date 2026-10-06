@@ -12,22 +12,41 @@ metadata:
     - id: security-policy
       title: "Information Security Policy"
       version: "2.1.0"
+      type: Policy
+
     - id: OSPS
       title: "Open Source Project Security Baseline"
       version: "2025.1"
       url: "baseline.openssf.org"
+      type: ControlCatalog
+
     - id: eval-log
       title: "PVTR Evaluation Log"
       version: "2025-08-22"
       url: "https://artifacts.example.com/eval-logs/pvtr-baseline-scan.yaml"
+      type: EvaluationLog
+
     - id: enforcement-log
       title: "Example Enforcement Log"
       version: "2025-08-22"
       url: "https://artifacts.example.com/enforcement-logs/enforcement-log-001.yaml"
+      type: EnforcementLog
+
     - id: github-api
       title: "GitHub Dependency Graph API"
       version: "2026"
       url: "https://docs.github.com/en/rest/dependency-graph"
+    - id: SCG
+      title: "Secure Development Guidance"
+      version: "1.2"
+      type: GuidanceCatalog
+      url: "https://guidance.example.com/secure-development"
+    - id: risk-catalog
+      title: "Organizational Risk Catalog"
+      version: "2026.1"
+      url: "https://artifacts.example.com/risk-catalog.yaml"
+      type: RiskCatalog
+
 
 target:
   id: gemara-repo
@@ -35,9 +54,6 @@ target:
   type: Software
   uri: "https://github.com/gemaraproj/gemara"
   environment: production
-  owner:
-    name: "Gemara Maintainers"
-    affiliation: "OpenSSF"
 
 owner:
   responsible:
@@ -47,32 +63,65 @@ owner:
     - name: "Project Lead"
       affiliation: "OpenSSF"
 
-summary: "Access control and quality controls are strong. Documentation controls have gaps requiring remediation."
+policy:
+  reference-id: security-policy
+  remarks: "Organizational policy establishing the audit's criteria; it imports the OSPS baseline."
 
-criteria:
-  - reference-id: security-policy
-    remarks: "Organizational policy establishing the audit's scope."
-  - reference-id: OSPS
-    remarks: "Baseline whose controls each result is scored against."
+objectives:
+  - "Establish whether the target meets the requirements the policy binds to it."
+  - "Establish whether the evidence behind each determination was obtained as the policy requires."
 
-results:
-  - id: AR-AC-01
-    title: "MFA enforcement verified"
-    type: Strength
-    description: "Multi-factor authentication is enforced at the organization level for all contributors."
-    criteria-reference:
-      reference-id: OSPS
-      entries:
-        - reference-id: OSPS-AC-01
+verifications:
+  # No plan is bound, so the policy's fallback method is what the evidence is held to.
+  - effective-requirement:
+      control:
+        reference-id: OSPS
+        entry-id: OSPS-AC-01
+      requirement:
+        reference-id: OSPS
+        entry-id: OSPS-AC-01.01
+      text: "When a user attempts to access a sensitive resource in the project's version
+        control system, the system MUST require multi-factor authentication."
+      applicability:
+        - Maturity Level 1
+    fidelity:
+      # No plan is bound, so the check is against the policy's fallback method.
+      - method-id: EM-BASELINE-SCAN
+        determination: Satisfied
+    outcome: Satisfied
+    assessments:
+      - reference-id: eval-log
+        entry-id: OSPS-AC-01.01
 
-  - id: AR-DO-01
-    title: "User documentation missing"
-    type: Gap
-    description: "No user guide is published or referenced in the Security Insights data."
-    criteria-reference:
-      reference-id: OSPS
-      entries:
-        - reference-id: OSPS-DO-01
+  # A plan is bound and was not followed: the probe ran outside its cadence.
+  - effective-requirement:
+      control:
+        reference-id: OSPS
+        entry-id: OSPS-DO-01
+      requirement:
+        reference-id: OSPS
+        entry-id: OSPS-DO-01.01
+      text: "The project MUST publish user documentation describing how to install and
+        use the software."
+      applicability:
+        - Maturity Level 1
+      constraints:
+        - id: c-annual-review
+          text: "Review the published user documentation at least annually."
+      plan-id: plan-doc-review
+    fidelity:
+      # A check that passed: the method and the determination say it. Restating what
+      # the plan required would only repeat the plan.
+      - method-id: EM-DOC-REVIEW
+        determination: Satisfied
+      - method-id: EM-DOC-PROBE
+        determination: Not Satisfied
+        required: "The automated probe runs within the requirement's 30-day cadence."
+        evidenced: "Last probe run 2025-05-14, 100 days before the audit window closed."
+    outcome: Not Satisfied
+    assessments:
+      - reference-id: eval-log
+        entry-id: OSPS-DO-01.01
     evidence:
       - id: EV-DO-01
         type: EvaluationLog
@@ -81,20 +130,20 @@ results:
         source:
           reference-id: eval-log
           entry-id: "assessment-do-01"
-          digest: "sha256:c4d5e6f7a8b9012cdef34567890abcdef1234567890abcdef1234567890abc123"
-    recommendations:
-      - id: REC-01
-        text: "Add user guide references to the Security Insights file and publish basic user documentation."
-        required: true
+          digest: "sha256:c4d5e6f7a8b9012cdef34567890abcdef1234567890abcdef1234567890abc12"
 
-  - id: AR-DO-02
-    title: "Vulnerability reporting channel not formalized"
-    type: Finding
-    description: "Private vulnerability reporting was not enabled prior to enforcement remediation."
-    criteria-reference:
-      reference-id: OSPS
-      entries:
-        - reference-id: OSPS-DO-02
+  - effective-requirement:
+      control:
+        reference-id: OSPS
+        entry-id: OSPS-DO-02
+      requirement:
+        reference-id: OSPS
+        entry-id: OSPS-DO-02.01
+      text: "The project MUST provide a private channel for reporting suspected
+        vulnerabilities."
+      applicability:
+        - Maturity Level 1
+    outcome: Not Satisfied
     evidence:
       - id: EV-DO-02
         type: EnforcementLog
@@ -102,24 +151,112 @@ results:
         collected-at: "2025-08-22T16:05:00Z"
         source:
           reference-id: enforcement-log
-    recommendations:
-      - id: REC-02
-        text: "Formalize the private vulnerability reporting process and document it in SECURITY.md."
 
-  - id: AR-QA-01
-    title: "Dependency manifests present"
-    type: Observation
-    description: "Repository includes dependency manifests and the dependency graph is accessible via GitHub API."
-    criteria-reference:
-      reference-id: OSPS
-      entries:
-        - reference-id: OSPS-QA-02
+  # Evidence that does not describe itself, so the entry says what established the outcome.
+  - effective-requirement:
+      control:
+        reference-id: OSPS
+        entry-id: OSPS-QA-02
+      requirement:
+        reference-id: OSPS
+        entry-id: OSPS-QA-02.01
+      text: "The project MUST publish dependency manifests enumerating its direct
+        dependencies."
+      applicability:
+        - Maturity Level 2
+    outcome: Satisfied
+    rationale: "The SBOM endpoint returned a manifest enumerating all 41 direct dependencies,
+      each with a resolved version."
     evidence:
       - id: EV-QA-01
-        type: api-response
+        type: urn:gemara:evidence:api-response
         description: "Dependency manifests from the GitHub dependency graph SBOM endpoint"
         collected-at: "2026-02-10T15:05:00Z"
         source:
           reference-id: github-api
           coordinate: "/repos/gemaraproj/gemara/dependency-graph/sbom"
           digest: "sha256:a1b2c3d4e5f67890abcdef1234567890abcdef1234567890abcdef1234567890"
+  # The control the guidance map relies on for independent review.
+  - effective-requirement:
+      control:
+        reference-id: OSPS
+        entry-id: OSPS-AC-03
+      requirement:
+        reference-id: OSPS
+        entry-id: OSPS-AC-03.01
+      text: "When a direct commit is attempted on the project's primary branch, an
+        enforcement mechanism MUST prevent the change from being applied."
+      applicability:
+        - Maturity Level 1
+    outcome: Satisfied
+    rationale: "Branch protection requires one approving review from a non-author on the
+      default branch, confirmed from the repository settings response."
+    evidence:
+      - id: EV-AC-03
+        type: urn:gemara:evidence:api-response
+        description: "Branch protection settings for the default branch"
+        collected-at: "2026-02-10T15:07:00Z"
+        source:
+          reference-id: github-api
+          coordinate: "/repos/gemaraproj/gemara/branches/main/protection"
+          digest: "sha256:b7c8d9e0f1a2b3c4d5e6f7089abcdef1234567890abcdef1234567890abcdef1"
+
+findings:
+  - id: AR-DO-01
+    status: Not Compliant
+    severity: Medium
+    disposition: Open
+    description: "No user guide is published or referenced in the Security Insights data,
+      and the review the plan requires ran outside its cadence."
+    control:
+      reference-id: OSPS
+      entry-id: OSPS-DO-01
+    recommendations:
+      - id: REC-01
+        text: "Add user guide references to the Security Insights file and publish basic user documentation."
+        required: true
+
+  - id: AR-DO-02
+    status: Not Compliant
+    severity: High
+    disposition: Resolved
+    description: "Private vulnerability reporting was not enabled during the period examined.
+      The release gate's autoremediation enabled it on 2025-08-22, after the failure."
+    control:
+      reference-id: OSPS
+      entry-id: OSPS-DO-02
+    response:
+      reference-id: enforcement-log
+      entry-id: ACT-DO-02
+    recommendations:
+      - id: REC-02
+        text: "Formalize the private vulnerability reporting process and document it in SECURITY.md."
+
+  # A finding may record conformity: ISO 19011 findings indicate conformity or nonconformity.
+  - id: AR-AC-01
+    status: Compliant
+    disposition: Resolved
+    description: "Multi-factor authentication is enforced organization-wide rather than per
+      repository, which satisfies this requirement for every repository in scope."
+    control:
+      reference-id: OSPS
+      entry-id: OSPS-AC-01
+
+  - id: AR-RISK-01
+    status: Not Compliant
+    severity: Critical
+    disposition: Open
+    description: "Residual risk RISK-002 remains above the maximum severity its category tolerates."
+    risk:
+      reference-id: risk-catalog
+      entry-id: RISK-002
+    recommendations:
+      - id: REC-03
+        text: "Add a compensating control or record a documented risk acceptance."
+
+opinion: Failed
+
+summary: "Access control and quality requirements are satisfied. Two documentation
+  requirements are not, one of them on evidence obtained outside the plan's cadence, and a
+  residual risk remains above tolerance. The audit examined evidence collected between
+  August 2025 and February 2026; conditions may have changed since."

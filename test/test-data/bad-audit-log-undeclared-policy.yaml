@@ -17,7 +17,7 @@ metadata:
     - id: OSPS
       title: "Open Source Project Security Baseline"
       version: "2025.1"
-      url: "2oci://baseline.openssf.org"
+      url: "https://baseline.openssf.org"
       type: ControlCatalog
 
     - id: eval-log
@@ -64,7 +64,7 @@ owner:
       affiliation: "OpenSSF"
 
 policy:
-  reference-id: security-policy
+  reference-id: NOT-DECLARED-ANYWHERE
   remarks: "Organizational policy establishing the audit's criteria; it imports the OSPS baseline."
 
 objectives:
