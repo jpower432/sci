@@ -76,47 +76,6 @@ import "list"
 	required: *false | bool @gemara(default=false)
 }
 
-// Evidence records what was cited to support an opinion for a specific activity:
-// raw data for the evaluation layer, evaluation and enforcement artifacts for the audit layer.
-// At least one of payload or source MUST be present; an entry with neither is semantically incomplete.
-#Evidence: {
-	// id uniquely identifies this evidence
-	id: string
-
-	// type categorizes the kind of evidence
-	type: #EvidenceType
-
-	// collected-at is the timestamp when the evidence was gathered
-	"collected-at": #Datetime @go(CollectedAt)
-
-	// payload is the raw evidence data collected inline
-	payload?: _ @go(Payload,type=any)
-
-	// source identifies the artifact or system from which this evidence was collected
-	source?: #EvidenceMapping @go(Source)
-
-	// description explains what this evidence represents
-	description?: string
-
-	// retention records the obligations governing how long this evidence must be kept
-	retention?: #Retention @go(Retention,optional=nillable)
-}
-
-// _EvidenceStrict layers the "at least one of payload or source" rule on top of #Evidence
-#_EvidenceStrict: {
-	@go(-)
-} & #Evidence & {
-	payload?: _
-	if payload == _|_ {
-		source: #EvidenceMapping
-	}
-}
-
-// EvidenceType categorizes the kind of evidence. It remains an open enum:
-// recommended values include artifact types already known to Gemara (e.g.
-// EvaluationLog, EnforcementLog) plus categories for common evidence forms.
-#EvidenceType: #ArtifactType | string @go(-)
-
 // Retention records the resolved policy obligations governing referenced evidence.
 // Each effective instant is a snapshot for this evidence at publication.
 // Conflicting obligations are recorded side by side rather than reconciled by the producer.
