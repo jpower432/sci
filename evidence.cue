@@ -65,8 +65,13 @@ package gemara
 	// entry-id to identify a sub-location within that entry's output.
 	coordinate?: string
 
-	// entry-id identifies a specific entry within a referenced Gemara artifact.
-	// May be combined with coordinate to identify a sub-location within that entry's output.
+	// entry-id is the id of a catalog entry: a control or an assessment requirement.
+	// It is used only when the evidence is a Gemara artifact, and selects what that
+	// artifact recorded for the entry. In an audit that is the findings an
+	// evaluation or enforcement log holds for that control or requirement. It
+	// narrows where to look and never what to fetch: the whole artifact is
+	// retrieved, and entry-id is not an input to digest. May be combined with
+	// coordinate.
 	"entry-id"?: string @go(EntryId)
 
 	// digest is a cryptographic hash of the observed content at collection time; format: algorithm:encoded (e.g. sha256:abc123...)
@@ -97,5 +102,12 @@ package gemara
 	// accompany a payload.
 	if payload != _|_ {
 		source?: digest?: error("an inline payload cannot also have a source digest: an inline payload is as trustworthy as the log that carries it, and a digest is for evidence that lives elsewhere")
+	}
+
+	// entry-id selects what a Gemara artifact recorded for a catalog entry, so it
+	// has nothing to select when the evidence is not a Gemara artifact.
+	type: #EvidenceType
+	if (type & #ArtifactType) == _|_ {
+		source?: "entry-id"?: error("entry-id is only for evidence that is a Gemara artifact: set type to the artifact type, or remove entry-id")
 	}
 }
