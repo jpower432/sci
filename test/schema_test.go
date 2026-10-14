@@ -120,6 +120,7 @@ func TestSchemaValidation(t *testing.T) {
 		{"one evidence item listed twice in one evidence list", "./test-data/bad-evaluation-log-evidence-id-repeated-in-list.yaml", "#EvaluationLog", true, "appears more than once in one evidence list"},
 		{"evidence source that is not declared", "./test-data/bad-evaluation-log-evidence-source-undeclared.yaml", "#EvaluationLog", true, "not declared in metadata.mapping-references"},
 		{"evidence with no id reported where the id is missing", "./test-data/bad-evaluation-log-evidence-missing-id.yaml", "#EvaluationLog", true, "evidence.0.id: incomplete value string"},
+		{"entry-id on evidence that is not a Gemara artifact", "./test-data/bad-evaluation-log-evidence-entry-id-not-artifact.yaml", "#EvaluationLog", true, "entry-id is only for evidence that is a Gemara artifact"},
 
 		// EvaluationLog — negative
 		{"executed assessment missing start", "./test-data/bad-evaluation-log-missing-start.yaml", "#EvaluationLog", true, ""},

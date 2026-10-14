@@ -990,9 +990,7 @@ components:
           pattern: ^[a-z0-9]+(?:[+._-][a-z0-9]+)*:[a-zA-Z0-9=_-]+$
           type: string
         entry-id:
-          description: |-
-            entry-id identifies a specific entry within a referenced Gemara artifact.
-            May be combined with coordinate to identify a sub-location within that entry's output.
+          description: "entry-id is the id of a catalog entry: a control or an assessment requirement.\nIt is used only when the evidence is a Gemara artifact, and selects what that\nartifact recorded for the entry. In an audit that is the findings an\nevaluation or enforcement log holds for that control or requirement. It\nnarrows where to look and never what to fetch: the whole artifact is\nretrieved, and entry-id is not an input to digest. May be combined with\ncoordinate."
           type: string
         reference-id:
           description: reference-id ties this evidence to a mapping-reference in the artifact's metadata
