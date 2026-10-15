@@ -955,6 +955,16 @@ components:
         Evidence records what was cited to support an opinion for a specific activity:
         raw data for the evaluation layer, evaluation and enforcement artifacts for the audit layer.
         At least one of payload or source MUST be present; an entry with neither is semantically incomplete.
+        
+        A tool attaching evidence gives it an id, says when it was collected and what
+        it is, and either carries small content inline in payload or leaves the content
+        where it lives and describes it in source. Evidence that came from somewhere
+        names that source.
+        
+        A reviewer reading evidence can rely on the following. source.reference-id
+        resolves to a source declared in the log. Within a log, one id names one item.
+        Inline content carries no digest of its own, because it is as trustworthy as
+        the log around it.
       properties:
         collected-at:
           allOf:
@@ -964,7 +974,14 @@ components:
           description: description explains what this evidence represents
           type: string
         id:
-          description: id uniquely identifies this evidence
+          description: |-
+            id identifies this evidence item within its log, so that a citation can
+            point at it. Within one log an id names exactly one item. It appears once
+            in any one evidence list. The same item may appear again under its id in
+            another evidence list of the log, which is how one artifact supports
+            several results, but two different items may not share an id. It identifies
+            the record in the log; source.reference-id identifies where the evidence
+            came from.
           type: string
         payload:
           description: payload is the raw evidence data collected inline

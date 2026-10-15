@@ -9,8 +9,24 @@ package gemara
 // Evidence records what was cited to support an opinion for a specific activity:
 // raw data for the evaluation layer, evaluation and enforcement artifacts for the audit layer.
 // At least one of payload or source MUST be present; an entry with neither is semantically incomplete.
+//
+// A tool attaching evidence gives it an id, says when it was collected and what
+// it is, and either carries small content inline in payload or leaves the content
+// where it lives and describes it in source. Evidence that came from somewhere
+// names that source.
+//
+// A reviewer reading evidence can rely on the following. source.reference-id
+// resolves to a source declared in the log. Within a log, one id names one item.
+// Inline content carries no digest of its own, because it is as trustworthy as
+// the log around it.
 #Evidence: {
-	// id uniquely identifies this evidence
+	// id identifies this evidence item within its log, so that a citation can
+	// point at it. Within one log an id names exactly one item. It appears once
+	// in any one evidence list. The same item may appear again under its id in
+	// another evidence list of the log, which is how one artifact supports
+	// several results, but two different items may not share an id. It identifies
+	// the record in the log; source.reference-id identifies where the evidence
+	// came from.
 	id: string
 
 	// type categorizes the kind of evidence
@@ -23,7 +39,7 @@ package gemara
 	payload?: _ @go(Payload,type=any)
 
 	// source identifies the artifact or system from which this evidence was collected
-	source?: #EvidenceMapping @go(Source)
+	source?: #EvidenceMapping @go(Source,optional=nillable)
 
 	// description explains what this evidence represents
 	description?: string
@@ -60,6 +76,12 @@ package gemara
 	remarks?: string
 }
 
+// ---- Validation ------------------------------------------------------------
+// #_EvidenceStrict carries the rules one evidence item can check about itself. It
+// is hidden (@go(-), and never projected), so the structures above stay shape and
+// documentation only. Rules across a log's evidence (one id per item, declared
+// sources) live on #EvaluationLog and #AuditLog.
+
 // _EvidenceStrict layers the "at least one of payload or source" rule on top of #Evidence
 #_EvidenceStrict: {
 	@go(-)
@@ -67,5 +89,13 @@ package gemara
 	payload?: _
 	if payload == _|_ {
 		source: #EvidenceMapping
+	}
+
+	// Evidence with an inline payload is carried by this log, and is as
+	// trustworthy as the log itself. source may still name where it came from, by
+	// reference-id. A digest is for evidence that lives elsewhere, so it cannot
+	// accompany a payload.
+	if payload != _|_ {
+		source?: digest?: error("an inline payload cannot also have a source digest: an inline payload is as trustworthy as the log that carries it, and a digest is for evidence that lives elsewhere")
 	}
 }
