@@ -125,7 +125,7 @@ import "list"
 	// ConfidenceLevel indicates the evaluator's confidence level in this specific assessment result.
 	"confidence-level"?: #ConfidenceLevel @go(ConfidenceLevel)
 	// Evidence records the raw data cited to support this assessment's opinion.
-	evidence?: [#Evidence, ...#Evidence] @go(Evidence)
+	evidence?: [#Evidence, ...#Evidence] @go(Evidence,type=[]Evidence)
 	evidence?: [#_EvidenceStrict, ...#_EvidenceStrict]
 }
 
