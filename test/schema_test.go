@@ -131,6 +131,8 @@ func TestSchemaValidation(t *testing.T) {
 		{"evidence source that is not declared", "./test-data/bad-evaluation-log-evidence-source-undeclared.yaml", "#EvaluationLog", true, "not declared in metadata.mapping-references"},
 		{"evidence with no id reported where the id is missing", "./test-data/bad-evaluation-log-evidence-missing-id.yaml", "#EvaluationLog", true, "evidence.0.id: incomplete value string"},
 		{"entry-id on evidence that is not a Gemara artifact", "./test-data/bad-evaluation-log-evidence-entry-id-not-artifact.yaml", "#EvaluationLog", true, "entry-id is only for evidence that is a Gemara artifact"},
+		{"evidence reused with an incomplete copy reports what is missing", "./test-data/bad-evaluation-log-evidence-id-reused-incomplete.yaml", "#EvaluationLog", true, "evidence.1.type: incomplete value"},
+		{"mapping reference with no id reported where the id is missing", "./test-data/bad-evaluation-log-mapping-reference-missing-id.yaml", "#EvaluationLog", true, "\"mapping-references\".1.id: incomplete value string"},
 
 		// EvaluationLog — negative
 		{"executed assessment missing start", "./test-data/bad-evaluation-log-missing-start.yaml", "#EvaluationLog", true, `"assessment-logs".0.start: incomplete value`},
@@ -230,6 +232,10 @@ func TestSchemaValidationErrorsExclude(t *testing.T) {
 		{"one bad mapping reference does not make audit evidence undeclared", "./test-data/bad-audit-log-url-no-scheme.yaml", "#AuditLog", "not declared in metadata.mapping-references"},
 		{"one bad mapping reference does not make evaluation evidence undeclared", "./test-data/bad-evaluation-log-mapping-reference-url-no-scheme.yaml", "#EvaluationLog", "not declared in metadata.mapping-references"},
 		{"evidence with neither payload nor source is reported as missing its source", "./test-data/bad-audit-log-evidence-neither.yaml", "#AuditLog", "invalid left-hand value"},
+		{"a mapping reference with no id does not make audit evidence undeclared", "./test-data/bad-audit-log-mapping-reference-missing-id.yaml", "#AuditLog", "not declared in metadata.mapping-references"},
+		{"a mapping reference with no id does not make evaluation evidence undeclared", "./test-data/bad-evaluation-log-mapping-reference-missing-id.yaml", "#EvaluationLog", "not declared in metadata.mapping-references"},
+		{"an incomplete reused audit evidence item does not hide other errors", "./test-data/bad-audit-log-evidence-id-reused-incomplete.yaml", "#AuditLog", "invalid right-hand value"},
+		{"an incomplete reused evaluation evidence item does not hide other errors", "./test-data/bad-evaluation-log-evidence-id-reused-incomplete.yaml", "#EvaluationLog", "invalid right-hand value"},
 	}
 
 	for _, tt := range tests {
