@@ -79,15 +79,15 @@ evaluations:
         digest: "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
     # The organization settings again, because this assessment relied on them too.
     # It is the same item under the same id, which is what ties the two
-    # assessments to one piece of evidence. Key order does not matter.
-    - source:
-        digest: "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
-        coordinate: "/orgs/gemaraproj/settings"
-        reference-id: github-api
-      description: Organization settings showing org-wide MFA enforcement
-      collected-at: 2026-03-28T04:10:01Z
+    # assessments to one piece of evidence.
+    - id: EV-AC-01-01
       type: api-response
-      id: EV-AC-01-01
+      collected-at: 2026-03-28T04:10:01Z
+      description: Organization settings showing org-wide MFA enforcement
+      source:
+        reference-id: github-api
+        coordinate: "/orgs/gemaraproj/settings"
+        digest: "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
   # A source with no digest makes no integrity claim. The second item is carried
   # inline: its source may name where it came from, but carries no digest.
   - requirement:
