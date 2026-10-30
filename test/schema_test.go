@@ -153,6 +153,9 @@ func TestSchemaValidation(t *testing.T) {
 		// ThreatCatalog — negative
 		{"threat with invalid group", "./test-data/bad-threat-invalid-group.yaml", "#ThreatCatalog", true, `_groupValidation."0": invalid value ["stride-s"]`},
 
+		// VectorCatalog — negative
+		{"vector with invalid group", "./test-data/bad-vector-invalid-group.yaml", "#VectorCatalog", true, `_groupValidation."0": invalid value ["prompt-injection"]`},
+
 		// PrincipleCatalog — negative
 		{"principle with invalid group", "./test-data/bad-principle-invalid-group.yaml", "#PrincipleCatalog", true, `_groupValidation."0": invalid value ["data-protection"]`},
 
