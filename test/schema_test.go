@@ -133,6 +133,7 @@ func TestSchemaValidation(t *testing.T) {
 		{"entry-id on evidence that is not a Gemara artifact", "./test-data/bad-evaluation-log-evidence-entry-id-not-artifact.yaml", "#EvaluationLog", true, "entry-id is only for evidence that is a Gemara artifact"},
 		{"evidence reused with an incomplete copy reports what is missing", "./test-data/bad-evaluation-log-evidence-id-reused-incomplete.yaml", "#EvaluationLog", true, "evidence.1.type: incomplete value"},
 		{"mapping reference with no id reported where the id is missing", "./test-data/bad-evaluation-log-mapping-reference-missing-id.yaml", "#EvaluationLog", true, "\"mapping-references\".1.id: incomplete value string"},
+		{"evaluation log mapping reference url with no scheme", "./test-data/bad-evaluation-log-mapping-reference-url-no-scheme.yaml", "#EvaluationLog", true, `metadata."mapping-references".0.url: invalid value "baseline.openssf.org"`},
 
 		// EvaluationLog — negative
 		{"executed assessment missing start", "./test-data/bad-evaluation-log-missing-start.yaml", "#EvaluationLog", true, `"assessment-logs".0.start: incomplete value`},
@@ -155,6 +156,8 @@ func TestSchemaValidation(t *testing.T) {
 		{"audit log evidence source with invalid digest format", "./test-data/bad-audit-log-invalid-digest.yaml", "#AuditLog", true, `invalid value "SHA256:invalidbecauseuppercasealgorithm"`},
 		{"audit result referencing undeclared criteria", "./test-data/bad-audit-log-undeclared-criteria.yaml", "#AuditLog", true, `does not satisfy list.Contains("OSPS")`},
 		{"audit log evidence with neither payload nor source", "./test-data/bad-audit-log-evidence-neither.yaml", "#AuditLog", true, `evidence.0.source."reference-id": incomplete value string`},
+		{"audit log evidence reused with an incomplete copy reports what is missing", "./test-data/bad-audit-log-evidence-id-reused-incomplete.yaml", "#AuditLog", true, "evidence.1.type: incomplete value"},
+		{"audit log mapping reference with no id reported where the id is missing", "./test-data/bad-audit-log-mapping-reference-missing-id.yaml", "#AuditLog", true, `metadata."mapping-references".4.id: incomplete value string`},
 		{"audit log mapping reference url with no scheme", "./test-data/bad-audit-log-url-no-scheme.yaml", "#AuditLog", true, `metadata."mapping-references".1.url: invalid value "baseline.openssf.org"`},
 		{"audit log mapping reference url with a non-alphabetic scheme", "./test-data/bad-audit-log-url-invalid-scheme.yaml", "#AuditLog", true, `metadata."mapping-references".1.url: invalid value "2oci://baseline.openssf.org"`},
 		{"audit log target uri with no scheme", "./test-data/bad-audit-log-uri-no-scheme.yaml", "#AuditLog", true, `target.uri: invalid value "github.com/gemaraproj/gemara"`},
